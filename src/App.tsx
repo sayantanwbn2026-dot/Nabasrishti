@@ -1,4 +1,6 @@
 import {
+  Suspense,
+  lazy,
   useEffect,
   useRef,
   useState,
@@ -19,10 +21,27 @@ import {
 import { heroItem, heroRail, heroStagger } from "@/lib/motion";
 
 import { media } from "@/data/media";
-import { site, telHref } from "@/data/site";
-import { projects, type Project } from "@/data/projects";
+import {
+  useArticles,
+  useFooterLinks,
+  useProcessSteps,
+  useProjects,
+  useServices,
+  useSiteSettings,
+  useTestimonials,
+  type CmsProject,
+  type SiteSettings,
+  type FooterLink as FooterLinkRow,
+  fallbackSettings,
+} from "@/lib/content";
+
 import { EnquiryModal } from "@/components/EnquiryModal";
 import { ThankYouPage } from "@/components/ThankYouPage";
+/* The CMS is loaded only when /admin is opened: visitors to the public
+   site should never download the editor or the Supabase auth code. */
+const AdminApp = lazy(() =>
+  import("@/admin/AdminApp").then((module) => ({ default: module.AdminApp })),
+);
 import { ProjectModal } from "@/components/ProjectModal";
 import { useDelayedEnquiry } from "@/hooks/useDelayedEnquiry";
 
@@ -197,7 +216,13 @@ function MenuLinks({
   );
 }
 
-function SiteNavigation({ onEnquire }: { onEnquire: () => void }) {
+function SiteNavigation({
+  onEnquire,
+  brand,
+}: {
+  onEnquire: () => void;
+  brand: string;
+}) {
   const lenis = useLenis();
   const [tone, setTone] = useState<"dark" | "light">("dark");
   const [active, setActive] = useState("Home");
@@ -279,8 +304,8 @@ function SiteNavigation({ onEnquire }: { onEnquire: () => void }) {
         } ${menuOpen ? "is-menu-open" : ""}`}
       >
         <div className="site-header__inner">
-          <a className="site-brand" href="#home" aria-label="Nabasrishti home">
-            Nabasrishti
+          <a className="site-brand" href="#home" aria-label={`${brand} home`}>
+            {brand}
           </a>
           <nav className="desktop-navigation" aria-label="Main navigation">
             <MenuLinks active={active} />
@@ -378,13 +403,13 @@ function ProjectFigure({
   project,
   onOpen,
 }: {
-  project: Project;
-  onOpen: (project: Project) => void;
+  project: CmsProject;
+  onOpen: (project: CmsProject) => void;
 }) {
   return (
     <Reveal
       as="figure"
-      className={`project-figure ${project.className}`}
+      className={`project-figure project-card--${project.card_layout}`}
       preset="rise"
     >
       <button
@@ -393,33 +418,34 @@ function ProjectFigure({
         onClick={() => onOpen(project)}
         aria-label={`View ${project.title} — ${project.typology} in ${project.location}`}
       >
-        <span className="project-figure__image">
+        <span
+          className="project-figure__image"
+          style={{ aspectRatio: String(project.card_ratio || 1.33) }}
+        >
           <ParallaxImage
             strength={0.05}
             hoverScale={1.025}
-            src={project.image}
-            alt={project.alt}
-            width={project.width}
-            height={project.height}
+            src={project.card_image_url}
+            alt={project.card_image_alt}
             loading="lazy"
             decoding="async"
           />
         </span>
         <figcaption className="project-caption">
           <span>{project.title}</span>
-          <span>{project.typology}</span>
+          <span>{project.accent_label || project.typology}</span>
         </figcaption>
       </button>
     </Reveal>
   );
 }
 
-function ServicesAccordion() {
+function ServicesAccordion({ items }: { items: typeof services }) {
   const [openIndex, setOpenIndex] = useState(0);
 
   return (
     <div className="service-list">
-      {services.map((service, index) => {
+      {items.map((service, index) => {
         const isOpen = openIndex === index;
         const panelId = `service-panel-${index}`;
         const buttonId = `service-button-${index}`;
@@ -565,27 +591,35 @@ function ImageComparison() {
 
 function TestimonialsSection({
   onEnquire,
+  items,
+  label,
+  heading,
+  aside,
 }: {
   onEnquire: (context: string) => void;
+  items: typeof testimonials;
+  label: string;
+  heading: string;
+  aside: string;
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const testimonial = testimonials[activeIndex];
+  const testimonial = items[Math.min(activeIndex, items.length - 1)];
 
   const goTo = (direction: -1 | 1) => {
-    setActiveIndex((index) =>
-      (index + direction + testimonials.length) % testimonials.length,
-    );
+    setActiveIndex((index) => (index + direction + items.length) % items.length);
   };
+
+  if (!testimonial) return null;
 
   return (
     <section className="testimonial-section dark-section" id="testimonials">
       <div className="page-shell">
         <Reveal className="section-heading testimonial-heading">
           <div>
-            <p className="section-label">Testimonials</p>
-            <h2>Trusted by Brands Across Industries</h2>
+            <p className="section-label">{label}</p>
+            <h2>{heading}</h2>
           </div>
-          <p className="section-aside">Feedback from brands we&apos;ve worked with.</p>
+          <p className="section-aside">{aside}</p>
         </Reveal>
         <Reveal className="testimonial-layout" delay={0.08} aria-live="polite">
           <div className="testimonial-copy">
@@ -659,57 +693,55 @@ function FooterLink({
   );
 }
 
-function SiteFooter() {
+function SiteFooter({
+  settings,
+  links,
+}: {
+  settings: SiteSettings;
+  links: FooterLinkRow[];
+}) {
+  // Group the CMS rows into their columns, preserving order.
+  const columns = links.reduce<Record<string, FooterLinkRow[]>>((acc, link) => {
+    (acc[link.column_label] ??= []).push(link);
+    return acc;
+  }, {});
+  const columnNames = Object.keys(columns);
+
   return (
     <footer className="site-footer dark-section">
       <div className="page-shell">
         <div className="footer-top">
           <div className="footer-intro">
             <a href="#home" className="footer-brand">
-              Nabasrishti
+              {settings.name}
             </a>
-            <p>Interior Design · Spatial Planning · Material Direction</p>
+            <p>{settings.footer_intro}</p>
           </div>
           <div className="footer-link-columns">
-            <div className="footer-link-column">
-              <p className="footer-column-label">Explore</p>
-              <FooterLink href="#home">Home</FooterLink>
-              <FooterLink href="#projects">Projects</FooterLink>
-              <FooterLink href="#studio">Studio</FooterLink>
-              <FooterLink href="#blog">Blogs</FooterLink>
-              <FooterLink href="#contact">Contact</FooterLink>
-            </div>
-            <div className="footer-link-column">
-              <p className="footer-column-label">Information</p>
-              <FooterLink href="/404">404</FooterLink>
-              <FooterLink href="#contact">Privacy Policy</FooterLink>
-              <FooterLink href="#contact">Terms of Service</FooterLink>
-            </div>
-            <div className="footer-link-column">
-              <p className="footer-column-label">Social</p>
-              <FooterLink href="https://x.com/" external>
-                Twitter
-              </FooterLink>
-              <FooterLink href="https://www.linkedin.com/" external>
-                LinkedIn
-              </FooterLink>
-              <FooterLink href="https://www.instagram.com/" external>
-                Instagram
-              </FooterLink>
-              <FooterLink href="https://www.facebook.com/" external>
-                Facebook
-              </FooterLink>
-            </div>
+            {columnNames.map((name) => (
+              <div className="footer-link-column" key={name}>
+                <p className="footer-column-label">{name}</p>
+                {columns[name].map((link) => (
+                  <FooterLink
+                    href={link.href}
+                    external={link.is_external}
+                    key={link.id}
+                  >
+                    {link.label}
+                  </FooterLink>
+                ))}
+              </div>
+            ))}
           </div>
         </div>
         <Parallax distance={70} direction={-1}>
-          <Reveal className="footer-wordmark" aria-label="Nabasrishti" delay={0.05}>
-            Nabasrishti
+          <Reveal className="footer-wordmark" aria-label={settings.name} delay={0.05}>
+            {settings.name}
           </Reveal>
         </Parallax>
         <div className="footer-bottom">
-          <p>Copyrights &copy;2025. All right reserved</p>
-          <p>Designed by Faris</p>
+          <p>{settings.footer_note}</p>
+          <p>{settings.email}</p>
         </div>
       </div>
     </footer>
@@ -767,12 +799,58 @@ function SectionCta({
 const ENQUIRY_DELAY_MS = 3000;
 
 function HomePage() {
-  const [activeProject, setActiveProject] = useState<Project | null>(null);
+  const { data: settings = fallbackSettings } = useSiteSettings();
+  const { data: cmsProjects = [] } = useProjects();
+  const { data: cmsServices = [] } = useServices();
+  const { data: cmsSteps = [] } = useProcessSteps();
+  const { data: cmsTestimonials = [] } = useTestimonials();
+  const { data: cmsArticles = [] } = useArticles();
+  const { data: cmsFooterLinks = [] } = useFooterLinks();
+
+  /* Each list falls back to the built-in content, so an empty table or a
+     missing environment variable degrades to the shipped design rather
+     than an empty section. */
+  const projectList = cmsProjects.filter((project) => project.is_published);
+  const serviceItems = cmsServices.length
+    ? cmsServices.map((item) => ({
+        title: item.title,
+        description: item.body,
+        image: item.image_url,
+        alt: item.image_alt,
+      }))
+    : services;
+  const stepItems = cmsSteps.length
+    ? cmsSteps.map((item) => ({
+        number: item.number,
+        title: item.title,
+        description: item.description,
+      }))
+    : processSteps;
+  const testimonialItems = cmsTestimonials.length
+    ? cmsTestimonials.map((item) => ({
+        name: item.name,
+        portrait: item.portrait_url,
+        image: item.image_url,
+        imageAlt: item.image_alt,
+        quote: item.quote,
+      }))
+    : testimonials;
+  const articleItems = cmsArticles.length
+    ? cmsArticles.map((item) => ({
+        title: item.title,
+        date: item.date_label,
+        dateTime: item.date_value ?? "",
+        image: item.image_url,
+        alt: item.image_alt,
+      }))
+    : articles;
+
+  const [activeProject, setActiveProject] = useState<CmsProject | null>(null);
   const [enquiryContext, setEnquiryContext] = useState<string | undefined>();
   // The timed prompt holds off while a project is open — two stacked
   // dialogs would be the worst version of this pattern.
   const [enquiryOpen, setEnquiryOpen] = useDelayedEnquiry(
-    ENQUIRY_DELAY_MS,
+    settings.enquiry_delay_ms || ENQUIRY_DELAY_MS,
     activeProject !== null,
   );
 
@@ -783,14 +861,14 @@ function HomePage() {
 
   return (
     <>
-      <SiteNavigation onEnquire={() => openEnquiry()} />
+      <SiteNavigation onEnquire={() => openEnquiry()} brand={settings.name} />
       <main>
         <section className="hero" id="home" aria-label="Nabasrishti Interior Design Studio">
           <ParallaxImage
             className="hero__image"
             strength={0.06}
-            src={media.hero}
-            alt="Sunlit minimalist living room with timber furniture and black-framed windows"
+            src={settings.hero_image_url || media.hero}
+            alt={settings.hero_image_alt}
             width="2150"
             height="1229"
             fetchPriority="high"
@@ -812,10 +890,10 @@ function HomePage() {
                   for; the wordmark is simply its first line. */}
               <h1>
                 <motion.span className="hero__wordmark" variants={heroItem}>
-                  {site.name}
+                  {settings.name}
                 </motion.span>
                 <motion.span className="hero__headline" variants={heroItem}>
-                  {site.headline}
+                  {settings.headline}
                 </motion.span>
               </h1>
               <motion.div className="hero__actions" variants={heroItem}>
@@ -824,13 +902,13 @@ function HomePage() {
                   className="button button-light hero__cta-primary"
                   onClick={() => openEnquiry("Hero banner")}
                 >
-                  Get free consultation
+                  {settings.cta_primary_label}
                 </button>
-                <a className="hero__cta-call" href={telHref}>
+                <a className="hero__cta-call" href={`tel:+${settings.phone_digits}`}>
                   <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
                     <path d="M5.2 2.5 6.6 5 5.3 6.4a8 8 0 0 0 4.3 4.3L11 9.4l2.5 1.4v2.4c0 .4-.3.8-.8.8A10.6 10.6 0 0 1 2.4 3.3c0-.5.4-.8.8-.8h2z" />
                   </svg>
-                  <span>{site.phone}</span>
+                  <span>{settings.phone}</span>
                 </a>
               </motion.div>
             </motion.div>
@@ -846,7 +924,7 @@ function HomePage() {
             animate="show"
           >
             <ul className="hero__highlights" aria-label="Services">
-              {site.serviceHighlights.map((item) => (
+              {settings.service_highlights.map((item) => (
                 <li key={item}>{item}</li>
               ))}
             </ul>
@@ -863,7 +941,7 @@ function HomePage() {
         <section className="promise-band light-section" aria-label="Our promise">
           <div className="page-shell">
             <Reveal as="p" className="promise-band__text">
-              {site.tagline}
+              {settings.tagline}
             </Reveal>
           </div>
         </section>
@@ -873,8 +951,8 @@ function HomePage() {
             <Reveal className="studio-image" preset="image">
               <ParallaxImage
                 strength={0.055}
-                src={media.studio}
-                alt="Warm minimalist room with stone walls, timber furniture and a tall artwork"
+                src={settings.studio_image_url || media.studio}
+                alt={settings.studio_image_alt}
                 width="1440"
                 height="1440"
                 loading="lazy"
@@ -884,31 +962,21 @@ function HomePage() {
             <div className="studio-copy">
               <TextReveal
                 className="studio-statement"
-                text="We are an independent interior design studio interested in what makes a space work beyond its appearance — how light travels through it, how materials respond to daily use, and how its layout quietly shapes the way people live."
+                text={settings.studio_statement}
               />
               <Stagger
                 className="studio-stats"
                 stagger={0.1}
                 aria-label="Studio statistics"
               >
-                <RevealItem className="studio-stat">
-                  <p className="studio-stat__value">
-                    <CountUp value={8} suffix="+" />
-                  </p>
-                  <p className="studio-stat__label">Years</p>
-                </RevealItem>
-                <RevealItem className="studio-stat">
-                  <p className="studio-stat__value">
-                    <CountUp value={120} suffix="+" />
-                  </p>
-                  <p className="studio-stat__label">Projects</p>
-                </RevealItem>
-                <RevealItem className="studio-stat">
-                  <p className="studio-stat__value">
-                    <CountUp value={100} suffix="%" />
-                  </p>
-                  <p className="studio-stat__label">Client Retention</p>
-                </RevealItem>
+                {settings.stats.map((stat) => (
+                  <RevealItem className="studio-stat" key={stat.label}>
+                    <p className="studio-stat__value">
+                      <CountUp value={stat.value} suffix={stat.suffix} />
+                    </p>
+                    <p className="studio-stat__label">{stat.label}</p>
+                  </RevealItem>
+                ))}
               </Stagger>
               <SectionCta
                 context="Studio section"
@@ -923,12 +991,8 @@ function HomePage() {
           <div className="page-shell">
             <Reveal className="section-heading projects-heading">
               <div>
-                <p className="section-label">Projects</p>
-                <h2>
-                  Explore some of our
-                  <br />
-                  most recent projects
-                </h2>
+                <p className="section-label">{settings.projects_label}</p>
+                <h2>{settings.projects_heading}</h2>
               </div>
               <button
                 type="button"
@@ -939,13 +1003,13 @@ function HomePage() {
               </button>
             </Reveal>
             <div className="projects-gallery" id="project-list">
-              <div className="project-pair">
-                <ProjectFigure project={projects[0]} onOpen={setActiveProject} />
-                <ProjectFigure project={projects[1]} onOpen={setActiveProject} />
-              </div>
-              <ProjectFigure project={projects[2]} onOpen={setActiveProject} />
-              <ProjectFigure project={projects[3]} onOpen={setActiveProject} />
-              <ProjectFigure project={projects[4]} onOpen={setActiveProject} />
+              {projectList.map((project) => (
+                <ProjectFigure
+                  project={project}
+                  onOpen={setActiveProject}
+                  key={project.id}
+                />
+              ))}
             </div>
           </div>
         </section>
@@ -953,11 +1017,11 @@ function HomePage() {
         <section className="services-section dark-section" id="services">
           <div className="page-shell">
             <Reveal className="section-heading section-heading-stacked">
-              <p className="section-label">Services</p>
-              <h2>How We Can Help</h2>
+              <p className="section-label">{settings.services_label}</p>
+              <h2>{settings.services_heading}</h2>
             </Reveal>
             <Reveal delay={0.08}>
-              <ServicesAccordion />
+              <ServicesAccordion items={serviceItems} />
             </Reveal>
             <SectionCta
               context="Services section"
@@ -971,7 +1035,7 @@ function HomePage() {
         <section className="comparison-section dark-section">
           <div className="page-shell">
             <Reveal as="h2" className="centered-heading">
-              From Concept to Creation
+              {settings.comparison_heading}
             </Reveal>
             <Reveal preset="image" delay={0.08}>
               <ImageComparison />
@@ -982,15 +1046,11 @@ function HomePage() {
         <section className="process-section dark-section" id="process">
           <div className="page-shell">
             <Reveal className="centered-section-heading">
-              <p className="section-label">Our Process</p>
-              <h2>
-                From First Conversion
-                <br />
-                to Finished State
-              </h2>
+              <p className="section-label">{settings.process_label}</p>
+              <h2>{settings.process_heading}</h2>
             </Reveal>
             <Stagger className="process-list" stagger={0.1}>
-              {processSteps.map((step) => (
+              {stepItems.map((step) => (
                 <RevealItem
                   as="article"
                   className="process-card"
@@ -1013,22 +1073,25 @@ function HomePage() {
           </div>
         </section>
 
-        <TestimonialsSection onEnquire={openEnquiry} />
+        <TestimonialsSection
+          onEnquire={openEnquiry}
+          items={testimonialItems}
+          label={settings.testimonials_label}
+          heading={settings.testimonials_heading}
+          aside={settings.testimonials_aside}
+        />
 
         <section className="journal-section dark-section" id="blog">
           <div className="page-shell">
             <Reveal className="section-heading journal-heading">
               <div>
-                <p className="section-label">Blogs</p>
-                <h2>Notes From The Studio</h2>
+                <p className="section-label">{settings.journal_label}</p>
+                <h2>{settings.journal_heading}</h2>
               </div>
-              <p className="section-aside">
-                Explore practical tips, industry trends, and creative insights from our
-                experts.
-              </p>
+              <p className="section-aside">{settings.journal_aside}</p>
             </Reveal>
             <Stagger className="article-grid" stagger={0.09}>
-              {articles.map((article) => (
+              {articleItems.map((article) => (
                 <RevealItem as="article" className="article" key={article.title}>
                   <div className="article__image">
                     <ParallaxImage
@@ -1059,8 +1122,8 @@ function HomePage() {
         <section className="contact-banner" id="contact">
           <ParallaxImage
             strength={0.08}
-            src={media.closing}
-            alt="Modern architectural home on a rocky coastal landscape"
+            src={settings.closing_image_url || media.closing}
+            alt={settings.closing_image_alt}
             width="2200"
             height="940"
             loading="lazy"
@@ -1068,11 +1131,8 @@ function HomePage() {
           />
           <div className="contact-banner__shade" aria-hidden="true" />
           <Reveal className="contact-banner__content">
-            <h2>Let&apos;s Make Space for Something Beautiful.</h2>
-            <p>
-              Let&apos;s transform your ideas into timeless spaces that feel uniquely
-              yours.
-            </p>
+            <h2>{settings.closing_heading}</h2>
+            <p>{settings.closing_body}</p>
             <div className="contact-banner__actions">
               <button
                 type="button"
@@ -1081,14 +1141,14 @@ function HomePage() {
               >
                 Get free consultation
               </button>
-              <a className="button button-outline" href={telHref}>
-                Call {site.phone}
+              <a className="button button-outline" href={`tel:+${settings.phone_digits}`}>
+                Call {settings.phone}
               </a>
             </div>
           </Reveal>
         </section>
       </main>
-      <SiteFooter />
+      <SiteFooter settings={settings} links={cmsFooterLinks} />
 
       <ProjectModal
         project={activeProject}
@@ -1110,6 +1170,14 @@ function HomePage() {
 export default function App() {
   const path = window.location.pathname.replace(/\/+$/, "") || "/";
 
+  // The content manager. Its styles load with it, not on the public site.
+  if (path === "/admin" || path.startsWith("/admin/")) {
+    return (
+      <Suspense fallback={null}>
+        <AdminApp />
+      </Suspense>
+    );
+  }
   // Google Ads counts a conversion when this URL loads — see ThankYouPage.
   if (path === "/thank-you") return <ThankYouPage />;
   if (path === "/" || path === "/index.html") return <HomePage />;

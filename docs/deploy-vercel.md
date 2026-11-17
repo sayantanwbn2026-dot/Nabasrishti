@@ -42,7 +42,13 @@ and Development:
 
 | Name | Value |
 |---|---|
+| `VITE_SUPABASE_URL` | `https://xuzdtsnfomfegfygxiox.supabase.co` |
+| `VITE_SUPABASE_ANON_KEY` | the publishable key from Supabase → Data API |
 | `VITE_ENQUIRY_ENDPOINT` | the Apps Script `/exec` URL |
+
+Without the two Supabase values the website still renders — it falls back to
+its built-in content — but `/admin` cannot connect and nothing can be edited.
+See [cms.md](./cms.md).
 
 `VITE_*` values are inlined at build time, so **redeploy after changing one** —
 editing the variable alone does nothing to the live site.

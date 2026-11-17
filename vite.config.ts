@@ -35,6 +35,7 @@ export default defineConfig({
           react: ["react", "react-dom", "react-dom/client", "react/jsx-runtime"],
           motion: ["framer-motion", "lenis", "lenis/react"],
           query: ["@tanstack/react-query"],
+          supabase: ["@supabase/supabase-js"],
         },
       },
     },
@@ -48,6 +49,7 @@ export default defineConfig({
       "lenis",
       "lenis/react",
       "@tanstack/react-query",
+      "@supabase/supabase-js",
     ],
   },
 });

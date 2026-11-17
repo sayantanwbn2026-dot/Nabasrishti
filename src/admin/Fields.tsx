@@ -1,0 +1,394 @@
+import { useId, useRef, useState, type ReactNode } from "react";
+import { uploadImage } from "./api";
+
+type BaseProps = {
+  label: string;
+  hint?: string;
+  children?: ReactNode;
+};
+
+export function Field({ label, hint, children }: BaseProps) {
+  return (
+    <label className="af">
+      <span className="af__label">{label}</span>
+      {hint ? <span className="af__hint">{hint}</span> : null}
+      {children}
+    </label>
+  );
+}
+
+export function TextField({
+  label,
+  hint,
+  value,
+  onChange,
+  placeholder,
+  mono,
+}: {
+  label: string;
+  hint?: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  mono?: boolean;
+}) {
+  return (
+    <Field label={label} hint={hint}>
+      <input
+        className={`af__input ${mono ? "af__input--mono" : ""}`}
+        value={value ?? ""}
+        placeholder={placeholder}
+        onChange={(event) => onChange(event.target.value)}
+      />
+    </Field>
+  );
+}
+
+export function TextArea({
+  label,
+  hint,
+  value,
+  onChange,
+  rows = 4,
+}: {
+  label: string;
+  hint?: string;
+  value: string;
+  onChange: (value: string) => void;
+  rows?: number;
+}) {
+  return (
+    <Field label={label} hint={hint}>
+      <textarea
+        className="af__input af__input--area"
+        rows={rows}
+        value={value ?? ""}
+        onChange={(event) => onChange(event.target.value)}
+      />
+    </Field>
+  );
+}
+
+export function NumberField({
+  label,
+  hint,
+  value,
+  onChange,
+  step = 1,
+}: {
+  label: string;
+  hint?: string;
+  value: number;
+  onChange: (value: number) => void;
+  step?: number;
+}) {
+  return (
+    <Field label={label} hint={hint}>
+      <input
+        className="af__input"
+        type="number"
+        step={step}
+        value={Number.isFinite(value) ? value : 0}
+        onChange={(event) => onChange(Number(event.target.value))}
+      />
+    </Field>
+  );
+}
+
+export function SelectField({
+  label,
+  hint,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  hint?: string;
+  value: string;
+  options: { value: string; label: string }[];
+  onChange: (value: string) => void;
+}) {
+  return (
+    <Field label={label} hint={hint}>
+      <select
+        className="af__input af__select"
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+      >
+        {options.map((option) => (
+          <option value={option.value} key={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </Field>
+  );
+}
+
+export function Toggle({
+  label,
+  hint,
+  value,
+  onChange,
+}: {
+  label: string;
+  hint?: string;
+  value: boolean;
+  onChange: (value: boolean) => void;
+}) {
+  const id = useId();
+  return (
+    <div className="af af--row">
+      <div>
+        <span className="af__label">{label}</span>
+        {hint ? <span className="af__hint">{hint}</span> : null}
+      </div>
+      <button
+        type="button"
+        id={id}
+        role="switch"
+        aria-checked={value}
+        className={`af__switch ${value ? "is-on" : ""}`}
+        onClick={() => onChange(!value)}
+      >
+        <span />
+      </button>
+    </div>
+  );
+}
+
+/**
+ * Image control: upload a file or paste a URL. Uploading puts the file in
+ * the Supabase `media` bucket and stores its public URL.
+ */
+export function ImageField({
+  label,
+  hint,
+  value,
+  onChange,
+}: {
+  label: string;
+  hint?: string;
+  value: string;
+  onChange: (url: string) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const pick = async (file?: File) => {
+    if (!file) return;
+    setBusy(true);
+    setError(null);
+    try {
+      onChange(await uploadImage(file));
+    } catch (uploadError) {
+      setError(
+        uploadError instanceof Error ? uploadError.message : "Upload failed.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="af">
+      <span className="af__label">{label}</span>
+      {hint ? <span className="af__hint">{hint}</span> : null}
+      <div className="af__image">
+        <div className="af__thumb">
+          {value ? (
+            <img src={value} alt="" />
+          ) : (
+            <span className="af__thumb-empty">No image</span>
+          )}
+        </div>
+        <div className="af__image-controls">
+          <input
+            className="af__input af__input--mono"
+            value={value ?? ""}
+            placeholder="Paste an image URL, or upload"
+            onChange={(event) => onChange(event.target.value)}
+          />
+          <div className="af__image-actions">
+            <button
+              type="button"
+              className="abtn abtn--ghost"
+              onClick={() => inputRef.current?.click()}
+              disabled={busy}
+            >
+              {busy ? "Uploading…" : "Upload image"}
+            </button>
+            {value ? (
+              <button
+                type="button"
+                className="abtn abtn--quiet"
+                onClick={() => onChange("")}
+              >
+                Clear
+              </button>
+            ) : null}
+          </div>
+          {error ? <p className="af__error">{error}</p> : null}
+        </div>
+      </div>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        hidden
+        onChange={(event) => pick(event.target.files?.[0])}
+      />
+    </div>
+  );
+}
+
+/** Editable list of plain strings (service highlights, scope, …). */
+export function StringList({
+  label,
+  hint,
+  value,
+  onChange,
+  addLabel = "Add item",
+}: {
+  label: string;
+  hint?: string;
+  value: string[];
+  onChange: (value: string[]) => void;
+  addLabel?: string;
+}) {
+  const items = Array.isArray(value) ? value : [];
+
+  const update = (index: number, next: string) =>
+    onChange(items.map((item, i) => (i === index ? next : item)));
+
+  const move = (index: number, delta: number) => {
+    const target = index + delta;
+    if (target < 0 || target >= items.length) return;
+    const next = [...items];
+    [next[index], next[target]] = [next[target], next[index]];
+    onChange(next);
+  };
+
+  return (
+    <div className="af">
+      <span className="af__label">{label}</span>
+      {hint ? <span className="af__hint">{hint}</span> : null}
+      <div className="af__list">
+        {items.map((item, index) => (
+          <div className="af__list-row" key={index}>
+            <input
+              className="af__input"
+              value={item}
+              onChange={(event) => update(index, event.target.value)}
+            />
+            <div className="af__list-actions">
+              <button type="button" className="aicon" onClick={() => move(index, -1)} aria-label="Move up">↑</button>
+              <button type="button" className="aicon" onClick={() => move(index, 1)} aria-label="Move down">↓</button>
+              <button
+                type="button"
+                className="aicon aicon--danger"
+                onClick={() => onChange(items.filter((_, i) => i !== index))}
+                aria-label="Remove"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+      <button
+        type="button"
+        className="abtn abtn--ghost"
+        onClick={() => onChange([...items, ""])}
+      >
+        {addLabel}
+      </button>
+    </div>
+  );
+}
+
+/** Editable list of {label, value} or {value, suffix, label} records. */
+export function RecordList<T extends Record<string, string | number>>({
+  label,
+  hint,
+  value,
+  onChange,
+  fields,
+  blank,
+  addLabel = "Add row",
+}: {
+  label: string;
+  hint?: string;
+  value: T[];
+  onChange: (value: T[]) => void;
+  fields: { key: keyof T & string; label: string; type?: "text" | "number" }[];
+  blank: T;
+  addLabel?: string;
+}) {
+  const items = Array.isArray(value) ? value : [];
+
+  const update = (index: number, key: string, next: string | number) =>
+    onChange(
+      items.map((item, i) => (i === index ? { ...item, [key]: next } : item)),
+    );
+
+  const move = (index: number, delta: number) => {
+    const target = index + delta;
+    if (target < 0 || target >= items.length) return;
+    const next = [...items];
+    [next[index], next[target]] = [next[target], next[index]];
+    onChange(next);
+  };
+
+  return (
+    <div className="af">
+      <span className="af__label">{label}</span>
+      {hint ? <span className="af__hint">{hint}</span> : null}
+      <div className="af__list">
+        {items.map((item, index) => (
+          <div className="af__record" key={index}>
+            {fields.map((field) => (
+              <label className="af__record-field" key={field.key}>
+                <span>{field.label}</span>
+                <input
+                  className="af__input"
+                  type={field.type === "number" ? "number" : "text"}
+                  value={(item[field.key] ?? "") as string | number}
+                  onChange={(event) =>
+                    update(
+                      index,
+                      field.key,
+                      field.type === "number"
+                        ? Number(event.target.value)
+                        : event.target.value,
+                    )
+                  }
+                />
+              </label>
+            ))}
+            <div className="af__list-actions">
+              <button type="button" className="aicon" onClick={() => move(index, -1)} aria-label="Move up">↑</button>
+              <button type="button" className="aicon" onClick={() => move(index, 1)} aria-label="Move down">↓</button>
+              <button
+                type="button"
+                className="aicon aicon--danger"
+                onClick={() => onChange(items.filter((_, i) => i !== index))}
+                aria-label="Remove"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+      <button
+        type="button"
+        className="abtn abtn--ghost"
+        onClick={() => onChange([...items, { ...blank }])}
+      >
+        {addLabel}
+      </button>
+    </div>
+  );
+}

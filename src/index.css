@@ -2609,3 +2609,172 @@ p {
     flex-direction: column;
   }
 }
+
+/* --- CMS-driven project cards -----------------------------------------
+   The gallery used bespoke classes per project. These presets let the CMS
+   place any number of projects without touching code. */
+
+.project-card--full {
+  width: 100%;
+  margin-top: var(--space-4xl);
+}
+
+.project-card--half {
+  width: 100%;
+  margin-top: var(--space-4xl);
+}
+
+.project-card--narrow-left {
+  width: 58%;
+  margin: var(--space-4xl) auto 0 0;
+}
+
+.project-card--offset-right {
+  width: 56%;
+  margin: var(--space-4xl) 0 0 auto;
+}
+
+.project-card--wide-right {
+  width: 78%;
+  margin: var(--space-4xl) 0 0 auto;
+}
+
+.projects-gallery > .project-figure:first-child {
+  margin-top: 0;
+}
+
+/* The ratio comes from the CMS, so the preset must not fight it. */
+.projects-gallery .project-figure__image {
+  aspect-ratio: auto;
+}
+
+/* --- Project detail blocks -------------------------------------------- */
+
+.project-detail__blocks {
+  display: grid;
+  gap: var(--space-2xl);
+  margin-top: var(--space-2xl);
+}
+
+.project-detail__block-heading {
+  max-width: 20ch;
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: var(--weight-regular);
+  letter-spacing: var(--track-tight);
+  line-height: var(--lh-subhead);
+}
+
+.project-detail__block-text {
+  max-width: var(--measure);
+  margin: 0;
+  color: var(--muted-light);
+  font-size: var(--text-base);
+  line-height: var(--lh-body);
+}
+
+.project-detail__quote {
+  max-width: 44ch;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.project-detail__quote p {
+  margin: 0;
+  font-size: var(--display-xs);
+  font-weight: var(--weight-light);
+  letter-spacing: var(--track-tight);
+  line-height: 1.28;
+  text-wrap: balance;
+}
+
+.project-detail__quote cite {
+  display: block;
+  margin-top: var(--space-sm);
+  color: var(--faint-light);
+  font-size: var(--text-2xs);
+  font-style: normal;
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--track-micro);
+  text-transform: uppercase;
+}
+
+.project-detail__caption {
+  margin-top: var(--space-2xs);
+  color: var(--faint-light);
+  font-size: var(--text-2xs);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+
+.project-detail__split {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: center;
+  gap: var(--space-2xl);
+}
+
+.project-detail__split-copy h3 {
+  margin: 0 0 var(--space-xs);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-regular);
+  letter-spacing: var(--track-tight);
+}
+
+.project-detail__split-copy p {
+  margin: 0;
+  color: var(--muted-light);
+  font-size: var(--text-base);
+  line-height: var(--lh-body);
+}
+
+.project-detail__specs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: var(--space-md);
+  margin: 0;
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--rule-dark);
+}
+
+.project-detail__specs dt {
+  margin-bottom: var(--space-3xs);
+  color: var(--faint-light);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--track-micro);
+  text-transform: uppercase;
+}
+
+.project-detail__specs dd {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: var(--lh-ui);
+}
+
+.project-detail__body--stacked {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (max-width: 760px) {
+  .project-card--narrow-left,
+  .project-card--offset-right,
+  .project-card--wide-right {
+    width: 82%;
+    margin-top: var(--space-3xl);
+  }
+
+  .project-card--full,
+  .project-card--half {
+    margin-top: var(--space-3xl);
+  }
+
+  .project-detail__split {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-md);
+  }
+
+  .project-detail__gallery {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
