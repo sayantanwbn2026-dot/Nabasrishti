@@ -2826,8 +2826,9 @@ p {
 }
 
 .preloader__logo {
+  /* The full lockup includes the tagline, which needs real size to read. */
   width: auto;
-  height: 56px;
+  height: clamp(92px, 13vw, 132px);
   object-fit: contain;
 }
 
@@ -2966,7 +2967,7 @@ p {
   }
 
   .preloader__logo {
-    height: 44px;
+    height: 92px;
   }
 }
 
@@ -2974,5 +2975,40 @@ p {
   .preloader__bar span {
     animation-duration: 0.01ms;
     transform: scaleX(1);
+  }
+}
+
+/* --- Brand lockup ------------------------------------------------------ */
+
+.site-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.site-brand__logo {
+  width: auto;
+  height: 30px;
+  flex: 0 0 auto;
+  object-fit: contain;
+  transition: height 240ms ease;
+}
+
+.site-header.is-lifted .site-brand__logo {
+  height: 26px;
+}
+
+.site-brand__name {
+  white-space: nowrap;
+}
+
+@media (max-width: 760px) {
+  .site-brand__logo {
+    height: 26px;
+  }
+
+  /* The mark carries the brand on small screens; the name would crowd it. */
+  .site-brand__name {
+    display: none;
   }
 }

@@ -328,10 +328,9 @@ function SiteNavigation({
         <div className="site-header__inner">
           <a className="site-brand" href="#home" aria-label={`${brand} home`}>
             {logo ? (
-              <img className="site-brand__logo" src={logo} alt={brand} />
-            ) : (
-              brand
-            )}
+              <img className="site-brand__logo" src={logo} alt="" />
+            ) : null}
+            <span className="site-brand__name">{brand}</span>
           </a>
           <nav className="desktop-navigation" aria-label="Main navigation">
             <MenuLinks
