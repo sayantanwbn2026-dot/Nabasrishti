@@ -1367,7 +1367,10 @@ p {
   display: grid;
   min-height: 620px;
   overflow: hidden;
-  margin-top: var(--section-y);
+  /* No top margin: the section above it provides the spacing, and a
+     margin here shows the dark body background as a band between a light
+     section and this one. */
+  margin-top: 0;
   background: #222;
   color: #f2f2ef;
   isolation: isolate;
@@ -1976,7 +1979,7 @@ p {
 
   .contact-banner {
     min-height: 500px;
-    margin-top: var(--section-y);
+    margin-top: 0;
   }
 
   .contact-banner__content {
@@ -2908,7 +2911,9 @@ p {
   height: 100%;
   background: var(--ink);
   transform-origin: left;
-  animation: preloader-fill 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  /* Duration is set inline from the CMS so the bar lands as the curtain
+     lifts; this is only the fallback. */
+  animation: preloader-fill 6s cubic-bezier(0.33, 0, 0.1, 1) forwards;
 }
 
 @keyframes preloader-fill {
@@ -3191,9 +3196,7 @@ p {
     padding-top: var(--space-3xl);
   }
 
-  .contact-banner {
-    margin-top: var(--space-3xl);
-  }
+
 
   .section-cta {
     margin-top: var(--space-xl);

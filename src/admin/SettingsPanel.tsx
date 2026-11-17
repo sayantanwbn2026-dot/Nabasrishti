@@ -132,6 +132,13 @@ export function SettingsPanel() {
               value={draft.preloader_enabled}
               onChange={(v) => set("preloader_enabled", v)}
             />
+            <NumberField
+              label="Loading screen length (milliseconds)"
+              hint="How long the logo is held before the site appears. 6000 = 6 seconds. Set the switch above off to skip it entirely."
+              value={draft.preloader_duration_ms}
+              step={500}
+              onChange={(v) => set("preloader_duration_ms", v)}
+            />
             <Toggle
               label="Show the WhatsApp button"
               hint="The floating green button at the bottom right."

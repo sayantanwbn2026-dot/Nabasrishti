@@ -55,29 +55,15 @@ export function WhatsAppFab({ settings }: { settings: SiteSettings }) {
 export function Preloader({ settings }: { settings: SiteSettings }) {
   const [done, setDone] = useState(false);
 
+  const hold = Math.max(0, settings.preloader_duration_ms || 0);
+
   useEffect(() => {
-    // Hold briefly, then release — whichever comes later, so the mark is
-    // never a flash and never a wall.
-    const minimum = new Promise((resolve) => setTimeout(resolve, 900));
-    const loaded =
-      document.readyState === "complete"
-        ? Promise.resolve()
-        : new Promise((resolve) =>
-            window.addEventListener("load", () => resolve(null), { once: true }),
-          );
-
-    let cancelled = false;
-    Promise.all([minimum, loaded]).then(() => {
-      if (!cancelled) setDone(true);
-    });
-
-    // Never trap the page if `load` is slow.
-    const failsafe = window.setTimeout(() => setDone(true), 4000);
-    return () => {
-      cancelled = true;
-      window.clearTimeout(failsafe);
-    };
-  }, []);
+    /* The set duration is the duration. Waiting on `load` as well made the
+       curtain outlast it by however long the images took — measured at
+       nearly nine seconds for a six second setting. */
+    const timer = window.setTimeout(() => setDone(true), hold);
+    return () => window.clearTimeout(timer);
+  }, [hold]);
 
   // The page behind must not scroll while the curtain is up.
   useEffect(() => {
@@ -119,7 +105,7 @@ export function Preloader({ settings }: { settings: SiteSettings }) {
               <span className="preloader__wordmark">{settings.name}</span>
             )}
             <span className="preloader__bar">
-              <span />
+              <span style={{ animationDuration: `${hold}ms` }} />
             </span>
           </motion.div>
         </motion.div>

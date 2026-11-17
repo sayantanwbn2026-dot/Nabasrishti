@@ -59,6 +59,7 @@ export type SiteSettings = {
   logo_dark_url: string;
   show_logo_in_nav: boolean;
   preloader_enabled: boolean;
+  preloader_duration_ms: number;
   whatsapp_enabled_fab: boolean;
   whatsapp_message: string;
   comparison_before_url: string;
@@ -290,6 +291,7 @@ export const fallbackSettings: SiteSettings = {
   logo_dark_url: "",
   show_logo_in_nav: true,
   preloader_enabled: true,
+  preloader_duration_ms: 6000,
   whatsapp_enabled_fab: true,
   whatsapp_message:
     "Hello! I would like to discuss an interior design project.",
