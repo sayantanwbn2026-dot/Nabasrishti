@@ -3040,7 +3040,9 @@ p {
 .site-brand {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2xs);
+  /* The name is tracked at 0.14em, so it needs a little more air than a
+     default gap to read as a lockup rather than a collision. */
+  gap: var(--space-xs);
 }
 
 .site-brand__logo {

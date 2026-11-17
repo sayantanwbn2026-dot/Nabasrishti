@@ -17,11 +17,11 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
       options={{
         duration: 1.05,
         easing: easeOutExpo,
-        // Lenis handles same-page #anchor clicks itself and already honours
-        // the CSS scroll-padding-top, which is where the fixed header's
-        // height lives (76px desktop / 68px mobile) — passing an offset here
-        // as well would double-count it.
-        anchors: true,
+        /* Off: its anchor handling moved to the target in a single frame,
+           so in-page links read as a hard cut. useSmoothAnchors does the
+           travel instead, and still leans on scroll-padding-top for the
+           header offset. */
+        anchors: false,
         // Trackpads and mice are interpolated; touch keeps the native feel,
         // which is what users actually expect on a phone.
         smoothWheel: true,

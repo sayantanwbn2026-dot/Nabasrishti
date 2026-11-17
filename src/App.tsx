@@ -53,6 +53,7 @@ import { ContactSection } from "@/components/ContactSection";
 import { FitText } from "@/components/FitText";
 import { useDelayedEnquiry } from "@/hooks/useDelayedEnquiry";
 import { useLiveContent } from "@/lib/useLiveContent";
+import { useSmoothAnchors } from "@/lib/useSmoothAnchors";
 
 
 const navigation = [
@@ -861,6 +862,8 @@ const ENQUIRY_DELAY_MS = 3000;
 function HomePage() {
   // Streams CMS edits into this page without a reload.
   useLiveContent();
+  // Animates clicks on in-page links.
+  useSmoothAnchors();
 
   const { data: settings = fallbackSettings } = useSiteSettings();
   const { data: cmsProjects = [] } = useProjects();
