@@ -505,6 +505,10 @@ p {
 
 .hero__content {
   width: min(calc(100% - (var(--gutter) * 2)), var(--page-width));
+  /* Without auto margins this constrained box aligns left inside the
+     full-width parallax wrapper, putting the whole title stack half a
+     gutter left of true centre. */
+  margin-inline: auto;
   /* Optically centred: the baseline rail occupies the lower edge, so the
      title sits a little above true centre. */
   padding: 0 0 var(--space-3xl);
@@ -1685,8 +1689,10 @@ p {
     gap: var(--space-3xs) var(--space-md);
   }
 
+  /* The separator is absolutely positioned, so when the list wraps it can
+     land alone at the start of a line. Spacing carries the separation here. */
   .hero__highlights li + li::before {
-    left: calc(var(--space-md) / -2);
+    content: none;
   }
 
   .hero__scroll {
