@@ -2526,6 +2526,13 @@ p {
   margin-top: var(--space-2xl);
 }
 
+/* In the studio section the button sits inside the left-aligned copy
+   column, so it lines up with the statement and the statistics rather
+   than floating centred beneath them. */
+.studio-copy .section-cta {
+  justify-content: flex-start;
+}
+
 .section-cta .button {
   min-width: 260px;
 }
