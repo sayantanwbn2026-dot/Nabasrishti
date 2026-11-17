@@ -1,0 +1,15 @@
+node_modules
+dist
+dist-ssr
+
+# Local env files — VITE_ENQUIRY_ENDPOINT lives here, set it in Vercel too.
+.env
+.env.local
+.env.*.local
+
+.vercel
+.DS_Store
+*.local
+logs
+*.log
+npm-debug.log*

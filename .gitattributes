@@ -1,0 +1,8 @@
+# Keep LF in the repository regardless of the contributor's platform.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.webp binary
+*.ico binary
+*.pdf binary

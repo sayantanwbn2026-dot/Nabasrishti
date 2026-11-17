@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# The conversion page should not be indexed — it is only reachable after a
+# form submission, and indexing it can inflate Ads conversion reporting.
+Disallow: /thank-you
+
+Sitemap: https://www.nabasrishti.in/sitemap.xml

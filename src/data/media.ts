@@ -1,0 +1,48 @@
+/** Shared image sources, used by both the page and the project data. */
+export const media = {
+  hero: "https://framerusercontent.com/images/b9Vote4Et3ahISRlTUf4xwUEQAI.webp?width=2150&height=1229",
+  studio:
+    "https://framerusercontent.com/images/0rVl9kvbmbGrUtFYknvYn00uI.webp?scale-down-to=2048&width=4800&height=4800",
+  projectHeritage:
+    "https://framerusercontent.com/images/y3hzMRd7OR6utDpM46mt4HK2XYM.webp?width=1920&height=1446",
+  projectCasaSol:
+    "https://framerusercontent.com/images/d8jsKsYHPXFkHwUdjQ0r8HTPho.webp?width=1920&height=1920",
+  projectUrban:
+    "https://framerusercontent.com/images/UJIVkbKHaDJiBg2XpkjIPRxyqY.webp?width=2202&height=1229",
+  projectCollective:
+    "https://framerusercontent.com/images/lizDAxY0SKCCfDAuWADhd5T6Y.png?width=1200&height=600",
+  projectSerene:
+    "https://framerusercontent.com/images/wNaHtyJGwmtJ7m4w5csNfiWJYM.webp?width=1920&height=1077",
+  serviceResidential:
+    "https://framerusercontent.com/images/9Ahp9pFha7Q3cQk2RplX7Uk36vM.webp?width=1920&height=1280",
+  serviceCommercial:
+    "https://framerusercontent.com/images/GoV9zXPy3hshC1OGHKOlBYqKgk.webp?width=1920&height=1280",
+  serviceLayout:
+    "https://framerusercontent.com/images/jU9C5Rnhd6eOWFkPXXGZbfwus.webp?width=1920&height=1099",
+  serviceMaterial:
+    "https://framerusercontent.com/images/CKyT7eig5pDOHzfRNkc8ECuCpQ.webp?width=2150&height=1229",
+  serviceStyling:
+    "https://framerusercontent.com/images/eTJxpRDlTq9gn04ER1mbXlpudRQ.webp?width=2150&height=1229",
+  comparisonSketch:
+    "https://framerusercontent.com/images/wYPAcX1I3KZpkgdKI9ljztaZyEI.webp",
+  portraitEmily:
+    "https://framerusercontent.com/images/V09GjbzLmn3SKxc0QOInwAHfw.webp?width=321&height=324",
+  testimonialEmily:
+    "https://framerusercontent.com/images/Vm8il2CVf6CuFYMhM72UV4BYI.webp?width=2150&height=1229",
+  portraitHenry:
+    "https://framerusercontent.com/images/Y7Io1rEQTpr82XSw3hvUWDoM.webp?width=640&height=640",
+  testimonialHenry:
+    "https://framerusercontent.com/images/2J4RjjI7115KzJTOhcJFmV68PA.webp?width=2150&height=1229",
+  portraitCharlotte:
+    "https://framerusercontent.com/images/z576pxgMO7uqozxes3YJljpu2s.webp?width=640&height=640",
+  testimonialCharlotte:
+    "https://framerusercontent.com/images/4R03LilxvElONY9uA0o6K7OA4o.webp?width=2150&height=1229",
+  journalOne:
+    "https://framerusercontent.com/images/WBzukeCVSbm3LT62OUFncFuflHI.webp?width=1536&height=1920",
+  journalTwo:
+    "https://framerusercontent.com/images/CR5z8x9EGdcyBmp5OrG5CNME.webp?width=1280&height=1920",
+  journalThree:
+    "https://framerusercontent.com/images/3BAFr53xkH9iNMjIpJu268O7Zpk.webp?width=1280&height=1920",
+  closing:
+    "https://framerusercontent.com/images/Zf5AKyohqhcb4zE5YdFCH8uKEs.png?width=2400&height=1024",
+};
