@@ -1,3 +1,5 @@
+import { supabase } from "./supabase";
+
 export const SERVICE_OPTIONS = [
   "1 BHK Interior",
   "2 BHK Interior",
@@ -63,14 +65,30 @@ export async function submitEnquiry(values: Enquiry): Promise<void> {
     submittedAt: new Date().toISOString(),
   };
 
-  if (!endpoint) {
-    if (import.meta.env.DEV) {
-      console.warn(
-        "[enquiry] VITE_ENQUIRY_ENDPOINT is not set — this lead was NOT recorded:",
-        payload,
-      );
+  /* Every lead is written to the CMS first: that is the studio's own
+     record, and it works whether or not the Sheets webhook is configured. */
+  let storedInCms = false;
+  if (supabase) {
+    const { error } = await supabase.from("enquiries").insert({
+      name: payload.name,
+      mobile: payload.mobile,
+      service: payload.service,
+      comments: payload.comments,
+      source: payload.source,
+      page: payload.page,
+    });
+    if (error) {
+      console.error("[enquiry] could not record in the CMS:", error.message);
+    } else {
+      storedInCms = true;
     }
-    await new Promise((resolve) => setTimeout(resolve, 600));
+  }
+
+  if (!endpoint) {
+    if (!storedInCms) {
+      // Nowhere to put it: fail loudly rather than show a false thank-you.
+      throw new Error("Enquiry could not be recorded.");
+    }
     return;
   }
 
@@ -82,7 +100,12 @@ export async function submitEnquiry(values: Enquiry): Promise<void> {
     body: JSON.stringify(payload),
   });
 
-  if (!response.ok) {
+  if (!response.ok && !storedInCms) {
     throw new Error(`Enquiry failed with status ${response.status}`);
+  }
+
+  if (!response.ok) {
+    // The studio still has the lead in the CMS; don't fail the visitor.
+    console.error("[enquiry] sheets webhook failed:", response.status);
   }
 }

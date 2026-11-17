@@ -11,6 +11,10 @@ export const TABLES = {
   testimonials: { order: "position" },
   articles: { order: "position" },
   footer_links: { order: "position" },
+  social_links: { order: "position" },
+  nav_links: { order: "position" },
+  article_blocks: { order: "position" },
+  enquiries: { order: null },
   media: { order: "created_at" },
 } as const;
 
@@ -65,6 +69,10 @@ function useRefresh(table: TableName) {
     if (table === "project_blocks") {
       queryClient.invalidateQueries({ queryKey: ["admin", "projects"] });
       queryClient.invalidateQueries({ queryKey: ["projects"] });
+    }
+    if (table === "article_blocks") {
+      queryClient.invalidateQueries({ queryKey: ["admin", "articles"] });
+      queryClient.invalidateQueries({ queryKey: ["articles"] });
     }
   };
 }

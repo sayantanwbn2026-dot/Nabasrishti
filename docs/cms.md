@@ -91,7 +91,32 @@ as many sections as you like, in any order:
 
 Use the ↑ ↓ buttons to reorder and × to delete. Each section saves on its own.
 
-### Services, Process, Testimonials, Journal, Footer links
+### Enquiries
+Every form submission lands here, newest first, with the page and button it
+came from. Set a status (new → contacted → quoted → won/lost), keep private
+notes, and call or WhatsApp straight from the record.
+
+**Download CSV** exports whatever the current filter shows. The file opens
+cleanly in Excel and Google Sheets, and mobile numbers keep their leading
+digits.
+
+### Journal
+Posts work exactly like projects: a card in the grid, and a full page built
+from the same sections. Summary, author and reading time appear in the meta
+line.
+
+### Navigation, Social links
+The links across the top of the site, and the icons in the footer. For social
+icons the **Platform** field picks the icon — use `instagram`, `facebook`,
+`linkedin`, `youtube`, `x` or `pinterest`.
+
+### Logo & chrome
+Under Site content: upload your logo (and a version for dark backgrounds, used
+on the loading screen), switch the loading screen and the WhatsApp button on or
+off, set the WhatsApp opening message, change the before/after slider images,
+and edit the page-not-found text.
+
+### Services, Process, Testimonials, Footer links
 Lists you can add to, reorder and hide. Every item has a **Visible on the
 website** switch so you can take something down without deleting it.
 

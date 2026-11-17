@@ -27,10 +27,14 @@ import {
   useProcessSteps,
   useProjects,
   useServices,
+  useNavLinks,
   useSiteSettings,
+  useSocialLinks,
   useTestimonials,
+  type Article as CmsArticle,
   type CmsProject,
   type SiteSettings,
+  type SocialLink,
   type FooterLink as FooterLinkRow,
   fallbackSettings,
 } from "@/lib/content";
@@ -43,6 +47,8 @@ const AdminApp = lazy(() =>
   import("@/admin/AdminApp").then((module) => ({ default: module.AdminApp })),
 );
 import { ProjectModal } from "@/components/ProjectModal";
+import { ArticleModal } from "@/components/ArticleModal";
+import { Preloader, SocialLinks, WhatsAppFab } from "@/components/SiteChrome";
 import { useDelayedEnquiry } from "@/hooks/useDelayedEnquiry";
 
 
@@ -186,14 +192,20 @@ function ArrowIcon({ direction }: { direction: "left" | "right" }) {
 
 function MenuLinks({
   active,
+  links,
+  ctaLabel,
   onNavigate,
+  onEnquire,
 }: {
   active: string;
+  links: { label: string; href: string }[];
+  ctaLabel: string;
   onNavigate?: () => void;
+  onEnquire?: () => void;
 }) {
   return (
     <>
-      {navigation.map((item) => (
+      {links.map((item) => (
         <a
           key={item.label}
           href={item.href}
@@ -204,14 +216,18 @@ function MenuLinks({
           {item.label}
         </a>
       ))}
-      <a
+      {/* On phones the header button is hidden, so the sheet carries the
+          same action rather than a link to a different place. */}
+      <button
+        type="button"
         className="navigation-link navigation-contact-mobile"
-        href="#contact"
-        aria-current={active === "Contact" ? "page" : undefined}
-        onClick={onNavigate}
+        onClick={() => {
+          onNavigate?.();
+          onEnquire?.();
+        }}
       >
-        Contact
-      </a>
+        {ctaLabel}
+      </button>
     </>
   );
 }
@@ -219,9 +235,15 @@ function MenuLinks({
 function SiteNavigation({
   onEnquire,
   brand,
+  logo,
+  links,
+  ctaLabel,
 }: {
   onEnquire: () => void;
   brand: string;
+  logo?: string;
+  links: { label: string; href: string }[];
+  ctaLabel: string;
 }) {
   const lenis = useLenis();
   const [tone, setTone] = useState<"dark" | "light">("dark");
@@ -305,17 +327,26 @@ function SiteNavigation({
       >
         <div className="site-header__inner">
           <a className="site-brand" href="#home" aria-label={`${brand} home`}>
-            {brand}
+            {logo ? (
+              <img className="site-brand__logo" src={logo} alt={brand} />
+            ) : (
+              brand
+            )}
           </a>
           <nav className="desktop-navigation" aria-label="Main navigation">
-            <MenuLinks active={active} />
+            <MenuLinks
+              active={active}
+              links={links}
+              ctaLabel={ctaLabel}
+              onEnquire={onEnquire}
+            />
           </nav>
           <button
             type="button"
             className="header-contact navigation-link"
             onClick={onEnquire}
           >
-            Enquire
+            {ctaLabel}
           </button>
           <button
             className={`menu-toggle ${menuOpen ? "is-open" : ""}`}
@@ -336,7 +367,13 @@ function SiteNavigation({
           id="mobile-navigation"
         >
           <nav aria-label="Mobile navigation">
-            <MenuLinks active={active} onNavigate={() => setMenuOpen(false)} />
+            <MenuLinks
+              active={active}
+              links={links}
+              ctaLabel={ctaLabel}
+              onEnquire={onEnquire}
+              onNavigate={() => setMenuOpen(false)}
+            />
           </nav>
         </div>
       )}
@@ -489,7 +526,13 @@ function ServicesAccordion({ items }: { items: typeof services }) {
   );
 }
 
-function ImageComparison() {
+function ImageComparison({
+  beforeUrl,
+  afterUrl,
+}: {
+  beforeUrl: string;
+  afterUrl: string;
+}) {
   const [position, setPosition] = useState(53);
   const isDragging = useRef(false);
   const frameRef = useRef<HTMLDivElement>(null);
@@ -541,8 +584,8 @@ function ImageComparison() {
     <div className="comparison-frame" ref={frameRef}>
       <img
         className="comparison-frame__image"
-        src={media.hero}
-        alt="Finished warm interior with timber furniture and black-framed glazing"
+        src={afterUrl || media.hero}
+        alt="Finished interior"
         width="2150"
         height="1229"
         loading="lazy"
@@ -550,7 +593,7 @@ function ImageComparison() {
       />
       <img
         className="comparison-frame__image comparison-frame__sketch"
-        src={media.comparisonSketch}
+        src={beforeUrl || media.comparisonSketch}
         alt=""
         aria-hidden="true"
         width="1600"
@@ -595,12 +638,14 @@ function TestimonialsSection({
   label,
   heading,
   aside,
+  ctaLabel,
 }: {
   onEnquire: (context: string) => void;
   items: typeof testimonials;
   label: string;
   heading: string;
   aside: string;
+  ctaLabel: string;
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const testimonial = items[Math.min(activeIndex, items.length - 1)];
@@ -668,7 +713,7 @@ function TestimonialsSection({
         </Reveal>
         <SectionCta
           context="Testimonials section"
-          label="Get your free consultation"
+          label={ctaLabel}
           variant="light"
           onEnquire={onEnquire}
         />
@@ -696,9 +741,11 @@ function FooterLink({
 function SiteFooter({
   settings,
   links,
+  socials,
 }: {
   settings: SiteSettings;
   links: FooterLinkRow[];
+  socials: SocialLink[];
 }) {
   // Group the CMS rows into their columns, preserving order.
   const columns = links.reduce<Record<string, FooterLinkRow[]>>((acc, link) => {
@@ -716,6 +763,7 @@ function SiteFooter({
               {settings.name}
             </a>
             <p>{settings.footer_intro}</p>
+            <SocialLinks links={socials} />
           </div>
           <div className="footer-link-columns">
             {columnNames.map((name) => (
@@ -749,16 +797,21 @@ function SiteFooter({
 }
 
 function NotFoundPage() {
+  const { data: settings = fallbackSettings } = useSiteSettings();
   return (
     <main className="not-found-page">
       <a href="/" className="site-brand">
-        Nabasrishti
+        {settings.logo_url ? (
+          <img className="site-brand__logo" src={settings.logo_url} alt={settings.name} />
+        ) : (
+          settings.name
+        )}
       </a>
       <p className="section-label">404</p>
-      <h1>This page isn&apos;t here.</h1>
-      <p>Return to the studio to explore our work and services.</p>
+      <h1>{settings.not_found_heading}</h1>
+      <p>{settings.not_found_body}</p>
       <a href="/" className="button button-light">
-        Back to Nabasrishti
+        Back to {settings.name}
       </a>
     </main>
   );
@@ -806,6 +859,13 @@ function HomePage() {
   const { data: cmsTestimonials = [] } = useTestimonials();
   const { data: cmsArticles = [] } = useArticles();
   const { data: cmsFooterLinks = [] } = useFooterLinks();
+  const { data: cmsSocials = [] } = useSocialLinks();
+  const { data: cmsNavLinks = [] } = useNavLinks();
+  const navItems = cmsNavLinks.length
+    ? cmsNavLinks
+        .filter((link) => link.is_published)
+        .map((link) => ({ label: link.label, href: link.href }))
+    : navigation;
 
   /* Each list falls back to the built-in content, so an empty table or a
      missing environment variable degrades to the shipped design rather
@@ -836,22 +896,26 @@ function HomePage() {
       }))
     : testimonials;
   const articleItems = cmsArticles.length
-    ? cmsArticles.map((item) => ({
-        title: item.title,
-        date: item.date_label,
-        dateTime: item.date_value ?? "",
-        image: item.image_url,
-        alt: item.image_alt,
-      }))
-    : articles;
+    ? cmsArticles
+        .filter((item) => item.is_published)
+        .map((item) => ({
+          title: item.title,
+          date: item.date_label,
+          dateTime: item.date_value ?? "",
+          image: item.image_url,
+          alt: item.image_alt,
+          source: item as CmsArticle | null,
+        }))
+    : articles.map((item) => ({ ...item, source: null }));
 
   const [activeProject, setActiveProject] = useState<CmsProject | null>(null);
+  const [activeArticle, setActiveArticle] = useState<CmsArticle | null>(null);
   const [enquiryContext, setEnquiryContext] = useState<string | undefined>();
   // The timed prompt holds off while a project is open — two stacked
   // dialogs would be the worst version of this pattern.
   const [enquiryOpen, setEnquiryOpen] = useDelayedEnquiry(
     settings.enquiry_delay_ms || ENQUIRY_DELAY_MS,
-    activeProject !== null,
+    activeProject !== null || activeArticle !== null,
   );
 
   const openEnquiry = (context?: string) => {
@@ -861,7 +925,13 @@ function HomePage() {
 
   return (
     <>
-      <SiteNavigation onEnquire={() => openEnquiry()} brand={settings.name} />
+      <SiteNavigation
+        onEnquire={() => openEnquiry("Header button")}
+        brand={settings.name}
+        logo={settings.show_logo_in_nav ? settings.logo_url : ""}
+        links={navItems}
+        ctaLabel={settings.nav_cta_label}
+      />
       <main>
         <section className="hero" id="home" aria-label="Nabasrishti Interior Design Studio">
           <ParallaxImage
@@ -980,7 +1050,7 @@ function HomePage() {
               </Stagger>
               <SectionCta
                 context="Studio section"
-                label="Book a free consultation"
+                label={settings.cta_studio_label}
                 onEnquire={openEnquiry}
               />
             </div>
@@ -999,7 +1069,7 @@ function HomePage() {
                 className="button button-dark"
                 onClick={() => openEnquiry("Projects section")}
               >
-                Start your project
+                {settings.cta_projects_label}
               </button>
             </Reveal>
             <div className="projects-gallery" id="project-list">
@@ -1025,7 +1095,7 @@ function HomePage() {
             </Reveal>
             <SectionCta
               context="Services section"
-              label="Discuss your requirement"
+              label={settings.cta_services_label}
               variant="light"
               onEnquire={openEnquiry}
             />
@@ -1038,7 +1108,10 @@ function HomePage() {
               {settings.comparison_heading}
             </Reveal>
             <Reveal preset="image" delay={0.08}>
-              <ImageComparison />
+              <ImageComparison
+                beforeUrl={settings.comparison_before_url}
+                afterUrl={settings.comparison_after_url}
+              />
             </Reveal>
           </div>
         </section>
@@ -1066,7 +1139,7 @@ function HomePage() {
             </Stagger>
             <SectionCta
               context="Process section"
-              label="Start with a free consultation"
+              label={settings.cta_process_label}
               variant="light"
               onEnquire={openEnquiry}
             />
@@ -1079,6 +1152,7 @@ function HomePage() {
           label={settings.testimonials_label}
           heading={settings.testimonials_heading}
           aside={settings.testimonials_aside}
+          ctaLabel={settings.cta_testimonials_label}
         />
 
         <section className="journal-section dark-section" id="blog">
@@ -1093,6 +1167,12 @@ function HomePage() {
             <Stagger className="article-grid" stagger={0.09}>
               {articleItems.map((article) => (
                 <RevealItem as="article" className="article" key={article.title}>
+                  <button
+                    type="button"
+                    className="article__link"
+                    onClick={() => setActiveArticle(article.source)}
+                    aria-label={`Read ${article.title}`}
+                  >
                   <div className="article__image">
                     <ParallaxImage
                       strength={0.045}
@@ -1107,12 +1187,13 @@ function HomePage() {
                   </div>
                   <time dateTime={article.dateTime}>{article.date}</time>
                   <h3>{article.title}</h3>
+                  </button>
                 </RevealItem>
               ))}
             </Stagger>
             <SectionCta
               context="Journal section"
-              label="Talk to our designers"
+              label={settings.cta_journal_label}
               variant="light"
               onEnquire={openEnquiry}
             />
@@ -1148,7 +1229,7 @@ function HomePage() {
           </Reveal>
         </section>
       </main>
-      <SiteFooter settings={settings} links={cmsFooterLinks} />
+      <SiteFooter settings={settings} links={cmsFooterLinks} socials={cmsSocials} />
 
       <ProjectModal
         project={activeProject}
@@ -1158,11 +1239,21 @@ function HomePage() {
           openEnquiry(project.title);
         }}
       />
+      <ArticleModal
+        article={activeArticle}
+        onClose={() => setActiveArticle(null)}
+        onEnquire={(article) => {
+          setActiveArticle(null);
+          openEnquiry(`Journal — ${article.title}`);
+        }}
+      />
       <EnquiryModal
         open={enquiryOpen}
         onClose={() => setEnquiryOpen(false)}
         context={enquiryContext}
       />
+      <WhatsAppFab settings={settings} />
+      <Preloader settings={settings} />
     </>
   );
 }

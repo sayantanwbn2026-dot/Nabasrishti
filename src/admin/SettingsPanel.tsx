@@ -3,6 +3,7 @@ import { useSaveRow, useSettingsRow } from "./api";
 import {
   ImageField,
   NumberField,
+  Toggle,
   RecordList,
   StringList,
   TextArea,
@@ -14,6 +15,7 @@ type Row = SiteSettings & { id: number };
 
 const GROUPS = [
   { id: "identity", label: "Studio & contact" },
+  { id: "brand", label: "Logo & chrome" },
   { id: "hero", label: "Hero banner" },
   { id: "studio", label: "Studio section" },
   { id: "sections", label: "Section headings" },
@@ -96,6 +98,74 @@ export function SettingsPanel() {
             />
             <TextField label="Email" value={draft.email} onChange={(v) => set("email", v)} />
             <TextField label="Location" value={draft.location} onChange={(v) => set("location", v)} />
+          </>
+        )}
+
+        {group === "brand" && (
+          <>
+            <ImageField
+              label="Logo"
+              hint="Shown in the navigation bar. Leave empty to show the studio name as text."
+              value={draft.logo_url}
+              onChange={(v) => set("logo_url", v)}
+            />
+            <TextField
+              label="Logo description"
+              value={draft.logo_alt}
+              onChange={(v) => set("logo_alt", v)}
+            />
+            <ImageField
+              label="Logo for dark backgrounds"
+              hint="Used on the loading screen. Falls back to the main logo."
+              value={draft.logo_dark_url}
+              onChange={(v) => set("logo_dark_url", v)}
+            />
+            <Toggle
+              label="Show the logo in the navigation"
+              value={draft.show_logo_in_nav}
+              onChange={(v) => set("show_logo_in_nav", v)}
+            />
+            <Toggle
+              label="Show the loading screen"
+              hint="The logo shown briefly while the site loads."
+              value={draft.preloader_enabled}
+              onChange={(v) => set("preloader_enabled", v)}
+            />
+            <Toggle
+              label="Show the WhatsApp button"
+              hint="The floating green button at the bottom right."
+              value={draft.whatsapp_enabled_fab}
+              onChange={(v) => set("whatsapp_enabled_fab", v)}
+            />
+            <TextArea
+              label="WhatsApp opening message"
+              hint="Pre-filled in WhatsApp when someone taps the button."
+              rows={2}
+              value={draft.whatsapp_message}
+              onChange={(v) => set("whatsapp_message", v)}
+            />
+            <ImageField
+              label="Before image"
+              hint="The left side of the before/after slider."
+              value={draft.comparison_before_url}
+              onChange={(v) => set("comparison_before_url", v)}
+            />
+            <ImageField
+              label="After image"
+              value={draft.comparison_after_url}
+              onChange={(v) => set("comparison_after_url", v)}
+            />
+            <TextField
+              label="Page-not-found heading"
+              value={draft.not_found_heading}
+              onChange={(v) => set("not_found_heading", v)}
+            />
+            <TextArea
+              label="Page-not-found text"
+              rows={2}
+              value={draft.not_found_body}
+              onChange={(v) => set("not_found_body", v)}
+            />
           </>
         )}
 

@@ -3,17 +3,22 @@ import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { SettingsPanel } from "./SettingsPanel";
 import { ProjectsPanel } from "./ProjectsPanel";
+import { ArticlesPanel } from "./ArticlesPanel";
+import { EnquiriesPanel } from "./EnquiriesPanel";
 import { COLLECTIONS, CollectionPanel } from "./CollectionPanel";
 import "./admin.css";
 
 const SECTIONS = [
+  { id: "enquiries", label: "Enquiries" },
   { id: "site", label: "Site content" },
   { id: "projects", label: "Projects" },
+  { id: "articles", label: "Journal" },
   { id: "services", label: "Services" },
   { id: "process_steps", label: "Process" },
   { id: "testimonials", label: "Testimonials" },
-  { id: "articles", label: "Journal" },
+  { id: "nav_links", label: "Navigation" },
   { id: "footer_links", label: "Footer links" },
+  { id: "social_links", label: "Social links" },
 ] as const;
 
 type SectionId = (typeof SECTIONS)[number]["id"];
@@ -85,7 +90,7 @@ function LoginScreen() {
 export function AdminApp() {
   const [session, setSession] = useState<Session | null>(null);
   const [checking, setChecking] = useState(true);
-  const [section, setSection] = useState<SectionId>("site");
+  const [section, setSection] = useState<SectionId>("enquiries");
   const [navOpen, setNavOpen] = useState(false);
 
   useEffect(() => {
@@ -176,9 +181,11 @@ export function AdminApp() {
       </header>
 
       <main className="amain">
+        {section === "enquiries" ? <EnquiriesPanel /> : null}
         {section === "site" ? <SettingsPanel /> : null}
         {section === "projects" ? <ProjectsPanel /> : null}
-        {section !== "site" && section !== "projects" ? (
+        {section === "articles" ? <ArticlesPanel /> : null}
+        {COLLECTIONS[section] ? (
           <CollectionPanel spec={COLLECTIONS[section]} />
         ) : null}
       </main>

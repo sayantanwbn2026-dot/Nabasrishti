@@ -54,6 +54,28 @@ export type SiteSettings = {
   thankyou_body: string;
   meta_title: string;
   meta_description: string;
+  logo_url: string;
+  logo_alt: string;
+  logo_dark_url: string;
+  show_logo_in_nav: boolean;
+  preloader_enabled: boolean;
+  whatsapp_enabled_fab: boolean;
+  whatsapp_message: string;
+  comparison_before_url: string;
+  comparison_after_url: string;
+  comparison_before_label: string;
+  comparison_after_label: string;
+  not_found_heading: string;
+  not_found_body: string;
+  nav_cta_label: string;
+  cta_studio_label: string;
+  cta_projects_label: string;
+  cta_services_label: string;
+  cta_process_label: string;
+  cta_testimonials_label: string;
+  cta_journal_label: string;
+  project_cta_prompt: string;
+  article_cta_prompt: string;
 };
 
 export type BlockType =
@@ -130,14 +152,52 @@ export type Testimonial = {
 
 export type Article = {
   id: string;
+  slug: string;
   title: string;
+  excerpt: string;
+  author: string;
+  read_minutes: number;
   date_label: string;
   date_value: string | null;
   image_url: string;
   image_alt: string;
   link_url: string;
+  detail_layout: "two-column" | "stacked";
+  show_cta: boolean;
+  cta_label: string;
   position: number;
   is_published: boolean;
+  blocks?: ProjectBlock[];
+};
+
+export type NavLink = {
+  id: string;
+  label: string;
+  href: string;
+  position: number;
+  is_published: boolean;
+};
+
+export type SocialLink = {
+  id: string;
+  platform: string;
+  label: string;
+  url: string;
+  position: number;
+  is_published: boolean;
+};
+
+export type Enquiry = {
+  id: string;
+  name: string;
+  mobile: string;
+  service: string;
+  comments: string;
+  source: string;
+  page: string;
+  status: string;
+  notes: string;
+  created_at: string;
 };
 
 export type FooterLink = {
@@ -218,6 +278,30 @@ export const fallbackSettings: SiteSettings = {
   meta_title: "Nabasrishti | Best Interior Design Studio in South Kolkata",
   meta_description:
     "Nabasrishti is an interior design studio in South Kolkata delivering residential and commercial interiors, space planning and turnkey execution.",
+  logo_url: "",
+  logo_alt: "Nabasrishti",
+  logo_dark_url: "",
+  show_logo_in_nav: true,
+  preloader_enabled: true,
+  whatsapp_enabled_fab: true,
+  whatsapp_message:
+    "Hello! I would like to discuss an interior design project.",
+  comparison_before_url: "",
+  comparison_after_url: "",
+  comparison_before_label: "Concept",
+  comparison_after_label: "Finished",
+  not_found_heading: "This page has moved on.",
+  not_found_body:
+    "The page you were looking for is not here. The work, the studio and the contact details all still are.",
+  nav_cta_label: "Enquire",
+  cta_studio_label: "Book a free consultation",
+  cta_projects_label: "Start your project",
+  cta_services_label: "Discuss your requirement",
+  cta_process_label: "Start with a free consultation",
+  cta_testimonials_label: "Get your free consultation",
+  cta_journal_label: "Talk to our designers",
+  project_cta_prompt: "Planning something similar?",
+  article_cta_prompt: "Thinking about your own space?",
 };
 
 const CARD_LAYOUTS: CmsProject["card_layout"][] = [
@@ -350,10 +434,41 @@ export function useTestimonials() {
   });
 }
 
+async function fetchArticles(): Promise<Article[]> {
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from("articles")
+    .select("*, blocks:article_blocks(*)")
+    .order("position", { ascending: true });
+  if (error || !data) return [];
+  return (data as Article[]).map((article) => ({
+    ...article,
+    blocks: [...(article.blocks ?? [])].sort((a, b) => a.position - b.position),
+  }));
+}
+
 export function useArticles() {
   return useQuery({
     queryKey: ["articles"],
-    queryFn: listQuery<Article>("articles", []),
+    queryFn: fetchArticles,
+    staleTime: STALE,
+    placeholderData: [],
+  });
+}
+
+export function useNavLinks() {
+  return useQuery({
+    queryKey: ["nav_links"],
+    queryFn: listQuery<NavLink>("nav_links", []),
+    staleTime: STALE,
+    placeholderData: [],
+  });
+}
+
+export function useSocialLinks() {
+  return useQuery({
+    queryKey: ["social_links"],
+    queryFn: listQuery<SocialLink>("social_links", []),
     staleTime: STALE,
     placeholderData: [],
   });
