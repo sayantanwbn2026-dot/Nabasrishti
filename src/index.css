@@ -3051,3 +3051,15 @@ p {
     display: none;
   }
 }
+
+/* --- Journal post headings --------------------------------------------
+   Project titles are short names and read best two words to a line, so
+   they keep the tighter 16ch measure. Post titles are sentences; at that
+   width they broke into ragged two-word lines, so they get more room. */
+.article-detail .project-detail__head h2 {
+  /* A post title is a sentence, not a name: it wants a longer measure and
+     one step less size than a project title, or it breaks into ragged
+     two-word lines — at phone widths 34px could not fit three words. */
+  max-width: 20ch;
+  font-size: var(--display-sm);
+}

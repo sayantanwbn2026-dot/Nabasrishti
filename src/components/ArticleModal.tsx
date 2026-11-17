@@ -26,7 +26,7 @@ export function ArticleModal({ article, onClose, onEnquire }: ArticleModalProps)
       closeLabel="Close post"
     >
       {article ? (
-        <article className="project-detail__inner">
+        <article className="project-detail__inner article-detail">
           <header className="project-detail__head">
             <p className="section-label">
               {[article.date_label, article.author, article.read_minutes
