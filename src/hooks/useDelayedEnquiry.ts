@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 
+/* Persistent storage on purpose: the prompt shows once per visitor, not
+   once per visit. Clear this key to see it again while testing. */
 const SEEN_KEY = "nabasrishti:enquiry-prompted";
 
 /**
  * Opens the enquiry prompt once a visitor has had a moment to look around.
  *
- * It fires at most once per browser session, holds off while another dialog
+ * It fires at most once ever per browser, holds off while another dialog
  * is open, and never interrupts someone who is actively scrolling — the
  * timer only resolves during a lull.
  */
@@ -17,7 +19,7 @@ export function useDelayedEnquiry(delayMs: number, blocked: boolean) {
 
     let alreadyPrompted = false;
     try {
-      alreadyPrompted = sessionStorage.getItem(SEEN_KEY) === "1";
+      alreadyPrompted = localStorage.getItem(SEEN_KEY) === "1";
     } catch {
       // Private browsing can throw on access; treat it as "not yet prompted".
     }
@@ -32,9 +34,9 @@ export function useDelayedEnquiry(delayMs: number, blocked: boolean) {
       idleTimer = window.setTimeout(() => {
         setOpen(true);
         try {
-          sessionStorage.setItem(SEEN_KEY, "1");
+          localStorage.setItem(SEEN_KEY, "1");
         } catch {
-          // Nothing to do — the prompt simply may reappear next session.
+          // Storage blocked (private mode): it may prompt again later.
         }
       }, 400);
     };

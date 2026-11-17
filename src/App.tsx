@@ -6,6 +6,7 @@ import {
   type PointerEvent,
   type ReactNode,
 } from "react";
+import { motion } from "framer-motion";
 import { useLenis } from "lenis/react";
 import {
   Parallax,
@@ -15,6 +16,7 @@ import {
   Stagger,
   TextReveal,
 } from "@/components/motion";
+import { heroItem, heroRail, heroStagger } from "@/lib/motion";
 
 import { media } from "@/data/media";
 import { site, telHref } from "@/data/site";
@@ -795,36 +797,64 @@ function HomePage() {
             decoding="async"
           />
           <div className="hero__shade" aria-hidden="true" />
+          {/* Fine grain stops the gradient wash from banding on large
+              screens and gives the photograph a little tooth. */}
+          <div className="hero__grain" aria-hidden="true" />
+
           <Parallax className="hero__parallax" distance={90}>
-            <div className="hero__content">
+            <motion.div
+              className="hero__content"
+              variants={heroStagger}
+              initial="hidden"
+              animate="show"
+            >
               {/* The h1 carries the full keyword phrase the Ads audit asked
                   for; the wordmark is simply its first line. */}
               <h1>
-                <span className="hero__wordmark">{site.name}</span>
-                <span className="hero__headline">{site.headline}</span>
+                <motion.span className="hero__wordmark" variants={heroItem}>
+                  {site.name}
+                </motion.span>
+                <motion.span className="hero__headline" variants={heroItem}>
+                  {site.headline}
+                </motion.span>
               </h1>
-              <div className="hero__actions">
+              <motion.div className="hero__actions" variants={heroItem}>
                 <button
                   type="button"
-                  className="button button-light"
+                  className="button button-light hero__cta-primary"
                   onClick={() => openEnquiry("Hero banner")}
                 >
                   Get free consultation
                 </button>
-                <a className="button button-outline" href={telHref}>
-                  Call {site.phone}
+                <a className="hero__cta-call" href={telHref}>
+                  <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                    <path d="M5.2 2.5 6.6 5 5.3 6.4a8 8 0 0 0 4.3 4.3L11 9.4l2.5 1.4v2.4c0 .4-.3.8-.8.8A10.6 10.6 0 0 1 2.4 3.3c0-.5.4-.8.8-.8h2z" />
+                  </svg>
+                  <span>{site.phone}</span>
                 </a>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </Parallax>
 
-          {/* Service highlights sit on the hero's base line rather than in
-              the centre stack, so the composition stays uncluttered. */}
-          <ul className="hero__highlights" aria-label="Services">
-            {site.serviceHighlights.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
+          {/* Baseline rail: services on the left, a scroll cue on the right,
+              sharing one hairline. Frames the composition instead of
+              floating a second centred block under the title. */}
+          <motion.div
+            className="hero__rail"
+            variants={heroRail}
+            initial="hidden"
+            animate="show"
+          >
+            <ul className="hero__highlights" aria-label="Services">
+              {site.serviceHighlights.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+            <a className="hero__scroll" href="#studio">
+              <span>Scroll</span>
+              <span className="hero__scroll-track" aria-hidden="true" />
+            </a>
+          </motion.div>
         </section>
 
         {/* The audit's supporting tagline, moved out of the banner so the

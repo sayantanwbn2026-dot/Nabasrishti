@@ -504,10 +504,22 @@ p {
 }
 
 .hero__content {
-  width: 100%;
-  padding: 64px 24px 24px;
+  width: min(calc(100% - (var(--gutter) * 2)), var(--page-width));
+  /* Optically centred: the baseline rail occupies the lower edge, so the
+     title sits a little above true centre. */
+  padding: 0 0 var(--space-3xl);
   text-align: center;
-  animation: hero-arrive 900ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+/* 140x140 tile of monochrome noise, held well below visibility. */
+.hero__grain {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  opacity: 0.16;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+  pointer-events: none;
 }
 
 .hero__content h1 {
@@ -564,20 +576,29 @@ p {
   text-wrap: balance;
 }
 
-/* Service highlights — audit item 4. Anchored to the foot of the hero so
-   they read as a caption to the image rather than part of the title stack. */
-.hero__highlights {
+/* Baseline rail: one hairline carrying the services and the scroll cue. */
+.hero__rail {
   position: absolute;
   z-index: 2;
   right: 0;
   bottom: var(--space-lg);
   left: 0;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--space-2xs) var(--space-lg);
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
   width: min(calc(100% - (var(--gutter) * 2)), var(--page-width));
   margin-inline: auto;
+  padding-top: var(--space-sm);
+  border-top: 1px solid rgba(248, 247, 243, 0.18);
+}
+
+/* Service highlights — audit item 4. */
+.hero__highlights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs) var(--space-lg);
+  margin: 0;
   padding: 0;
   list-style: none;
 }
@@ -599,20 +620,100 @@ p {
   opacity: 0.5;
 }
 
+/* One primary action, one quiet one. Two equally weighted buttons made the
+   hero read like a form rather than an invitation. */
 .hero__actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   justify-content: center;
-  gap: var(--space-xs);
-  margin-top: var(--space-lg);
-}
-
-.hero__actions {
+  gap: var(--space-sm) var(--space-xl);
   margin-top: var(--space-xl);
 }
 
-.hero__actions .button {
-  min-width: 220px;
+.hero__cta-primary {
+  min-width: 240px;
+}
+
+.hero__cta-call {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding-bottom: 3px;
+  border-bottom: 1px solid rgba(248, 247, 243, 0.35);
+  color: rgba(248, 247, 243, 0.92);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--track-micro);
+  text-transform: uppercase;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
+  transition: border-color 220ms ease;
+}
+
+.hero__cta-call:hover {
+  border-bottom-color: #fff;
+}
+
+.hero__cta-call svg {
+  width: 13px;
+  height: 13px;
+  fill: currentColor;
+}
+
+/* Scroll cue — a travelling segment inside a static hairline. */
+.hero__scroll {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--space-2xs);
+  color: rgba(248, 247, 243, 0.72);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--track-micro);
+  text-transform: uppercase;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.6);
+  transition: color 220ms ease;
+}
+
+.hero__scroll:hover {
+  color: #fff;
+}
+
+.hero__scroll-track {
+  position: relative;
+  display: block;
+  width: 1px;
+  height: 34px;
+  overflow: hidden;
+  background: rgba(248, 247, 243, 0.25);
+}
+
+.hero__scroll-track::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 12px;
+  background: #fff;
+  content: "";
+  animation: scroll-cue 2.4s cubic-bezier(0.6, 0, 0.2, 1) infinite;
+}
+
+@keyframes scroll-cue {
+  0% {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  30% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(34px);
+  }
 }
 
 .studio-section {
@@ -1558,19 +1659,38 @@ p {
 
   .hero__actions {
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
     width: min(100%, 320px);
     margin-top: var(--space-lg);
     margin-inline: auto;
   }
 
-  .hero__highlights {
+  .hero__cta-primary {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .hero__content {
+    padding-bottom: var(--space-2xl);
+  }
+
+  /* No room for two columns — services centre and the scroll cue goes. */
+  .hero__rail {
     bottom: var(--space-md);
+    justify-content: center;
+  }
+
+  .hero__highlights {
+    justify-content: center;
     gap: var(--space-3xs) var(--space-md);
   }
 
   .hero__highlights li + li::before {
     left: calc(var(--space-md) / -2);
+  }
+
+  .hero__scroll {
+    display: none;
   }
 
   /* Only the first two services at the narrowest widths. */
@@ -1902,6 +2022,13 @@ p {
   .word-mask__inner {
     transform: none !important;
     will-change: auto;
+  }
+
+  /* A looping cue is exactly what reduced motion is asking to stop. */
+  .hero__scroll-track::after {
+    animation: none;
+    height: 34px;
+    opacity: 0.6;
   }
 }
 
@@ -2302,8 +2429,20 @@ p {
 }
 
 @media (max-width: 760px) {
+  /* The card stays a card on phones: inset from every edge and capped
+     below the viewport, so it never reads as a full-screen takeover. */
   .modal {
-    padding: var(--space-2xs);
+    align-items: center;
+    padding: var(--space-md);
+  }
+
+  .modal:not(.modal--fullscreen) .modal__panel {
+    max-height: 82svh;
+    /* The card scrolls itself here; at this size the backdrop is only a
+       thin frame, so overlay-level scrolling has nothing to grab. */
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
   }
 
   /* Same specificity as the rule above, so it has to be restated here. */
@@ -2317,7 +2456,20 @@ p {
 
   .modal__panel-paper,
   .modal__panel-dark {
-    padding: var(--space-xl) var(--space-md) var(--space-md);
+    padding: var(--space-lg) var(--space-md) var(--space-md);
+  }
+
+  /* Trim the form's vertical rhythm so it fits the shorter card. */
+  .enquiry__head {
+    margin-bottom: var(--space-lg);
+  }
+
+  .enquiry__form {
+    gap: var(--space-sm);
+  }
+
+  .field__control-area {
+    min-height: 64px;
   }
 
   .project-detail__inner {

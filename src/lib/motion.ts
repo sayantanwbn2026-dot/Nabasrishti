@@ -54,3 +54,33 @@ export const staggerParent = (stagger = 0.08, delayChildren = 0): Variants => ({
     transition: { staggerChildren: stagger, delayChildren },
   },
 });
+
+/* --- Hero choreography -----------------------------------------------
+   The hero is above the fold, so it animates on mount rather than on
+   scroll. Children arrive in reading order instead of as one block. */
+
+export const heroStagger: Variants = {
+  hidden: {},
+  show: {
+    transition: { staggerChildren: 0.14, delayChildren: 0.12 },
+  },
+};
+
+export const heroItem: Variants = {
+  hidden: { opacity: 0, y: 26 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.95, ease: EASE_SOFT },
+  },
+};
+
+/** The baseline rail settles last, once the title has landed. */
+export const heroRail: Variants = {
+  hidden: { opacity: 0, y: 14 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.8, ease: EASE_SOFT, delay: 0.75 },
+  },
+};
