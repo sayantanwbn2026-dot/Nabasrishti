@@ -48,7 +48,13 @@ export function ParallaxImage({
 
   const offset = strength * 100;
   const y = useTransform(progress, [0, 1], [`${-offset}%`, `${offset}%`]);
-  const baseScale = 1 + strength * 2.2;
+  /* The image travels +/- `strength` of its own height, so it must be
+     oversized by more than twice that or an edge shows. At 2.2x the margin
+     was under a pixel at the extremes and a fast scroll exposed the panel
+     behind. 3x leaves half the travel again as headroom, and the small
+     constant keeps a few pixels in hand on short frames and fractional
+     device pixel ratios. */
+  const baseScale = 1 + strength * 3 + 0.015;
 
   // No drift at all when the OS asks for reduced motion.
   if (reduceMotion) {

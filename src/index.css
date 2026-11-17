@@ -1304,7 +1304,9 @@ p {
 }
 
 .journal-section {
-  padding: var(--space-md) 0 0;
+  /* Zero bottom padding left the section CTA overhanging the section edge
+     by 18px, so the button appeared to be cut off by the next section. */
+  padding: var(--space-md) 0 var(--space-3xl);
 }
 
 .journal-heading h2 {
