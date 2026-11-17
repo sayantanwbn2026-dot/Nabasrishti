@@ -992,15 +992,17 @@ function HomePage() {
             initial="hidden"
             animate="show"
           >
-            <ul className="hero__highlights" aria-label="Services">
-              {settings.service_highlights.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-            <a className="hero__scroll" href="#studio">
-              <span>Scroll</span>
-              <span className="hero__scroll-track" aria-hidden="true" />
-            </a>
+            <div className="hero__rail-inner">
+              <ul className="hero__highlights" aria-label="Services">
+                {settings.service_highlights.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+              <a className="hero__scroll" href="#studio">
+                <span>Scroll</span>
+                <span className="hero__scroll-track" aria-hidden="true" />
+              </a>
+            </div>
           </motion.div>
         </section>
 

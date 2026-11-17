@@ -350,18 +350,22 @@ p {
   text-shadow: 0 1px 12px rgba(0, 0, 0, 0.45);
 }
 
-/* Windows/macOS "reduce transparency" keeps the translucency — it is the
-   requested look — but drops the blur, which is the costly part. The plate
-   is pushed closer to opaque so the links stay crisp without it. */
+/* Windows/macOS "reduce transparency" makes the plates more opaque so the
+   links stay crisp, but keeps the frosting: the glass bars are the
+   requested look, and the hero rail is treated the same way. */
 @media (prefers-reduced-transparency: reduce) {
   .site-header.is-lifted {
-    background: rgba(5, 5, 5, 0.9);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
+    background: rgba(5, 5, 5, 0.88);
+    -webkit-backdrop-filter: saturate(130%) blur(8px);
+    backdrop-filter: saturate(130%) blur(8px);
   }
 
   .site-header.is-lifted.site-header-light {
-    background: rgba(252, 250, 243, 0.92);
+    background: rgba(252, 250, 243, 0.9);
+  }
+
+  .hero__rail {
+    background: rgba(6, 6, 5, 0.52);
   }
 }
 
@@ -580,21 +584,45 @@ p {
   text-wrap: balance;
 }
 
-/* Baseline rail: one hairline carrying the services and the scroll cue. */
+/* Baseline rail: a frosted bar across the foot of the hero, carrying the
+   services and the scroll cue. Full-bleed, with its contents held to the
+   page shell. */
 .hero__rail {
   position: absolute;
   z-index: 2;
   right: 0;
-  bottom: var(--space-lg);
+  bottom: 0;
   left: 0;
+  width: 100%;
+  padding-block: var(--space-sm);
+  border-top: 1px solid rgba(248, 247, 243, 0.14);
+  background: rgba(6, 6, 5, 0.34);
+  -webkit-backdrop-filter: saturate(130%) blur(14px);
+  backdrop-filter: saturate(130%) blur(14px);
+}
+
+.hero__rail-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-md);
   width: min(calc(100% - (var(--gutter) * 2)), var(--page-width));
   margin-inline: auto;
-  padding-top: var(--space-sm);
-  border-top: 1px solid rgba(248, 247, 243, 0.18);
+}
+
+/* The bar does the separating now, so the type needs less shadow of its own. */
+.hero__rail .hero__highlights li,
+.hero__rail .hero__scroll {
+  color: rgba(248, 247, 243, 0.86);
+  text-shadow: none;
+}
+
+/* Where the blur cannot be painted, lean on opacity instead so the bar is
+   never a flat transparent strip with unreadable type over it. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .hero__rail {
+    background: rgba(6, 6, 5, 0.66);
+  }
 }
 
 /* Service highlights — audit item 4. */
@@ -1697,7 +1725,11 @@ p {
 
   /* No room for two columns — services centre and the scroll cue goes. */
   .hero__rail {
-    bottom: var(--space-md);
+    bottom: 0;
+    padding-block: var(--space-xs);
+  }
+
+  .hero__rail-inner {
     justify-content: center;
   }
 
