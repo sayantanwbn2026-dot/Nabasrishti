@@ -49,7 +49,9 @@ const AdminApp = lazy(() =>
 import { ProjectModal } from "@/components/ProjectModal";
 import { ArticleModal } from "@/components/ArticleModal";
 import { Preloader, SocialLinks, WhatsAppFab } from "@/components/SiteChrome";
+import { ContactSection } from "@/components/ContactSection";
 import { useDelayedEnquiry } from "@/hooks/useDelayedEnquiry";
+import { useLiveContent } from "@/lib/useLiveContent";
 
 
 const navigation = [
@@ -767,7 +769,7 @@ function SiteFooter({
               {settings.name}
             </a>
             <p>{settings.footer_intro}</p>
-            <SocialLinks links={socials} />
+            {settings.show_social_in_footer ? <SocialLinks links={socials} /> : null}
           </div>
           <div className="footer-link-columns">
             {columnNames.map((name) => (
@@ -856,6 +858,9 @@ function SectionCta({
 const ENQUIRY_DELAY_MS = 3000;
 
 function HomePage() {
+  // Streams CMS edits into this page without a reload.
+  useLiveContent();
+
   const { data: settings = fallbackSettings } = useSiteSettings();
   const { data: cmsProjects = [] } = useProjects();
   const { data: cmsServices = [] } = useServices();
@@ -1206,7 +1211,13 @@ function HomePage() {
           </div>
         </section>
 
-        <section className="contact-banner" id="contact">
+        <ContactSection
+          settings={settings}
+          socials={cmsSocials}
+          onEnquire={openEnquiry}
+        />
+
+        <section className="contact-banner" aria-label="Start a project">
           <ParallaxImage
             strength={0.08}
             src={settings.closing_image_url || media.closing}

@@ -76,6 +76,13 @@ export type SiteSettings = {
   cta_journal_label: string;
   project_cta_prompt: string;
   article_cta_prompt: string;
+  contact_label: string;
+  contact_heading: string;
+  contact_address: string;
+  contact_hours: string;
+  map_embed_url: string;
+  map_link_url: string;
+  show_social_in_footer: boolean;
 };
 
 export type BlockType =
@@ -302,6 +309,13 @@ export const fallbackSettings: SiteSettings = {
   cta_journal_label: "Talk to our designers",
   project_cta_prompt: "Planning something similar?",
   article_cta_prompt: "Thinking about your own space?",
+  contact_label: "Get in touch",
+  contact_heading: "Let's start your journey together.",
+  contact_address: "South Kolkata, West Bengal, India",
+  contact_hours: "",
+  map_embed_url: "",
+  map_link_url: "",
+  show_social_in_footer: false,
 };
 
 const CARD_LAYOUTS: CmsProject["card_layout"][] = [
@@ -351,7 +365,7 @@ export const fallbackCmsProjects: CmsProject[] = fallbackProjects.map(
    takes the whole page down.
    ------------------------------------------------------------------ */
 
-const STALE = 60_000;
+const STALE = 15_000;
 
 async function fetchSettings(): Promise<SiteSettings> {
   if (!supabase) return fallbackSettings;

@@ -10,8 +10,12 @@ import App from "./App";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 60_000,
-      refetchOnWindowFocus: false,
+      /* Short, so a tab that has been sitting open picks up a CMS edit
+         when the visitor comes back to it. Realtime (useLiveContent)
+         handles the instant case; this is the fallback when the socket
+         is unavailable. */
+      staleTime: 15_000,
+      refetchOnWindowFocus: true,
       retry: 1,
     },
   },

@@ -109,6 +109,8 @@ export function Preloader({ settings }: { settings: SiteSettings }) {
           >
             {settings.logo_dark_url || settings.logo_url ? (
               <img
+                /* The curtain is the paper tone, so this wants the full
+                   lockup with its dark wordmark, not the nav's mark. */
                 src={settings.logo_dark_url || settings.logo_url}
                 alt=""
                 className="preloader__logo"

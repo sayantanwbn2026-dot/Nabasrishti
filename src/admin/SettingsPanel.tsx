@@ -19,6 +19,7 @@ const GROUPS = [
   { id: "hero", label: "Hero banner" },
   { id: "studio", label: "Studio section" },
   { id: "sections", label: "Section headings" },
+  { id: "contact", label: "Contact & map" },
   { id: "closing", label: "Closing & footer" },
   { id: "enquiry", label: "Enquiry form" },
   { id: "seo", label: "SEO" },
@@ -115,8 +116,8 @@ export function SettingsPanel() {
               onChange={(v) => set("logo_alt", v)}
             />
             <ImageField
-              label="Logo for dark backgrounds"
-              hint="Used on the loading screen. Falls back to the main logo."
+              label="Loading screen logo"
+              hint="Shown on the cream loading screen, where the full lockup with its name and tagline reads well. Falls back to the logo above."
               value={draft.logo_dark_url}
               onChange={(v) => set("logo_dark_url", v)}
             />
@@ -262,6 +263,54 @@ export function SettingsPanel() {
             <TextField label="Journal label" value={draft.journal_label} onChange={(v) => set("journal_label", v)} />
             <TextField label="Journal heading" value={draft.journal_heading} onChange={(v) => set("journal_heading", v)} />
             <TextArea label="Journal aside" value={draft.journal_aside} onChange={(v) => set("journal_aside", v)} rows={2} />
+          </>
+        )}
+
+        {group === "contact" && (
+          <>
+            <TextField
+              label="Section label"
+              value={draft.contact_label}
+              onChange={(v) => set("contact_label", v)}
+            />
+            <TextArea
+              label="Heading"
+              rows={2}
+              value={draft.contact_heading}
+              onChange={(v) => set("contact_heading", v)}
+            />
+            <TextArea
+              label="Studio address"
+              rows={2}
+              value={draft.contact_address}
+              onChange={(v) => set("contact_address", v)}
+            />
+            <TextField
+              label="Opening hours"
+              hint="Optional. Leave blank to hide the row."
+              value={draft.contact_hours}
+              onChange={(v) => set("contact_hours", v)}
+            />
+            <TextField
+              label="Map embed address"
+              hint="In Google Maps: Share → Embed a map → copy the src=&quot;...&quot; value only."
+              value={draft.map_embed_url}
+              onChange={(v) => set("map_embed_url", v)}
+              mono
+            />
+            <TextField
+              label="Open in Maps link"
+              hint="Where the button above the map goes."
+              value={draft.map_link_url}
+              onChange={(v) => set("map_link_url", v)}
+              mono
+            />
+            <Toggle
+              label="Also show social icons in the footer"
+              hint="The social links already appear in this section."
+              value={draft.show_social_in_footer}
+              onChange={(v) => set("show_social_in_footer", v)}
+            />
           </>
         )}
 

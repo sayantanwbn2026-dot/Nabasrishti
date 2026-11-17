@@ -110,6 +110,13 @@ The links across the top of the site, and the icons in the footer. For social
 icons the **Platform** field picks the icon — use `instagram`, `facebook`,
 `linkedin`, `youtube`, `x` or `pinterest`.
 
+### Contact & map
+The section above the closing banner: label, heading, studio address,
+optional opening hours, and the map. For the map, open Google Maps →
+**Share → Embed a map**, and paste only the `src="..."` value into **Map
+embed address**. Social links shown here come from the **Social links**
+panel; a switch puts them back in the footer too if you want both.
+
 ### Logo & chrome
 Under Site content: upload your logo (and a version for dark backgrounds, used
 on the loading screen), switch the loading screen and the WhatsApp button on or
@@ -142,9 +149,9 @@ when there is something to save, and reads "Saved" when there isn't. Project
 page sections save individually, so a long page is safe to edit a piece at a
 time.
 
-Changes are live the moment they save. Visitors already on the page may see
-the previous version for up to a minute, because the site caches content
-briefly.
+Changes are live the moment they save. Pages that are already open update
+themselves within a second — the site subscribes to the database and
+refreshes the affected section without a reload.
 
 ---
 
