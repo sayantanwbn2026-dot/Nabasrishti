@@ -3063,3 +3063,192 @@ p {
   max-width: 20ch;
   font-size: var(--display-sm);
 }
+
+/* =====================================================================
+   Phone refinements
+   Measured against a 390x844 viewport: micro-type was 11px, footer links
+   were 17px tall, social icons 36px, and the project cards gave up a
+   third of the screen to decorative indents.
+   ================================================================== */
+
+@media (max-width: 760px) {
+  :root {
+    /* The micro tier carries labels, captions, nav and buttons. 11px
+       uppercase is legible on a desktop at arm's length and marginal on a
+       phone, so the bottom two steps each move up one. */
+    --text-2xs: 0.75rem;
+    --text-xs: 0.8125rem;
+  }
+
+  /* --- Touch targets ------------------------------------------------
+     Anything tappable gets to 44px, the smallest reliable target. --- */
+
+  .menu-toggle {
+    width: 48px;
+    height: 48px;
+    /* Pull the larger hit area back so the icon stays optically aligned. */
+    margin-right: -6px;
+  }
+
+  /* Both brand links are tappable and were only ~21-26px tall. */
+  .site-brand,
+  .footer-brand {
+    min-height: 44px;
+    align-items: center;
+  }
+
+  .footer-brand {
+    display: inline-flex;
+  }
+
+  .hero__cta-call {
+    min-height: 44px;
+    align-items: center;
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+
+  .hero__cta-call span:last-child {
+    border-bottom: 1px solid rgba(248, 247, 243, 0.35);
+    padding-bottom: 3px;
+  }
+
+  .round-control {
+    width: 46px;
+    height: 46px;
+  }
+
+  .footer-link-column a {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+  }
+
+  .footer-link-column {
+    gap: 0;
+  }
+
+  .social-links {
+    gap: var(--space-2xs);
+  }
+
+  .social-links a {
+    width: 44px;
+    height: 44px;
+  }
+
+  .social-links svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .comparison-frame__handle {
+    width: 48px;
+    height: 48px;
+  }
+
+  /* --- Projects -------------------------------------------------------
+     The staggered insets are a desktop composition. On a phone they only
+     shrink the photographs, so every card runs full width and the rhythm
+     comes from the spacing between them instead. */
+
+  .project-card--full,
+  .project-card--half,
+  .project-card--narrow-left,
+  .project-card--offset-right,
+  .project-card--wide-right {
+    width: 100%;
+    margin-right: 0;
+    margin-left: 0;
+    margin-top: var(--space-2xl);
+  }
+
+  /* --- Vertical rhythm ------------------------------------------------
+     Twelve screens of scrolling; the section insets come in a step. --- */
+
+  .studio-section,
+  .services-section,
+  .process-section,
+  .testimonial-section,
+  .projects-section {
+    padding-bottom: var(--space-3xl);
+  }
+
+  .studio-section {
+    padding-top: var(--space-3xl);
+  }
+
+  .contact-banner {
+    margin-top: var(--space-3xl);
+  }
+
+  .section-cta {
+    margin-top: var(--space-xl);
+  }
+
+  /* The two halves of the bottom row collided at this width and the email
+     was clipped; stack them and let the address wrap. */
+  .footer-bottom {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--space-2xs);
+  }
+
+  .footer-bottom p {
+    overflow-wrap: anywhere;
+  }
+
+  /* Clear the floating WhatsApp button, which otherwise sits on top of
+     the last line of the footer. */
+  .site-footer {
+    padding-bottom: 84px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Three link columns at 111px each were cramped and the labels wrapped. */
+  .footer-link-columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-md) var(--space-sm);
+  }
+
+  .footer-link-column a {
+    font-size: var(--text-xs);
+  }
+
+  /* "Client Retention" wrapped to two lines while the others sat on one,
+     so the row read as uneven. Two columns give every label its line. */
+  .studio-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-md) var(--space-sm);
+  }
+
+  .studio-stat__label {
+    max-width: none;
+  }
+}
+
+/* Short screens — a phone held sideways, or a small laptop. The hero's
+   100svh leaves no room for the title stack and the rail together. */
+@media (max-height: 680px) and (orientation: landscape) {
+  .hero {
+    min-height: 520px;
+  }
+
+  .hero__content {
+    padding-bottom: var(--space-2xl);
+  }
+
+  .hero__wordmark {
+    font-size: clamp(2rem, 7vw, 4rem);
+  }
+
+  .hero__actions {
+    flex-direction: row;
+    margin-top: var(--space-sm);
+  }
+
+  .preloader__logo {
+    height: 72px;
+  }
+}

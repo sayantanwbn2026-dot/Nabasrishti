@@ -401,7 +401,10 @@ function listQuery<T>(table: string, fallback: T[]) {
     const { data, error } = await supabase
       .from(table)
       .select("*")
-      .order("position", { ascending: true });
+      // id is the tiebreak: rows sharing a position would otherwise come
+      // back in whatever order the database happened to produce.
+      .order("position", { ascending: true })
+      .order("id", { ascending: true });
     if (error || !data) return fallback;
     return data as T[];
   };

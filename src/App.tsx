@@ -746,12 +746,17 @@ function SiteFooter({
   links: FooterLinkRow[];
   socials: SocialLink[];
 }) {
-  // Group the CMS rows into their columns, preserving order.
+  // Group into columns, then order the columns by their first link, so
+  // moving a link to the top of the list in the CMS moves its column too.
   const columns = links.reduce<Record<string, FooterLinkRow[]>>((acc, link) => {
     (acc[link.column_label] ??= []).push(link);
     return acc;
   }, {});
-  const columnNames = Object.keys(columns);
+  const columnNames = Object.keys(columns).sort((a, b) => {
+    const first = (rows: FooterLinkRow[]) =>
+      Math.min(...rows.map((row) => row.position));
+    return first(columns[a]) - first(columns[b]) || a.localeCompare(b);
+  });
 
   return (
     <footer className="site-footer dark-section">
