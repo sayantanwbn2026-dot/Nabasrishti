@@ -50,6 +50,7 @@ import { ProjectModal } from "@/components/ProjectModal";
 import { ArticleModal } from "@/components/ArticleModal";
 import { Preloader, SocialLinks, WhatsAppFab } from "@/components/SiteChrome";
 import { ContactSection } from "@/components/ContactSection";
+import { FitText } from "@/components/FitText";
 import { useDelayedEnquiry } from "@/hooks/useDelayedEnquiry";
 import { useLiveContent } from "@/lib/useLiveContent";
 
@@ -790,7 +791,7 @@ function SiteFooter({
         </div>
         <Parallax distance={70} direction={-1}>
           <Reveal className="footer-wordmark" aria-label={settings.name} delay={0.05}>
-            {settings.name}
+            <FitText text={settings.name} className="footer-wordmark__fit" />
           </Reveal>
         </Parallax>
         <div className="footer-bottom">

@@ -1490,14 +1490,24 @@ p {
   opacity: 1;
 }
 
+/* The size is solved in FitText so the name spans the column exactly,
+   leaving the same gutter either side whatever the studio is called. */
 .footer-wordmark {
   margin-top: var(--space-4xl);
   color: var(--light-text);
-  font-size: clamp(5rem, 19.5vw, 17rem);
   font-weight: var(--weight-light);
   letter-spacing: -0.055em;
   line-height: 0.86;
   white-space: nowrap;
+}
+
+.footer-wordmark__fit {
+  display: block;
+  /* Negative tracking pulls the last glyph in; this returns that space so
+     the optical gap matches the left. */
+  margin-right: -0.055em;
+  /* Before the fit runs, fall back to something close rather than 16px. */
+  font-size: clamp(5rem, 19.5vw, 17rem);
 }
 
 .footer-bottom {
@@ -1988,8 +1998,11 @@ p {
 
   .footer-wordmark {
     margin-top: var(--space-3xl);
-    font-size: clamp(3rem, 16vw, 7.5rem);
     letter-spacing: -0.06em;
+  }
+
+  .footer-wordmark__fit {
+    margin-right: -0.06em;
   }
 
   .footer-bottom {
@@ -2026,9 +2039,7 @@ p {
     gap: var(--space-2xs);
   }
 
-  .footer-wordmark {
-    font-size: clamp(3rem, 16vw, 4.9rem);
-  }
+
 
   .footer-bottom {
     align-items: flex-start;
