@@ -7,6 +7,7 @@ import { ArticlesPanel } from "./ArticlesPanel";
 import { EnquiriesPanel } from "./EnquiriesPanel";
 import { COLLECTIONS, CollectionPanel } from "./CollectionPanel";
 import { SectionsPanel } from "./SectionsPanel";
+import { confirmDiscard } from "./unsaved";
 import "./admin.css";
 
 const SECTIONS = [
@@ -148,6 +149,7 @@ export function AdminApp() {
               key={item.id}
               className={`anav__item ${section === item.id ? "is-active" : ""}`}
               onClick={() => {
+                if (item.id !== section && !confirmDiscard()) return;
                 setSection(item.id);
                 setNavOpen(false);
               }}

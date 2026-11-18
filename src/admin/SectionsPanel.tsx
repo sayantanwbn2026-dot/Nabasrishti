@@ -54,15 +54,15 @@ export function SectionsPanel() {
         </div>
       </header>
 
-      <ul className="asections">
+      <ul className="aorder-list">
         {data.map((row) => {
           const index = movable.findIndex((item) => item.id === row.id);
           return (
             <li
-              className={`asection ${row.is_locked ? "asection--locked" : ""}`}
+              className={`aorder ${row.is_locked ? "aorder--locked" : ""}`}
               key={row.id}
             >
-              <div className="asection__move">
+              <div className="aorder__move">
                 <button
                   type="button"
                   onClick={() => move(row, -1)}
@@ -81,13 +81,13 @@ export function SectionsPanel() {
                 </button>
               </div>
 
-              <div className="asection__body">
-                <p className="asection__label">{row.label}</p>
+              <div className="aorder__body">
+                <p className="aorder__label">{row.label}</p>
                 {row.note ? <p className="amuted">{row.note}</p> : null}
               </div>
 
               {row.is_locked ? (
-                <span className="asection__fixed">Fixed</span>
+                <span className="aorder__fixed">Fixed</span>
               ) : (
                 <Toggle
                   label="On the site"

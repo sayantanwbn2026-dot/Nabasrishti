@@ -9,6 +9,7 @@ import {
   TextArea,
   TextField,
 } from "./Fields";
+import { useSaveShortcut, useUnsavedGuard } from "./unsaved";
 import type { SiteSettings } from "@/lib/content";
 
 type Row = SiteSettings & { id: number };
@@ -44,6 +45,11 @@ export function SettingsPanel() {
 
   const dirty = JSON.stringify(draft) !== JSON.stringify(data);
 
+  const commit = () => save.mutate(draft as unknown as Record<string, unknown>);
+
+  useUnsavedGuard(dirty);
+  useSaveShortcut(dirty && !save.isPending, commit);
+
   return (
     <div className="apanel">
       <header className="apanel__head">
@@ -57,7 +63,7 @@ export function SettingsPanel() {
           type="button"
           className="abtn"
           disabled={!dirty || save.isPending}
-          onClick={() => save.mutate(draft as unknown as Record<string, unknown>)}
+          onClick={commit}
         >
           {save.isPending ? "Saving…" : dirty ? "Save changes" : "Saved"}
         </button>

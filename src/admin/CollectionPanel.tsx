@@ -8,6 +8,7 @@ import {
   type TableName,
 } from "./api";
 import { ImageField, TextArea, TextField, Toggle } from "./Fields";
+import { confirmDiscard, useSaveShortcut, useUnsavedGuard } from "./unsaved";
 
 type FieldSpec = {
   key: string;
@@ -57,8 +58,14 @@ export function CollectionPanel({ spec }: { spec: CollectionSpec }) {
     reorder.mutate(next.map((row, i) => ({ id: row.id, position: (i + 1) * 10 })));
   };
 
-  const dirty =
-    draft && JSON.stringify(draft) !== JSON.stringify(data.find((r) => r.id === draft.id));
+  const dirty = Boolean(
+    draft && JSON.stringify(draft) !== JSON.stringify(data.find((r) => r.id === draft.id)),
+  );
+
+  useUnsavedGuard(dirty);
+  useSaveShortcut(dirty && !save.isPending, () => {
+    if (draft) save.mutate(draft);
+  });
 
   return (
     <div className="apanel">
@@ -90,7 +97,10 @@ export function CollectionPanel({ spec }: { spec: CollectionSpec }) {
                 <button
                   type="button"
                   className="arow__title"
-                  onClick={() => setOpenId(isOpen ? null : row.id)}
+                  onClick={() => {
+                    if (!confirmDiscard()) return;
+                    setOpenId(isOpen ? null : row.id);
+                  }}
                 >
                   <span className="arow__index">{index + 1}</span>
                   <span>{String(row[spec.titleKey] || "Untitled")}</span>

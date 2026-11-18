@@ -180,7 +180,11 @@ original file again. Search it by file name.
 Nothing saves as you type. Each panel has a **Save** button that turns dark
 when there is something to save, and reads "Saved" when there isn't. Project
 page sections save individually, so a long page is safe to edit a piece at a
-time.
+time. **Ctrl+S** (**Cmd+S** on a Mac) saves without reaching for the button.
+
+If you try to leave a page with unsaved changes — switching section, going
+back to the list, or closing the tab — you are asked first. Nothing is
+thrown away without you saying so.
 
 Changes are live the moment they save. Pages that are already open update
 themselves within a second — the site subscribes to the database and

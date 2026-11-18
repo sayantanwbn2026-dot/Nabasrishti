@@ -72,8 +72,9 @@
 
 .anav__brand {
   display: grid;
+  flex: 0 0 auto;
   gap: 2px;
-  margin-bottom: var(--space-2xl);
+  margin-bottom: var(--space-lg);
 }
 
 .anav__brand strong {
@@ -84,8 +85,18 @@
 
 .anav__list {
   display: grid;
+  /* The list has to be the part that gives way, or a short window draws
+     the last sections straight over the sign-out block below. `min-height`
+     is what lets a flex child shrink past its content. */
+  min-height: 0;
+  flex: 1 1 auto;
   align-content: start;
   gap: 2px;
+  overflow-y: auto;
+  /* Room for the scrollbar so the labels do not sit under it. */
+  margin-right: calc(var(--space-2xs) * -1);
+  padding-right: var(--space-2xs);
+  overscroll-behavior: contain;
 }
 
 .anav__item {
@@ -112,8 +123,10 @@
 
 .anav__foot {
   display: grid;
+  /* Never squeezed: the list above scrolls instead. */
+  flex: 0 0 auto;
   gap: var(--space-2xs);
-  margin-top: auto;
+  margin-top: var(--space-md);
   padding-top: var(--space-md);
   border-top: 1px solid var(--rule-light);
 }
@@ -121,9 +134,16 @@
 .anav__link,
 .anav__user {
   margin: 0;
-  color: var(--ink-tertiary);
+  color: var(--ink-secondary);
   font-size: var(--text-2xs);
   letter-spacing: var(--track-label);
+}
+
+/* An email address is long and must not widen the sidebar or spill out. */
+.anav__user {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .anav__link {
@@ -137,7 +157,9 @@
 
 .amain {
   min-width: 0;
-  padding: var(--space-2xl) var(--space-xl) var(--space-4xl);
+  /* No top padding: the sticky panel head provides its own, so it meets
+     the top of the window cleanly when it sticks. */
+  padding: 0 var(--space-xl) var(--space-4xl);
 }
 
 /* --- Panels ----------------------------------------------------------- */
@@ -147,13 +169,29 @@
 }
 
 .apanel__head {
+  /* A project page is long enough that Save scrolled out of reach, which
+     is how work gets lost. It rides along instead. */
+  position: sticky;
+  z-index: 5;
+  top: 0;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: var(--space-md);
+  padding-top: var(--space-md);
   padding-bottom: var(--space-md);
   margin-bottom: var(--space-xl);
   border-bottom: 1px solid var(--rule-light);
+  background: var(--paper);
+}
+
+/* The head must not clip the form below it while stuck. */
+.apanel {
+  position: relative;
+}
+
+.apanel__head > div {
+  min-width: 0;
 }
 
 .apanel__head h1 {
@@ -210,12 +248,26 @@
   border-top: 1px solid var(--rule-light);
 }
 
+/* The first group sits under the panel head, which already draws a rule. */
+.asection:first-of-type {
+  padding-top: 0;
+  margin-top: 0;
+  border-top: 0;
+}
+
 .asection__title {
-  margin: 0 0 var(--space-md);
+  margin: 0 0 var(--space-2xs);
   font-size: var(--text-2xs);
   font-weight: var(--weight-medium);
   letter-spacing: var(--track-micro);
   text-transform: uppercase;
+}
+
+/* A group's explanation belongs with its title, not floating above the
+   first field. */
+.asection__title + .amuted {
+  margin: 0 0 var(--space-md);
+  max-width: 62ch;
 }
 
 /* --- Form fields ------------------------------------------------------ */
@@ -625,9 +677,21 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
+  /* The top bar is the one that sticks on a phone. The panel head would
+     pin to the same line and sit on top of it, and at this width it
+     stacks to about 150px — too much of a small screen to give up. */
+  .apanel__head {
+    position: static;
+    padding-top: var(--space-lg);
+  }
+
+  .amain {
+    padding-inline: var(--space-md);
+  }
+
   .atopbar {
     position: sticky;
-    z-index: 5;
+    z-index: 6;
     top: 0;
     display: flex;
     align-items: center;
@@ -734,7 +798,7 @@
 
 /* --- Page sections ----------------------------------------------------- */
 
-.asections {
+.aorder-list {
   display: grid;
   gap: 6px;
   margin: var(--space-md) 0 0;
@@ -742,7 +806,7 @@
   list-style: none;
 }
 
-.asection {
+.aorder {
   display: flex;
   gap: var(--space-sm);
   align-items: center;
@@ -752,16 +816,16 @@
 }
 
 /* A band that cannot move reads as part of the frame, not a choice. */
-.asection--locked {
+.aorder--locked {
   background: #fbf9f2;
 }
 
-.asection__move {
+.aorder__move {
   display: grid;
   gap: 4px;
 }
 
-.asection__move button {
+.aorder__move button {
   width: 26px;
   height: 22px;
   padding: 0;
@@ -773,27 +837,27 @@
   line-height: 1;
 }
 
-.asection__move button:hover:not(:disabled) {
+.aorder__move button:hover:not(:disabled) {
   border-color: var(--ink);
   color: var(--ink);
 }
 
-.asection__move button:disabled {
+.aorder__move button:disabled {
   opacity: 0.3;
   cursor: default;
 }
 
-.asection__body {
+.aorder__body {
   flex: 1;
   min-width: 0;
 }
 
-.asection__label {
+.aorder__label {
   margin: 0;
   font-weight: var(--weight-medium);
 }
 
-.asection__fixed {
+.aorder__fixed {
   color: var(--ink-tertiary);
   font-size: var(--text-xs);
   letter-spacing: var(--track-label);

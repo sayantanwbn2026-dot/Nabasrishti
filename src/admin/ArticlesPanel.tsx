@@ -16,6 +16,7 @@ import {
   Toggle,
 } from "./Fields";
 import { BlockList } from "./BlockEditing";
+import { confirmDiscard, useSaveShortcut, useUnsavedGuard } from "./unsaved";
 import type { Article } from "@/lib/content";
 
 function ArticleEditor({
@@ -37,11 +38,25 @@ function ArticleEditor({
     JSON.stringify({ ...draft, blocks: null }) !==
     JSON.stringify({ ...article, blocks: null });
 
+  const commit = () => {
+    const { blocks: _ignored, ...row } = draft;
+    save.mutate(row as unknown as Record<string, unknown>);
+  };
+
+  useUnsavedGuard(dirty);
+  useSaveShortcut(dirty && !save.isPending, commit);
+
   return (
     <div className="apanel">
       <header className="apanel__head">
         <div>
-          <button type="button" className="abtn abtn--quiet" onClick={onBack}>
+          <button
+            type="button"
+            className="abtn abtn--quiet"
+            onClick={() => {
+              if (confirmDiscard()) onBack();
+            }}
+          >
             ← All posts
           </button>
           <h1>{draft.title}</h1>
@@ -53,10 +68,7 @@ function ArticleEditor({
           type="button"
           className="abtn"
           disabled={!dirty || save.isPending}
-          onClick={() => {
-            const { blocks: _ignored, ...row } = draft;
-            save.mutate(row as unknown as Record<string, unknown>);
-          }}
+          onClick={commit}
         >
           {save.isPending ? "Saving…" : dirty ? "Save post" : "Saved"}
         </button>

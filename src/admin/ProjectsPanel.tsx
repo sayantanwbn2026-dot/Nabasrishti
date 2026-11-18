@@ -17,6 +17,7 @@ import {
   Toggle,
 } from "./Fields";
 import { BlockList } from "./BlockEditing";
+import { confirmDiscard, useSaveShortcut, useUnsavedGuard } from "./unsaved";
 import type { CmsProject } from "@/lib/content";
 
 const CARD_LAYOUTS = [
@@ -44,11 +45,25 @@ function ProjectEditor({
 
   const dirty = JSON.stringify({ ...draft, blocks: null }) !== JSON.stringify({ ...project, blocks: null });
 
+  const commit = () => {
+    const { blocks: _ignored, ...row } = draft;
+    saveProject.mutate(row as unknown as Record<string, unknown>);
+  };
+
+  useUnsavedGuard(dirty);
+  useSaveShortcut(dirty && !saveProject.isPending, commit);
+
   return (
     <div className="apanel">
       <header className="apanel__head">
         <div>
-          <button type="button" className="abtn abtn--quiet" onClick={onBack}>
+          <button
+            type="button"
+            className="abtn abtn--quiet"
+            onClick={() => {
+              if (confirmDiscard()) onBack();
+            }}
+          >
             ← All projects
           </button>
           <h1>{draft.title}</h1>
@@ -60,10 +75,7 @@ function ProjectEditor({
           type="button"
           className="abtn"
           disabled={!dirty || saveProject.isPending}
-          onClick={() => {
-            const { blocks: _ignored, ...row } = draft;
-            saveProject.mutate(row as unknown as Record<string, unknown>);
-          }}
+          onClick={commit}
         >
           {saveProject.isPending ? "Saving…" : dirty ? "Save project" : "Saved"}
         </button>
