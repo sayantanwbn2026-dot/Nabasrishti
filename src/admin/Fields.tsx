@@ -1,5 +1,77 @@
 import { useId, useRef, useState, type ReactNode } from "react";
-import { uploadImage } from "./api";
+import { uploadImage, useRows } from "./api";
+
+type MediaRow = {
+  id: string;
+  url: string;
+  label: string;
+  alt: string;
+  created_at: string;
+};
+
+/**
+ * Everything uploaded so far, so a photograph used in one place can be
+ * reused in another without hunting for the original file.
+ */
+function MediaLibrary({
+  onPick,
+  onClose,
+}: {
+  onPick: (url: string) => void;
+  onClose: () => void;
+}) {
+  const { data = [], isLoading, error } = useRows<MediaRow>("media");
+  const [term, setTerm] = useState("");
+
+  const needle = term.trim().toLowerCase();
+  const shown = needle
+    ? data.filter((row) =>
+        `${row.label ?? ""} ${row.alt ?? ""}`.toLowerCase().includes(needle),
+      )
+    : data;
+
+  return (
+    <div className="alibrary">
+      <div className="alibrary__head">
+        <input
+          className="af__input"
+          value={term}
+          placeholder="Search by file name"
+          onChange={(event) => setTerm(event.target.value)}
+        />
+        <button type="button" className="abtn abtn--quiet" onClick={onClose}>
+          Close
+        </button>
+      </div>
+
+      {isLoading ? <p className="amuted">Loading…</p> : null}
+      {error ? <p className="aerror">{(error as Error).message}</p> : null}
+      {!isLoading && shown.length === 0 ? (
+        <p className="amuted">
+          {data.length === 0
+            ? "Nothing uploaded yet. Images you upload will collect here."
+            : "No image matches that."}
+        </p>
+      ) : null}
+
+      <ul className="alibrary__grid">
+        {shown.map((row) => (
+          <li key={row.id}>
+            <button
+              type="button"
+              className="alibrary__item"
+              onClick={() => onPick(row.url)}
+              title={row.label || row.url}
+            >
+              <img src={row.url} alt="" loading="lazy" decoding="async" />
+              <span>{row.label || "Untitled"}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 type BaseProps = {
   label: string;
@@ -175,6 +247,7 @@ export function ImageField({
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [browsing, setBrowsing] = useState(false);
 
   const pick = async (file?: File) => {
     if (!file) return;
@@ -219,6 +292,13 @@ export function ImageField({
             >
               {busy ? "Uploading…" : "Upload image"}
             </button>
+            <button
+              type="button"
+              className="abtn abtn--ghost"
+              onClick={() => setBrowsing((open) => !open)}
+            >
+              {browsing ? "Hide library" : "Choose existing"}
+            </button>
             {value ? (
               <button
                 type="button"
@@ -232,6 +312,15 @@ export function ImageField({
           {error ? <p className="af__error">{error}</p> : null}
         </div>
       </div>
+      {browsing ? (
+        <MediaLibrary
+          onPick={(url) => {
+            onChange(url);
+            setBrowsing(false);
+          }}
+          onClose={() => setBrowsing(false)}
+        />
+      ) : null}
       <input
         ref={inputRef}
         type="file"

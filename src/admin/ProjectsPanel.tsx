@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   useCreateRow,
+  useDuplicatePage,
   useDeleteRow,
   useReorder,
   useRows,
@@ -131,6 +132,35 @@ function ProjectEditor({
       </section>
 
       <section className="asection">
+        <h2 className="asection__title">Search and sharing</h2>
+        <p className="amuted">
+          How this page appears in Google results and when the link is
+          shared. Leave any of them blank to use the page's own name and story.
+        </p>
+        <div className="aform">
+          <TextField
+            label="Search title"
+            hint="Around 60 characters. Put the most useful words first."
+            value={draft.seo_title}
+            onChange={(v) => set("seo_title", v)}
+          />
+          <TextArea
+            label="Search description"
+            hint="Around 155 characters. This is the grey text under the link."
+            rows={3}
+            value={draft.seo_description}
+            onChange={(v) => set("seo_description", v)}
+          />
+          <ImageField
+            label="Sharing image"
+            hint="Shown on WhatsApp, Facebook and LinkedIn. Wide works best."
+            value={draft.share_image_url}
+            onChange={(v) => set("share_image_url", v)}
+          />
+        </div>
+      </section>
+
+      <section className="asection">
         <h2 className="asection__title">Page options</h2>
         <div className="aform">
           <SelectField
@@ -171,6 +201,7 @@ function ProjectEditor({
 export function ProjectsPanel() {
   const { data = [], isLoading, error } = useRows<CmsProject>("projects");
   const create = useCreateRow("projects");
+  const duplicate = useDuplicatePage("projects", "project_blocks", "project_id");
   const remove = useDeleteRow("projects");
   const reorder = useReorder("projects");
   const [openId, setOpenId] = useState<string | null>(null);
@@ -217,6 +248,10 @@ export function ProjectsPanel() {
         </button>
       </header>
 
+      {duplicate.isError ? (
+        <p className="aerror">{(duplicate.error as Error).message}</p>
+      ) : null}
+
       <div className="alist">
         {data.map((project, index) => (
           <div className="arow" key={project.id}>
@@ -242,6 +277,20 @@ export function ProjectsPanel() {
               <div className="arow__actions">
                 <button type="button" className="aicon" onClick={() => move(index, -1)} aria-label="Move up">↑</button>
                 <button type="button" className="aicon" onClick={() => move(index, 1)} aria-label="Move down">↓</button>
+                <button
+                  type="button"
+                  className="aicon"
+                  aria-label={`Duplicate ${project.title}`}
+                  title="Duplicate"
+                  disabled={duplicate.isPending}
+                  onClick={() =>
+                    duplicate.mutate(project.id, {
+                      onSuccess: (row) => setOpenId((row as CmsProject).id),
+                    })
+                  }
+                >
+                  ⧉
+                </button>
                 <button
                   type="button"
                   className="aicon aicon--danger"

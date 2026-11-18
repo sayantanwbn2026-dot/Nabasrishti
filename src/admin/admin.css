@@ -731,3 +731,141 @@
   font-size: var(--text-base);
   line-height: var(--lh-body);
 }
+
+/* --- Page sections ----------------------------------------------------- */
+
+.asections {
+  display: grid;
+  gap: 6px;
+  margin: var(--space-md) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.asection {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--rule-light);
+  background: #fff;
+}
+
+/* A band that cannot move reads as part of the frame, not a choice. */
+.asection--locked {
+  background: #fbf9f2;
+}
+
+.asection__move {
+  display: grid;
+  gap: 4px;
+}
+
+.asection__move button {
+  width: 26px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid var(--rule-light);
+  background: #fff;
+  color: var(--ink-secondary);
+  cursor: pointer;
+  font: inherit;
+  line-height: 1;
+}
+
+.asection__move button:hover:not(:disabled) {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.asection__move button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.asection__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.asection__label {
+  margin: 0;
+  font-weight: var(--weight-medium);
+}
+
+.asection__fixed {
+  color: var(--ink-tertiary);
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+
+/* --- Media library ----------------------------------------------------- */
+
+.alibrary {
+  margin-top: var(--space-sm);
+  padding: var(--space-md);
+  border: 1px solid var(--rule-light);
+  background: #fbf9f2;
+}
+
+.alibrary__head {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+  margin-bottom: var(--space-sm);
+}
+
+.alibrary__head .af__input {
+  flex: 1;
+}
+
+.alibrary__grid {
+  display: grid;
+  gap: var(--space-sm);
+  /* Caps the height so a long library does not push the form off screen. */
+  max-height: 320px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  list-style: none;
+}
+
+.alibrary__item {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  padding: 0;
+  border: 1px solid transparent;
+  background: none;
+  color: var(--ink-secondary);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--text-2xs);
+  text-align: left;
+}
+
+.alibrary__item:hover,
+.alibrary__item:focus-visible {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.alibrary__item img {
+  width: 100%;
+  aspect-ratio: 1;
+  background: #ece8dd;
+  object-fit: cover;
+}
+
+.alibrary__item span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.aicon:disabled {
+  opacity: 0.4;
+  cursor: default;
+}

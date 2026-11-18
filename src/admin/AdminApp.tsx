@@ -6,11 +6,13 @@ import { ProjectsPanel } from "./ProjectsPanel";
 import { ArticlesPanel } from "./ArticlesPanel";
 import { EnquiriesPanel } from "./EnquiriesPanel";
 import { COLLECTIONS, CollectionPanel } from "./CollectionPanel";
+import { SectionsPanel } from "./SectionsPanel";
 import "./admin.css";
 
 const SECTIONS = [
   { id: "enquiries", label: "Enquiries" },
   { id: "site", label: "Site content" },
+  { id: "sections", label: "Page sections" },
   { id: "projects", label: "Projects" },
   { id: "articles", label: "Journal" },
   { id: "transformations", label: "Transformations" },
@@ -184,6 +186,7 @@ export function AdminApp() {
       <main className="amain">
         {section === "enquiries" ? <EnquiriesPanel /> : null}
         {section === "site" ? <SettingsPanel /> : null}
+        {section === "sections" ? <SectionsPanel /> : null}
         {section === "projects" ? <ProjectsPanel /> : null}
         {section === "articles" ? <ArticlesPanel /> : null}
         {COLLECTIONS[section] ? (

@@ -1,6 +1,7 @@
 import { useId } from "react";
 import { Modal } from "./Modal";
 import { Blocks } from "./Blocks";
+import { usePageMeta } from "@/lib/usePageMeta";
 import type { Article } from "@/lib/content";
 
 type ArticleModalProps = {
@@ -15,6 +16,18 @@ type ArticleModalProps = {
  */
 export function ArticleModal({ article, onClose, onEnquire }: ArticleModalProps) {
   const headingId = useId();
+
+  /* The post's own wording while it is open, falling back to what the
+     post already says rather than leaving the home page's title on it. */
+  usePageMeta(
+    article
+      ? {
+          title: article.seo_title || article.title,
+          description: article.seo_description || article.excerpt,
+          image: article.share_image_url || article.image_url,
+        }
+      : null,
+  );
 
   return (
     <Modal

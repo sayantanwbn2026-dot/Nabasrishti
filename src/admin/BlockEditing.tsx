@@ -31,7 +31,7 @@ const blankPayload = (type: BlockType): Record<string, unknown> => {
     case "gallery":
       return { images: [], columns: 1 };
     case "image":
-      return { url: "", alt: "", caption: "" };
+      return { url: "", alt: "", caption: "", ratio: "" };
     case "text":
     case "heading":
       return { text: "" };
@@ -58,7 +58,48 @@ const blankPayload = (type: BlockType): Record<string, unknown> => {
   }
 };
 
-type Img = { url?: string; alt?: string; caption?: string };
+type Img = { url?: string; alt?: string; caption?: string; ratio?: string };
+
+/* Offered in the order an editor is likely to want them: the two
+   landscape shapes first, since those are the ones that pair up. */
+const RATIO_CHOICES: { value: string; label: string }[] = [
+  { value: "", label: "As uploaded" },
+  { value: "16:9", label: "16:9 — wide (pairs up)" },
+  { value: "4:3", label: "4:3 — classic (pairs up)" },
+  { value: "1:1", label: "1:1 — square" },
+  { value: "4:5", label: "4:5 — upright" },
+  { value: "3:4", label: "3:4 — upright" },
+  { value: "9:16", label: "9:16 — tall" },
+];
+
+function RatioField({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (next: string) => void;
+}) {
+  return (
+    <label className="af">
+      <span className="af__label">Shape</span>
+      <select
+        className="af__input"
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+      >
+        {RATIO_CHOICES.map((choice) => (
+          <option value={choice.value} key={choice.value || "auto"}>
+            {choice.label}
+          </option>
+        ))}
+      </select>
+      <span className="af__hint">
+        Two wide images sit side by side. An upright one takes a row to
+        itself.
+      </span>
+    </label>
+  );
+}
 
 /** Editor for the images inside gallery / split blocks. */
 function ImageList({
@@ -110,6 +151,10 @@ function ImageList({
               value={image.alt ?? ""}
               onChange={(alt) => update(index, { alt })}
             />
+            <RatioField
+              value={image.ratio ?? ""}
+              onChange={(ratio) => update(index, { ratio })}
+            />
             <TextField
               label="Caption"
               hint="Optional, shown under the image."
@@ -122,7 +167,7 @@ function ImageList({
       <button
         type="button"
         className="abtn abtn--ghost"
-        onClick={() => onChange([...items, { url: "", alt: "" }])}
+        onClick={() => onChange([...items, { url: "", alt: "", ratio: "" }])}
       >
         Add image
       </button>
@@ -167,6 +212,7 @@ function BlockEditor({
       return (
         <>
           <ImageField label="Photograph" value={str("url")} onChange={(url) => set({ url })} />
+          <RatioField value={str("ratio")} onChange={(ratio) => set({ ratio })} />
           <TextField label="Description" value={str("alt")} onChange={(alt) => set({ alt })} />
           <TextField label="Caption" value={str("caption")} onChange={(caption) => set({ caption })} />
         </>

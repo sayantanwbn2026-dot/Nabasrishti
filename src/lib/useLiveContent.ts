@@ -16,6 +16,7 @@ const CONTENT_TABLES = [
   "social_links",
   "nav_links",
   "transformations",
+  "home_sections",
 ] as const;
 
 /** A block change has to refresh the parent the site actually queries. */

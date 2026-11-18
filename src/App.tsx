@@ -1,4 +1,5 @@
 import {
+  Fragment,
   Suspense,
   lazy,
   useEffect,
@@ -23,6 +24,7 @@ import {
   useArticles,
   useFooterLinks,
   useProcessSteps,
+  useHomeSections,
   useProjects,
   useTransformations,
   useServices,
@@ -35,6 +37,7 @@ import {
   type SiteSettings,
   type SocialLink,
   type FooterLink as FooterLinkRow,
+  fallbackHomeSections,
   fallbackSettings,
 } from "@/lib/content";
 
@@ -764,6 +767,7 @@ function HomePage() {
     useSiteSettings();
   const { data: cmsProjects = [] } = useProjects();
   const { data: cmsTransformations = [] } = useTransformations();
+  const { data: cmsSections = [] } = useHomeSections();
   const { data: cmsServices = [] } = useServices();
   const { data: cmsSteps = [] } = useProcessSteps();
   const { data: cmsTestimonials = [] } = useTestimonials();
@@ -834,6 +838,368 @@ function HomePage() {
     setEnquiryOpen(true);
   };
 
+  /* Each band of the page, keyed so the CMS can set the order and
+     hide any of them. The hero and the closing banner are locked
+     there, so they stay first and last. */
+  const bands: Record<string, ReactNode> = {
+    hero: (
+      <>
+          <section className="hero" id="home" aria-label="Nabasrishti Interior Design Studio">
+            <ParallaxImage
+              className="hero__image"
+              strength={0.06}
+              src={settings.hero_image_url || media.hero}
+              alt={settings.hero_image_alt}
+              width="2150"
+              height="1229"
+              fetchPriority="high"
+              decoding="async"
+            />
+            <div className="hero__shade" aria-hidden="true" />
+            {/* Fine grain stops the gradient wash from banding on large
+                screens and gives the photograph a little tooth. */}
+            <div className="hero__grain" aria-hidden="true" />
+
+            <Parallax className="hero__parallax" distance={90}>
+              <motion.div
+                className="hero__content"
+                variants={heroStagger}
+                initial="hidden"
+                animate="show"
+              >
+                {/* The h1 carries the full keyword phrase the Ads audit asked
+                    for; the wordmark is simply its first line. */}
+                <h1>
+                  <motion.span className="hero__wordmark" variants={heroItem}>
+                    {settings.name}
+                  </motion.span>
+                  <motion.span className="hero__headline" variants={heroItem}>
+                    {settings.headline}
+                  </motion.span>
+                </h1>
+                <motion.div className="hero__actions" variants={heroItem}>
+                  <button
+                    type="button"
+                    className="button button-light hero__cta-primary"
+                    onClick={() => openEnquiry("Hero banner")}
+                  >
+                    {settings.cta_primary_label}
+                  </button>
+                  <a className="hero__cta-call" href={`tel:+${settings.phone_digits}`}>
+                    <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                      <path d="M5.2 2.5 6.6 5 5.3 6.4a8 8 0 0 0 4.3 4.3L11 9.4l2.5 1.4v2.4c0 .4-.3.8-.8.8A10.6 10.6 0 0 1 2.4 3.3c0-.5.4-.8.8-.8h2z" />
+                    </svg>
+                    <span>{settings.phone}</span>
+                  </a>
+                </motion.div>
+              </motion.div>
+            </Parallax>
+
+            {/* Baseline rail: services on the left, a scroll cue on the right,
+                sharing one hairline. Frames the composition instead of
+                floating a second centred block under the title. */}
+            <motion.div
+              className="hero__rail"
+              variants={heroRail}
+              initial="hidden"
+              animate="show"
+            >
+              <div className="hero__rail-inner">
+                <ul className="hero__highlights" aria-label="Services">
+                  {settings.service_highlights.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+                <a className="hero__scroll" href="#studio">
+                  <span>Scroll</span>
+                  <span className="hero__scroll-track" aria-hidden="true" />
+                </a>
+              </div>
+            </motion.div>
+          </section>
+      </>
+    ),
+    promise: (
+      <>
+          {/* The audit's supporting tagline, moved out of the banner so the
+              hero can breathe. The USPs it also asks for are the studio
+              stats immediately below. */}
+          <section className="promise-band light-section" aria-label="Our promise">
+            <div className="page-shell">
+              <Reveal as="p" className="promise-band__text">
+                {settings.tagline}
+              </Reveal>
+            </div>
+          </section>
+      </>
+    ),
+    studio: (
+      <>
+          <section className="studio-section light-section" id="studio">
+            <div className="page-shell studio-layout">
+              <Reveal className="studio-image" preset="image">
+                <ParallaxImage
+                  strength={0.055}
+                  src={settings.studio_image_url || media.studio}
+                  alt={settings.studio_image_alt}
+                  width="1440"
+                  height="1440"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </Reveal>
+              <div className="studio-copy">
+                <TextReveal
+                  className="studio-statement"
+                  text={settings.studio_statement}
+                />
+                <Stagger
+                  className="studio-stats"
+                  stagger={0.1}
+                  aria-label="Studio statistics"
+                >
+                  {settings.stats.map((stat) => (
+                    <RevealItem className="studio-stat" key={stat.label}>
+                      <p className="studio-stat__value">
+                        <CountUp value={stat.value} suffix={stat.suffix} />
+                      </p>
+                      <p className="studio-stat__label">{stat.label}</p>
+                    </RevealItem>
+                  ))}
+                </Stagger>
+                <SectionCta
+                  context="Studio section"
+                  label={settings.cta_studio_label}
+                  onEnquire={openEnquiry}
+                />
+              </div>
+            </div>
+          </section>
+      </>
+    ),
+    projects: (
+      <>
+          <section className="projects-section light-section" id="projects">
+            <div className="page-shell">
+              <Reveal className="section-heading projects-heading">
+                <div>
+                  <p className="section-label">{settings.projects_label}</p>
+                  <h2>{settings.projects_heading}</h2>
+                </div>
+                <button
+                  type="button"
+                  className="button button-dark"
+                  onClick={() => openEnquiry("Projects section")}
+                >
+                  {settings.cta_projects_label}
+                </button>
+              </Reveal>
+              <div className="projects-gallery" id="project-list">
+                {projectList.map((project) => (
+                  <ProjectFigure
+                    project={project}
+                    onOpen={setActiveProject}
+                    key={project.id}
+                  />
+                ))}
+              </div>
+            </div>
+          </section>
+      </>
+    ),
+    services: (
+      <>
+          <section className="services-section dark-section" id="services">
+            <div className="page-shell">
+              <Reveal className="section-heading section-heading-stacked">
+                <p className="section-label">{settings.services_label}</p>
+                <h2>{settings.services_heading}</h2>
+              </Reveal>
+              <Reveal delay={0.08}>
+                <ServicesAccordion items={serviceItems} />
+              </Reveal>
+              <SectionCta
+                context="Services section"
+                label={settings.cta_services_label}
+                variant="light"
+                onEnquire={openEnquiry}
+              />
+            </div>
+          </section>
+      </>
+    ),
+    comparison: (
+      <>
+          <section className="comparison-section dark-section">
+            <div className="page-shell">
+              <Reveal as="h2" className="centered-heading">
+                {settings.comparison_heading}
+              </Reveal>
+              <Reveal preset="image" delay={0.08}>
+                <ImageComparison
+                  beforeUrl={settings.comparison_before_url}
+                  afterUrl={settings.comparison_after_url}
+                  beforeLabel={settings.comparison_before_label}
+                  afterLabel={settings.comparison_after_label}
+                />
+              </Reveal>
+              <Reveal className="comparison-section__more" delay={0.12}>
+                <button
+                  type="button"
+                  className="button button-light"
+                  onClick={() => setTransformationsOpen(true)}
+                >
+                  {settings.comparison_cta_label}
+                </button>
+              </Reveal>
+            </div>
+          </section>
+      </>
+    ),
+    process: (
+      <>
+          <section className="process-section dark-section" id="process">
+            <div className="page-shell">
+              <Reveal className="centered-section-heading">
+                <p className="section-label">{settings.process_label}</p>
+                <h2>{settings.process_heading}</h2>
+              </Reveal>
+              <Stagger className="process-list" stagger={0.1}>
+                {stepItems.map((step) => (
+                  <RevealItem
+                    as="article"
+                    className="process-card"
+                    key={step.number}
+                  >
+                    <p className="process-card__number">{step.number}</p>
+                    <div className="process-card__content">
+                      <h3>{step.title}</h3>
+                      <p>{step.description}</p>
+                    </div>
+                  </RevealItem>
+                ))}
+              </Stagger>
+              <SectionCta
+                context="Process section"
+                label={settings.cta_process_label}
+                variant="light"
+                onEnquire={openEnquiry}
+              />
+            </div>
+          </section>
+      </>
+    ),
+    testimonials: (
+      <>
+          <TestimonialsSection
+            onEnquire={openEnquiry}
+            items={testimonialItems}
+            label={settings.testimonials_label}
+            heading={settings.testimonials_heading}
+            aside={settings.testimonials_aside}
+            ctaLabel={settings.cta_testimonials_label}
+          />
+      </>
+    ),
+    journal: (
+      <>
+          <section className="journal-section dark-section" id="blog">
+            <div className="page-shell">
+              <Reveal className="section-heading journal-heading">
+                <div>
+                  <p className="section-label">{settings.journal_label}</p>
+                  <h2>{settings.journal_heading}</h2>
+                </div>
+                <p className="section-aside">{settings.journal_aside}</p>
+              </Reveal>
+              <Stagger className="article-grid" stagger={0.09}>
+                {articleItems.map((article) => (
+                  <RevealItem as="article" className="article" key={article.title}>
+                    <button
+                      type="button"
+                      className="article__link"
+                      onClick={() => setActiveArticle(article.source)}
+                      aria-label={`Read ${article.title}`}
+                    >
+                    <div className="article__image">
+                      <ParallaxImage
+                        strength={0.045}
+                        hoverScale={1.025}
+                        src={article.image}
+                        alt={article.alt}
+                        width="1200"
+                        height="1500"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </div>
+                    <time dateTime={article.dateTime}>{article.date}</time>
+                    <h3>{article.title}</h3>
+                    </button>
+                  </RevealItem>
+                ))}
+              </Stagger>
+              <SectionCta
+                context="Journal section"
+                label={settings.cta_journal_label}
+                variant="light"
+                onEnquire={openEnquiry}
+              />
+            </div>
+          </section>
+      </>
+    ),
+    contact: (
+      <>
+          <ContactSection
+            settings={settings}
+            socials={cmsSocials}
+            onEnquire={openEnquiry}
+          />
+      </>
+    ),
+    closing: (
+      <>
+          <section className="contact-banner" aria-label="Start a project">
+            <ParallaxImage
+              strength={0.08}
+              src={settings.closing_image_url || media.closing}
+              alt={settings.closing_image_alt}
+              width="2200"
+              height="940"
+              loading="lazy"
+              decoding="async"
+            />
+            <div className="contact-banner__shade" aria-hidden="true" />
+            <Reveal className="contact-banner__content">
+              <h2>{settings.closing_heading}</h2>
+              <p>{settings.closing_body}</p>
+              <div className="contact-banner__actions">
+                <button
+                  type="button"
+                  className="button button-light"
+                  onClick={() => openEnquiry("Closing banner")}
+                >
+                  Get free consultation
+                </button>
+                <a className="button button-outline" href={`tel:+${settings.phone_digits}`}>
+                  Call {settings.phone}
+                </a>
+              </div>
+            </Reveal>
+          </section>
+      </>
+    ),
+  };
+
+  /* The CMS owns the order. Anything it does not know about is dropped,
+     and a band the page no longer renders is ignored, so the two can
+     drift apart without leaving a hole or throwing. */
+  const orderedBands = (cmsSections.length > 0 ? cmsSections : fallbackHomeSections)
+    .filter((section) => section.is_published)
+    .map((section) => section.key)
+    .filter((key) => key in bands);
+
   return (
     <>
       <SiteNavigation
@@ -844,320 +1210,9 @@ function HomePage() {
         ctaLabel={settings.nav_cta_label}
       />
       <main>
-        <section className="hero" id="home" aria-label="Nabasrishti Interior Design Studio">
-          <ParallaxImage
-            className="hero__image"
-            strength={0.06}
-            src={settings.hero_image_url || media.hero}
-            alt={settings.hero_image_alt}
-            width="2150"
-            height="1229"
-            fetchPriority="high"
-            decoding="async"
-          />
-          <div className="hero__shade" aria-hidden="true" />
-          {/* Fine grain stops the gradient wash from banding on large
-              screens and gives the photograph a little tooth. */}
-          <div className="hero__grain" aria-hidden="true" />
-
-          <Parallax className="hero__parallax" distance={90}>
-            <motion.div
-              className="hero__content"
-              variants={heroStagger}
-              initial="hidden"
-              animate="show"
-            >
-              {/* The h1 carries the full keyword phrase the Ads audit asked
-                  for; the wordmark is simply its first line. */}
-              <h1>
-                <motion.span className="hero__wordmark" variants={heroItem}>
-                  {settings.name}
-                </motion.span>
-                <motion.span className="hero__headline" variants={heroItem}>
-                  {settings.headline}
-                </motion.span>
-              </h1>
-              <motion.div className="hero__actions" variants={heroItem}>
-                <button
-                  type="button"
-                  className="button button-light hero__cta-primary"
-                  onClick={() => openEnquiry("Hero banner")}
-                >
-                  {settings.cta_primary_label}
-                </button>
-                <a className="hero__cta-call" href={`tel:+${settings.phone_digits}`}>
-                  <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-                    <path d="M5.2 2.5 6.6 5 5.3 6.4a8 8 0 0 0 4.3 4.3L11 9.4l2.5 1.4v2.4c0 .4-.3.8-.8.8A10.6 10.6 0 0 1 2.4 3.3c0-.5.4-.8.8-.8h2z" />
-                  </svg>
-                  <span>{settings.phone}</span>
-                </a>
-              </motion.div>
-            </motion.div>
-          </Parallax>
-
-          {/* Baseline rail: services on the left, a scroll cue on the right,
-              sharing one hairline. Frames the composition instead of
-              floating a second centred block under the title. */}
-          <motion.div
-            className="hero__rail"
-            variants={heroRail}
-            initial="hidden"
-            animate="show"
-          >
-            <div className="hero__rail-inner">
-              <ul className="hero__highlights" aria-label="Services">
-                {settings.service_highlights.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-              <a className="hero__scroll" href="#studio">
-                <span>Scroll</span>
-                <span className="hero__scroll-track" aria-hidden="true" />
-              </a>
-            </div>
-          </motion.div>
-        </section>
-
-        {/* The audit's supporting tagline, moved out of the banner so the
-            hero can breathe. The USPs it also asks for are the studio
-            stats immediately below. */}
-        <section className="promise-band light-section" aria-label="Our promise">
-          <div className="page-shell">
-            <Reveal as="p" className="promise-band__text">
-              {settings.tagline}
-            </Reveal>
-          </div>
-        </section>
-
-        <section className="studio-section light-section" id="studio">
-          <div className="page-shell studio-layout">
-            <Reveal className="studio-image" preset="image">
-              <ParallaxImage
-                strength={0.055}
-                src={settings.studio_image_url || media.studio}
-                alt={settings.studio_image_alt}
-                width="1440"
-                height="1440"
-                loading="lazy"
-                decoding="async"
-              />
-            </Reveal>
-            <div className="studio-copy">
-              <TextReveal
-                className="studio-statement"
-                text={settings.studio_statement}
-              />
-              <Stagger
-                className="studio-stats"
-                stagger={0.1}
-                aria-label="Studio statistics"
-              >
-                {settings.stats.map((stat) => (
-                  <RevealItem className="studio-stat" key={stat.label}>
-                    <p className="studio-stat__value">
-                      <CountUp value={stat.value} suffix={stat.suffix} />
-                    </p>
-                    <p className="studio-stat__label">{stat.label}</p>
-                  </RevealItem>
-                ))}
-              </Stagger>
-              <SectionCta
-                context="Studio section"
-                label={settings.cta_studio_label}
-                onEnquire={openEnquiry}
-              />
-            </div>
-          </div>
-        </section>
-
-        <section className="projects-section light-section" id="projects">
-          <div className="page-shell">
-            <Reveal className="section-heading projects-heading">
-              <div>
-                <p className="section-label">{settings.projects_label}</p>
-                <h2>{settings.projects_heading}</h2>
-              </div>
-              <button
-                type="button"
-                className="button button-dark"
-                onClick={() => openEnquiry("Projects section")}
-              >
-                {settings.cta_projects_label}
-              </button>
-            </Reveal>
-            <div className="projects-gallery" id="project-list">
-              {projectList.map((project) => (
-                <ProjectFigure
-                  project={project}
-                  onOpen={setActiveProject}
-                  key={project.id}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="services-section dark-section" id="services">
-          <div className="page-shell">
-            <Reveal className="section-heading section-heading-stacked">
-              <p className="section-label">{settings.services_label}</p>
-              <h2>{settings.services_heading}</h2>
-            </Reveal>
-            <Reveal delay={0.08}>
-              <ServicesAccordion items={serviceItems} />
-            </Reveal>
-            <SectionCta
-              context="Services section"
-              label={settings.cta_services_label}
-              variant="light"
-              onEnquire={openEnquiry}
-            />
-          </div>
-        </section>
-
-        <section className="comparison-section dark-section">
-          <div className="page-shell">
-            <Reveal as="h2" className="centered-heading">
-              {settings.comparison_heading}
-            </Reveal>
-            <Reveal preset="image" delay={0.08}>
-              <ImageComparison
-                beforeUrl={settings.comparison_before_url}
-                afterUrl={settings.comparison_after_url}
-                beforeLabel={settings.comparison_before_label}
-                afterLabel={settings.comparison_after_label}
-              />
-            </Reveal>
-            <Reveal className="comparison-section__more" delay={0.12}>
-              <button
-                type="button"
-                className="button button-light"
-                onClick={() => setTransformationsOpen(true)}
-              >
-                {settings.comparison_cta_label}
-              </button>
-            </Reveal>
-          </div>
-        </section>
-
-        <section className="process-section dark-section" id="process">
-          <div className="page-shell">
-            <Reveal className="centered-section-heading">
-              <p className="section-label">{settings.process_label}</p>
-              <h2>{settings.process_heading}</h2>
-            </Reveal>
-            <Stagger className="process-list" stagger={0.1}>
-              {stepItems.map((step) => (
-                <RevealItem
-                  as="article"
-                  className="process-card"
-                  key={step.number}
-                >
-                  <p className="process-card__number">{step.number}</p>
-                  <div className="process-card__content">
-                    <h3>{step.title}</h3>
-                    <p>{step.description}</p>
-                  </div>
-                </RevealItem>
-              ))}
-            </Stagger>
-            <SectionCta
-              context="Process section"
-              label={settings.cta_process_label}
-              variant="light"
-              onEnquire={openEnquiry}
-            />
-          </div>
-        </section>
-
-        <TestimonialsSection
-          onEnquire={openEnquiry}
-          items={testimonialItems}
-          label={settings.testimonials_label}
-          heading={settings.testimonials_heading}
-          aside={settings.testimonials_aside}
-          ctaLabel={settings.cta_testimonials_label}
-        />
-
-        <section className="journal-section dark-section" id="blog">
-          <div className="page-shell">
-            <Reveal className="section-heading journal-heading">
-              <div>
-                <p className="section-label">{settings.journal_label}</p>
-                <h2>{settings.journal_heading}</h2>
-              </div>
-              <p className="section-aside">{settings.journal_aside}</p>
-            </Reveal>
-            <Stagger className="article-grid" stagger={0.09}>
-              {articleItems.map((article) => (
-                <RevealItem as="article" className="article" key={article.title}>
-                  <button
-                    type="button"
-                    className="article__link"
-                    onClick={() => setActiveArticle(article.source)}
-                    aria-label={`Read ${article.title}`}
-                  >
-                  <div className="article__image">
-                    <ParallaxImage
-                      strength={0.045}
-                      hoverScale={1.025}
-                      src={article.image}
-                      alt={article.alt}
-                      width="1200"
-                      height="1500"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </div>
-                  <time dateTime={article.dateTime}>{article.date}</time>
-                  <h3>{article.title}</h3>
-                  </button>
-                </RevealItem>
-              ))}
-            </Stagger>
-            <SectionCta
-              context="Journal section"
-              label={settings.cta_journal_label}
-              variant="light"
-              onEnquire={openEnquiry}
-            />
-          </div>
-        </section>
-
-        <ContactSection
-          settings={settings}
-          socials={cmsSocials}
-          onEnquire={openEnquiry}
-        />
-
-        <section className="contact-banner" aria-label="Start a project">
-          <ParallaxImage
-            strength={0.08}
-            src={settings.closing_image_url || media.closing}
-            alt={settings.closing_image_alt}
-            width="2200"
-            height="940"
-            loading="lazy"
-            decoding="async"
-          />
-          <div className="contact-banner__shade" aria-hidden="true" />
-          <Reveal className="contact-banner__content">
-            <h2>{settings.closing_heading}</h2>
-            <p>{settings.closing_body}</p>
-            <div className="contact-banner__actions">
-              <button
-                type="button"
-                className="button button-light"
-                onClick={() => openEnquiry("Closing banner")}
-              >
-                Get free consultation
-              </button>
-              <a className="button button-outline" href={`tel:+${settings.phone_digits}`}>
-                Call {settings.phone}
-              </a>
-            </div>
-          </Reveal>
-        </section>
+        {orderedBands.map((key) => (
+          <Fragment key={key}>{bands[key]}</Fragment>
+        ))}
       </main>
       <SiteFooter settings={settings} links={cmsFooterLinks} socials={cmsSocials} />
 

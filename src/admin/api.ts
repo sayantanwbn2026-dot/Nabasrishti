@@ -6,6 +6,7 @@ export const TABLES = {
   site_settings: { order: null },
   projects: { order: "position" },
   project_blocks: { order: "position" },
+  home_sections: { order: "position" },
   transformations: { order: "position" },
   services: { order: "position" },
   process_steps: { order: "position" },
@@ -124,6 +125,78 @@ export function useReorder(table: TableName) {
       );
     },
     onSuccess: refresh,
+  });
+}
+
+/**
+ * Copies a project or journal post, with every block on its page.
+ *
+ * The copy arrives hidden and is left for the editor to rename, so a
+ * duplicate can never quietly appear on the live site under a name that
+ * reads like the original.
+ */
+export function useDuplicatePage(
+  table: "projects" | "articles",
+  blockTable: "project_blocks" | "article_blocks",
+  parentKey: "project_id" | "article_id",
+) {
+  const refreshParent = useRefresh(table);
+  const refreshBlocks = useRefresh(blockTable);
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const db = client();
+
+      const { data: source, error: readError } = await db
+        .from(table)
+        .select("*")
+        .eq("id", id)
+        .single();
+      if (readError) throw readError;
+
+      const { id: _id, created_at: _created, ...rest } = source as Record<
+        string,
+        unknown
+      >;
+      const stamp = Date.now();
+      const copy = {
+        ...rest,
+        title: `${(rest.title as string) ?? "Untitled"} (copy)`,
+        slug: `${(rest.slug as string) ?? "page"}-copy-${stamp}`,
+        position: Number(rest.position ?? 0) + 1,
+        is_published: false,
+      };
+
+      const { data: created, error: createError } = await db
+        .from(table)
+        .insert(copy)
+        .select()
+        .single();
+      if (createError) throw createError;
+
+      const newId = (created as { id: string }).id;
+
+      const { data: blocks, error: blockError } = await db
+        .from(blockTable)
+        .select("*")
+        .eq(parentKey, id);
+      if (blockError) throw blockError;
+
+      if (blocks && blocks.length > 0) {
+        const copies = (blocks as Record<string, unknown>[]).map((block) => {
+          const { id: _blockId, created_at: _blockCreated, ...blockRest } = block;
+          return { ...blockRest, [parentKey]: newId };
+        });
+        const { error: insertError } = await db.from(blockTable).insert(copies);
+        if (insertError) throw insertError;
+      }
+
+      return created;
+    },
+    onSuccess: () => {
+      refreshParent();
+      refreshBlocks();
+    },
   });
 }
 

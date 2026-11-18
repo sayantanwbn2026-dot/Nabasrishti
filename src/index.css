@@ -2582,6 +2582,27 @@ p {
   object-fit: cover;
 }
 
+/* Galleries where the editor has set each image's shape. Two landscape
+   pictures share a row; an upright one takes the row to itself, held to a
+   column narrow enough that it does not tower over the page. */
+.project-detail__gallery--shaped {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.project-detail__row {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.project-detail__row--2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.project-detail__row--1 > .project-detail__frame--upright {
+  width: min(100%, 460px);
+  margin-inline: auto;
+}
+
 .project-detail__foot {
   display: flex;
   align-items: center;
@@ -2960,6 +2981,15 @@ p {
 
   .project-detail__gallery {
     grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  /* A pair stacks on a phone, and an upright image can take the width. */
+  .project-detail__row--2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .project-detail__row--1 > .project-detail__frame--upright {
+    width: 100%;
   }
 }
 

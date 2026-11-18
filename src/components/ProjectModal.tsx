@@ -1,6 +1,7 @@
 import { useId } from "react";
 import { Modal } from "./Modal";
 import { Blocks } from "./Blocks";
+import { usePageMeta } from "@/lib/usePageMeta";
 import type { CmsProject } from "@/lib/content";
 
 type ProjectModalProps = {
@@ -12,6 +13,18 @@ type ProjectModalProps = {
 
 export function ProjectModal({ project, onClose, onEnquire }: ProjectModalProps) {
   const headingId = useId();
+
+  /* The page's own wording while it is open, falling back to what the
+     page already says rather than leaving the home page's title on it. */
+  usePageMeta(
+    project
+      ? {
+          title: project.seo_title || project.title,
+          description: project.seo_description || project.narrative,
+          image: project.share_image_url || project.card_image_url,
+        }
+      : null,
+  );
 
   return (
     <Modal

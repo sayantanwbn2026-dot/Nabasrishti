@@ -131,7 +131,22 @@ export type CmsProject = {
   accent_label: string;
   position: number;
   is_published: boolean;
+  seo_title: string;
+  seo_description: string;
+  share_image_url: string;
   blocks?: ProjectBlock[];
+};
+
+/** A band on the home page, in the order the CMS puts it. */
+export type HomeSection = {
+  id: string;
+  key: string;
+  label: string;
+  note: string;
+  position: number;
+  is_published: boolean;
+  /** The hero and the closing banner cannot be moved or hidden. */
+  is_locked: boolean;
 };
 
 /** One before/after pairing in the transformations gallery. */
@@ -194,6 +209,9 @@ export type Article = {
   cta_label: string;
   position: number;
   is_published: boolean;
+  seo_title: string;
+  seo_description: string;
+  share_image_url: string;
   blocks?: ProjectBlock[];
 };
 
@@ -353,6 +371,28 @@ const CARD_LAYOUTS: CmsProject["card_layout"][] = [
 ];
 
 /** Shown when the gallery cannot be read from the CMS. */
+export const fallbackHomeSections: HomeSection[] = [
+  ["hero", "Hero banner", true],
+  ["promise", "Tagline band", false],
+  ["studio", "Studio", false],
+  ["projects", "Projects", false],
+  ["services", "Services", false],
+  ["comparison", "Before and after", false],
+  ["process", "Process", false],
+  ["testimonials", "Our stories", false],
+  ["journal", "Journal", false],
+  ["contact", "Contact and map", false],
+  ["closing", "Closing banner", true],
+].map(([key, label, locked], index) => ({
+  id: key as string,
+  key: key as string,
+  label: label as string,
+  note: "",
+  position: index * 10,
+  is_published: true,
+  is_locked: locked as boolean,
+}));
+
 export const fallbackTransformations: Transformation[] = fallbackProjects
   .slice(0, 4)
   .map((project, index) => ({
@@ -388,6 +428,9 @@ export const fallbackCmsProjects: CmsProject[] = fallbackProjects.map(
     accent_label: "",
     position: (index + 1) * 10,
     is_published: true,
+    seo_title: "",
+    seo_description: "",
+    share_image_url: "",
     blocks: [
       {
         /* Every project page carries the drawing it grew from. */
@@ -488,6 +531,15 @@ export function useServices() {
     queryFn: listQuery<Service>("services", []),
     staleTime: STALE,
     placeholderData: [],
+  });
+}
+
+export function useHomeSections() {
+  return useQuery({
+    queryKey: ["home_sections"],
+    queryFn: listQuery<HomeSection>("home_sections", fallbackHomeSections),
+    staleTime: STALE,
+    placeholderData: fallbackHomeSections,
   });
 }
 

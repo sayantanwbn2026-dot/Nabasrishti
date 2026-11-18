@@ -62,8 +62,20 @@ Everything that appears once, grouped into tabs:
 | Enquiry form | Form wording, the service dropdown, pop-up delay, thank-you page |
 | SEO | Browser tab title and the description Google shows |
 
+### Page sections
+The order of the bands down the home page. Use ↑ and ↓ to rearrange them,
+and the switch to take one off the site without losing anything inside it.
+The hero and the closing banner are marked **Fixed**: they stay first and
+last.
+
+> If you hide a section that a navigation link points to, that link will
+> have nothing to scroll to. Hide the matching link under **Navigation**
+> at the same time.
+
 ### Projects
-The list controls the home-page gallery. Click a project to open its editor.
+The list controls the home-page gallery. Click a project to open its
+editor, or use **⧉** to duplicate one — the copy arrives hidden, with
+every section of its page, ready to rename.
 
 **Details** — name, web address, type, location, year, the story, scope list.
 
@@ -81,6 +93,7 @@ as many sections as you like, in any order:
 | Section | Use it for |
 |---|---|
 | Image gallery | A set of photographs, in 1, 2 or 3 columns |
+| Before and after | A slider between two images |
 | Single image | One photograph, full width, with an optional caption |
 | Paragraph | A block of writing |
 | Heading | A sub-heading partway down the page |
@@ -91,6 +104,17 @@ as many sections as you like, in any order:
 
 Use the ↑ ↓ buttons to reorder and × to delete. Each section saves on its own.
 
+**Image shapes.** Every photograph in a gallery has a **Shape** setting:
+16:9 and 4:3 are wide, 1:1 is square, and 4:5, 3:4 and 9:16 stand upright.
+Two wide images in a row sit side by side; an upright one takes the row to
+itself. Leave it on **As uploaded** to keep a gallery exactly as it is —
+the shapes only take over once you set them.
+
+**Search and sharing.** Each project and post has its own search title,
+description and sharing image. Leave them blank and the page uses its own
+name and story. These are what Google shows, and what appears when the
+link is pasted into WhatsApp.
+
 ### Enquiries
 Every form submission lands here, newest first, with the page and button it
 came from. Set a status (new → contacted → quoted → won/lost), keep private
@@ -99,6 +123,11 @@ notes, and call or WhatsApp straight from the record.
 **Download CSV** exports whatever the current filter shows. The file opens
 cleanly in Excel and Google Sheets, and mobile numbers keep their leading
 digits.
+
+### Transformations
+The before and after pairs behind "From Concept to Creation". Each one
+becomes a slider on the page the button opens. Both images in a pair
+should be the same shape, or the slider will crop one of them.
 
 ### Journal
 Posts work exactly like projects: a card in the grid, and a full page built
@@ -133,6 +162,10 @@ website** switch so you can take something down without deleting it.
 
 Any image field accepts either an upload or a pasted URL. Uploads go to the
 project's `media` bucket and are served from Supabase.
+
+**Choose existing** opens the library of everything uploaded so far, so a
+photograph used in one place can be reused in another without finding the
+original file again. Search it by file name.
 
 - Keep photographs under 10 MB. JPEG, PNG, WebP, AVIF and SVG are accepted.
 - Always fill in the description field next to an image. It is read aloud by

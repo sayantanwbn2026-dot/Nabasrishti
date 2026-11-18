@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   useCreateRow,
+  useDuplicatePage,
   useDeleteRow,
   useReorder,
   useRows,
@@ -110,6 +111,36 @@ function ArticleEditor({
       </section>
 
       <section className="asection">
+        <h2 className="asection__title">Search and sharing</h2>
+        <p className="amuted">
+          How this post appears in Google results and when the link is
+          shared. Leave any of them blank to use the post's own title and
+          summary.
+        </p>
+        <div className="aform">
+          <TextField
+            label="Search title"
+            hint="Around 60 characters. Put the most useful words first."
+            value={draft.seo_title}
+            onChange={(v) => set("seo_title", v)}
+          />
+          <TextArea
+            label="Search description"
+            hint="Around 155 characters. This is the grey text under the link."
+            rows={3}
+            value={draft.seo_description}
+            onChange={(v) => set("seo_description", v)}
+          />
+          <ImageField
+            label="Sharing image"
+            hint="Shown on WhatsApp, Facebook and LinkedIn. Wide works best."
+            value={draft.share_image_url}
+            onChange={(v) => set("share_image_url", v)}
+          />
+        </div>
+      </section>
+
+      <section className="asection">
         <h2 className="asection__title">Page options</h2>
         <div className="aform">
           <SelectField
@@ -147,6 +178,7 @@ function ArticleEditor({
 export function ArticlesPanel() {
   const { data = [], isLoading, error } = useRows<Article>("articles");
   const create = useCreateRow("articles");
+  const duplicate = useDuplicatePage("articles", "article_blocks", "article_id");
   const remove = useDeleteRow("articles");
   const reorder = useReorder("articles");
   const [openId, setOpenId] = useState<string | null>(null);
@@ -214,6 +246,20 @@ export function ArticlesPanel() {
               <div className="arow__actions">
                 <button type="button" className="aicon" onClick={() => move(index, -1)} aria-label="Move up">↑</button>
                 <button type="button" className="aicon" onClick={() => move(index, 1)} aria-label="Move down">↓</button>
+                <button
+                  type="button"
+                  className="aicon"
+                  aria-label={`Duplicate ${article.title}`}
+                  title="Duplicate"
+                  disabled={duplicate.isPending}
+                  onClick={() =>
+                    duplicate.mutate(article.id, {
+                      onSuccess: (row) => setOpenId((row as Article).id),
+                    })
+                  }
+                >
+                  ⧉
+                </button>
                 <button
                   type="button"
                   className="aicon aicon--danger"
