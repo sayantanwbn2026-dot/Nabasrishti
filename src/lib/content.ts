@@ -316,7 +316,7 @@ export const fallbackSettings: SiteSettings = {
     "Commercial Interior",
     "Renovation",
   ],
-  enquiry_delay_ms: 3000,
+  enquiry_delay_ms: 10000,
   thankyou_heading: "Thank you — your enquiry is with our team.",
   thankyou_body:
     "A designer from the studio will call you within one working day to understand your space and talk through next steps.",

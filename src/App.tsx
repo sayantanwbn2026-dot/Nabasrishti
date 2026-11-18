@@ -758,7 +758,9 @@ function SectionCta({
  * Ads audit: the single enquiry form should appear as a pop-up 2–3 seconds
  * after the page loads.
  */
-const ENQUIRY_DELAY_MS = 3000;
+/** Used only if the CMS has no value. Counted from the end of the
+    loading screen, not from the page opening. */
+const ENQUIRY_DELAY_MS = 10000;
 
 function HomePage() {
   // Streams CMS edits into this page without a reload.
@@ -848,12 +850,17 @@ function HomePage() {
   const [activeProject, setActiveProject] = useState<CmsProject | null>(null);
   const [activeArticle, setActiveArticle] = useState<CmsArticle | null>(null);
   const [transformationsOpen, setTransformationsOpen] = useState(false);
+
+  /* The enquiry prompt counts from here, not from mount: the visitor has
+     not landed on anything until the curtain lifts. */
+  const [introDone, setIntroDone] = useState(false);
   const [enquiryContext, setEnquiryContext] = useState<string | undefined>();
   // The timed prompt holds off while a project is open — two stacked
   // dialogs would be the worst version of this pattern.
   const [enquiryOpen, setEnquiryOpen] = useDelayedEnquiry(
     settings.enquiry_delay_ms || ENQUIRY_DELAY_MS,
     activeProject !== null || activeArticle !== null || transformationsOpen,
+    introDone,
   );
 
   const openEnquiry = (context?: string) => {
@@ -1271,7 +1278,11 @@ function HomePage() {
         context={enquiryContext}
       />
       <WhatsAppFab settings={settings} />
-      <Preloader settings={settings} pending={settingsPending} />
+      <Preloader
+        settings={settings}
+        pending={settingsPending}
+        onDone={() => setIntroDone(true)}
+      />
     </>
   );
 }

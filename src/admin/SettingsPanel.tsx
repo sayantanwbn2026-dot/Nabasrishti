@@ -369,7 +369,7 @@ export function SettingsPanel() {
             />
             <NumberField
               label="Pop-up delay (milliseconds)"
-              hint="How long after landing the form appears. 3000 = 3 seconds."
+              hint="How long after the loading screen clears the form appears. 10000 = 10 seconds. It shows once per visit, and again if the page is reloaded."
               value={draft.enquiry_delay_ms}
               step={500}
               onChange={(v) => set("enquiry_delay_ms", v)}

@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { EASE_OUT, EASE_SOFT } from "@/lib/motion";
 import type { SiteSettings, SocialLink } from "@/lib/content";
 
@@ -54,6 +54,9 @@ export function WhatsAppFab({ settings }: { settings: SiteSettings }) {
 
 export function Preloader({
   settings,
+  /** Called once the curtain starts lifting, so the page can begin its
+      own timings from the moment the visitor actually sees the site. */
+  onDone,
   /* True while the query is still serving its built-in placeholder. The
      placeholder carries no logo, so the mark would render as the plain
      wordmark and then swap to the real lockup a moment later — two
@@ -62,11 +65,28 @@ export function Preloader({
   pending = false,
 }: {
   settings: SiteSettings;
+  onDone?: () => void;
   pending?: boolean;
 }) {
   const [done, setDone] = useState(false);
 
-  const hold = Math.max(0, settings.preloader_duration_ms || 0);
+  /* With the curtain switched off there is nothing to wait for, and
+     anything timed from its end must not be held back by six seconds of
+     a screen nobody is shown. */
+  const hold = settings.preloader_enabled
+    ? Math.max(0, settings.preloader_duration_ms || 0)
+    : 0;
+
+  /* The callback is usually an inline arrow, so holding it in a ref keeps
+     the effect below keyed on `done` alone. */
+  const onDoneRef = useRef(onDone);
+  useEffect(() => {
+    onDoneRef.current = onDone;
+  }, [onDone]);
+
+  useEffect(() => {
+    if (done) onDoneRef.current?.();
+  }, [done]);
 
   useEffect(() => {
     /* The set duration is the duration. Waiting on `load` as well made the
