@@ -1,4 +1,5 @@
-import { site, telHref, whatsappHref } from "@/data/site";
+import { fallbackSettings, useSiteSettings } from "@/lib/content";
+import { useNoIndex } from "@/lib/usePageMeta";
 
 /**
  * Dedicated Thank You page (Ads audit item 7).
@@ -8,11 +9,20 @@ import { site, telHref, whatsappHref } from "@/data/site";
  * conversion is configured against /thank-you.
  */
 export function ThankYouPage() {
+  /* This page was reading the built-in data rather than the CMS, so the
+     number it offered to call was whatever shipped with the build. */
+  const { data: settings = fallbackSettings } = useSiteSettings();
+  const telHref = `tel:+${settings.phone_digits}`;
+  const whatsappHref = `https://wa.me/${settings.phone_digits}`;
+
+  // Reachable only after a submission; it has no business in search.
+  useNoIndex();
+
   return (
     <main className="thank-you dark-section">
       <div className="page-shell thank-you__inner">
         <a className="site-brand thank-you__brand" href="/">
-          {site.name}
+          {settings.name}
         </a>
 
         <div className="thank-you__body">
@@ -32,7 +42,7 @@ export function ThankYouPage() {
 
           <div className="thank-you__actions">
             <a className="button button-light" href={telHref}>
-              Call {site.phone}
+              Call {settings.phone}
             </a>
             <a
               className="button button-outline"

@@ -92,7 +92,16 @@ export function SettingsPanel() {
             />
             <TextField
               label="Phone (digits only)"
-              hint="Used for the call and WhatsApp links, e.g. 919000000000"
+              /* These two fields drifted apart once: the number on screen
+                 was the studio's and the number being dialled was still
+                 the placeholder, so every call went nowhere. Say so here
+                 rather than leaving it to be noticed. */
+              hint={
+                draft.phone_digits &&
+                draft.phone.replace(/\D/g, "") !== draft.phone_digits
+                  ? `This does not match the number above (${draft.phone.replace(/\D/g, "")}). The call and WhatsApp buttons use THIS field, so they will dial what is written here.`
+                  : "Country code and number, no spaces. The call and WhatsApp buttons use this."
+              }
               value={draft.phone_digits}
               onChange={(v) => set("phone_digits", v)}
               mono

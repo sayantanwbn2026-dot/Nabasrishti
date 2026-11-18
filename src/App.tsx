@@ -58,6 +58,7 @@ import { FitText } from "@/components/FitText";
 import { useDelayedEnquiry } from "@/hooks/useDelayedEnquiry";
 import { useLiveContent } from "@/lib/useLiveContent";
 import { useSmoothAnchors } from "@/lib/useSmoothAnchors";
+import { useNoIndex, usePageMeta, useStructuredData } from "@/lib/usePageMeta";
 
 
 const navigation = [
@@ -704,6 +705,8 @@ function SiteFooter({
 
 function NotFoundPage() {
   const { data: settings = fallbackSettings } = useSiteSettings();
+  useNoIndex();
+  usePageMeta({ title: `Page not found | ${settings.name}` });
   return (
     <main className="not-found-page">
       <a href="/" className="site-brand">
@@ -768,12 +771,32 @@ function HomePage() {
   const { data: cmsProjects = [] } = useProjects();
   const { data: cmsTransformations = [] } = useTransformations();
   const { data: cmsSections = [] } = useHomeSections();
+
   const { data: cmsServices = [] } = useServices();
   const { data: cmsSteps = [] } = useProcessSteps();
   const { data: cmsTestimonials = [] } = useTestimonials();
   const { data: cmsArticles = [] } = useArticles();
   const { data: cmsFooterLinks = [] } = useFooterLinks();
   const { data: cmsSocials = [] } = useSocialLinks();
+  /* The SEO tab in the CMS was being filled in and then ignored: nothing
+     ever put these on the document. */
+  usePageMeta({
+    title: settings.meta_title,
+    description: settings.meta_description,
+  });
+
+  useStructuredData({
+    name: settings.name,
+    url: window.location.origin + "/",
+    logo: settings.logo_url,
+    image: settings.hero_image_url,
+    description: settings.meta_description,
+    phoneDigits: settings.phone_digits,
+    email: settings.email,
+    address: settings.contact_address,
+    areaServed: settings.location,
+    sameAs: cmsSocials.filter((s) => s.is_published && s.url).map((s) => s.url),
+  });
   const { data: cmsNavLinks = [] } = useNavLinks();
   const navItems = cmsNavLinks.length
     ? cmsNavLinks
@@ -872,7 +895,7 @@ function HomePage() {
                 <h1>
                   <motion.span className="hero__wordmark" variants={heroItem}>
                     {settings.name}
-                  </motion.span>
+                  </motion.span>{" "}
                   <motion.span className="hero__headline" variants={heroItem}>
                     {settings.headline}
                   </motion.span>

@@ -2997,6 +2997,10 @@ p {
 
 .site-brand__logo {
   width: auto;
+  /* Reserve the width before the file arrives, or the studio name beside
+     it jumps sideways on every load. `contain` means a logo of another
+     shape is letterboxed rather than stretched. */
+  aspect-ratio: 1.5 / 1;
   height: 30px;
   object-fit: contain;
 }
@@ -3189,6 +3193,7 @@ p {
 
 .site-brand__logo {
   width: auto;
+  aspect-ratio: 1.5 / 1;
   height: 30px;
   flex: 0 0 auto;
   object-fit: contain;
@@ -3501,6 +3506,13 @@ p {
 }
 
 .contact-row dd a {
+  /* A phone number is the main thing a visitor taps on this page, and at
+     the body size its line box is only 18px tall. The padding is negative
+     on the sides so the text still lines up with the label above it. */
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  padding: 3px 0;
   transition: opacity 180ms ease;
 }
 
@@ -3511,7 +3523,9 @@ p {
 .contact-row__socials {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2xs) var(--space-sm);
+  /* Row gap carries the extra height the links now take, so the wrapped
+     rows do not close up on each other. */
+  gap: 2px var(--space-sm);
 }
 
 .contact-details__cta {
@@ -3533,7 +3547,10 @@ p {
   justify-items: center;
   gap: var(--space-2xs);
   padding: var(--space-md);
-  color: var(--ink-tertiary);
+  /* Sits on the panel's own tint rather than the page, where the tertiary
+     ink only reaches 3.97:1. This text is what a visitor reads when the
+     embed is blocked, so it has to carry its own weight. */
+  color: var(--ink-secondary);
   text-align: center;
 }
 

@@ -8,9 +8,9 @@ export const site = {
   name: "Nabasrishti",
 
   /** PLACEHOLDER — replace with the studio's real number. */
-  phone: "+91 90000 00000",
+  phone: "+91 82404 76980",
   /** PLACEHOLDER — digits only, used for tel: and wa.me links. */
-  phoneDigits: "919000000000",
+  phoneDigits: "918240476980",
 
   email: "hello@nabasrishti.in",
   location: "South Kolkata",
