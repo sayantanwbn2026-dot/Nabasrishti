@@ -47,6 +47,19 @@ export function CollectionPanel({ spec }: { spec: CollectionSpec }) {
     setDraft(row ? { ...row } : null);
   }, [openId, data]);
 
+  const dirty = Boolean(
+    draft && JSON.stringify(draft) !== JSON.stringify(data.find((r) => r.id === draft.id)),
+  );
+
+  /* Every hook has to run on every render, including the loading and error
+     ones below. Calling these after an early return changes the hook count
+     between renders, which React treats as a fatal error — it took the
+     whole content manager down to a blank page. */
+  useUnsavedGuard(dirty);
+  useSaveShortcut(dirty && !save.isPending, () => {
+    if (draft) save.mutate(draft);
+  });
+
   if (isLoading) return <p className="amuted">Loading…</p>;
   if (error) return <p className="aerror">{(error as Error).message}</p>;
 
@@ -57,15 +70,6 @@ export function CollectionPanel({ spec }: { spec: CollectionSpec }) {
     [next[index], next[target]] = [next[target], next[index]];
     reorder.mutate(next.map((row, i) => ({ id: row.id, position: (i + 1) * 10 })));
   };
-
-  const dirty = Boolean(
-    draft && JSON.stringify(draft) !== JSON.stringify(data.find((r) => r.id === draft.id)),
-  );
-
-  useUnsavedGuard(dirty);
-  useSaveShortcut(dirty && !save.isPending, () => {
-    if (draft) save.mutate(draft);
-  });
 
   return (
     <div className="apanel">

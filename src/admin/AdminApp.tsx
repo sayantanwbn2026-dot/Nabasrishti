@@ -8,6 +8,7 @@ import { EnquiriesPanel } from "./EnquiriesPanel";
 import { COLLECTIONS, CollectionPanel } from "./CollectionPanel";
 import { SectionsPanel } from "./SectionsPanel";
 import { confirmDiscard } from "./unsaved";
+import { PanelBoundary } from "./PanelBoundary";
 import "./admin.css";
 
 const SECTIONS = [
@@ -24,6 +25,15 @@ const SECTIONS = [
   { id: "footer_links", label: "Footer links" },
   { id: "social_links", label: "Social links" },
 ] as const;
+
+/** Sections that have a panel written for them by hand. */
+const KNOWN_PANELS = new Set([
+  "enquiries",
+  "site",
+  "sections",
+  "projects",
+  "articles",
+]);
 
 type SectionId = (typeof SECTIONS)[number]["id"];
 
@@ -186,14 +196,31 @@ export function AdminApp() {
       </header>
 
       <main className="amain">
-        {section === "enquiries" ? <EnquiriesPanel /> : null}
-        {section === "site" ? <SettingsPanel /> : null}
-        {section === "sections" ? <SectionsPanel /> : null}
-        {section === "projects" ? <ProjectsPanel /> : null}
-        {section === "articles" ? <ArticlesPanel /> : null}
-        {COLLECTIONS[section] ? (
-          <CollectionPanel spec={COLLECTIONS[section]} />
-        ) : null}
+        <PanelBoundary resetKey={section}>
+          {section === "enquiries" ? <EnquiriesPanel /> : null}
+          {section === "site" ? <SettingsPanel /> : null}
+          {section === "sections" ? <SectionsPanel /> : null}
+          {section === "projects" ? <ProjectsPanel /> : null}
+          {section === "articles" ? <ArticlesPanel /> : null}
+          {COLLECTIONS[section] ? (
+            <CollectionPanel spec={COLLECTIONS[section]} />
+          ) : null}
+
+          {/* A section in the sidebar with no panel behind it would simply
+              draw nothing, which reads as a broken page. Say so instead. */}
+          {!KNOWN_PANELS.has(section) && !COLLECTIONS[section] ? (
+            <div className="apanel">
+              <header className="apanel__head">
+                <div>
+                  <h1>{current?.label ?? "Not available"}</h1>
+                  <p className="amuted">
+                    This section has no editor yet. Pick another on the left.
+                  </p>
+                </div>
+              </header>
+            </div>
+          ) : null}
+        </PanelBoundary>
       </main>
     </div>
   );

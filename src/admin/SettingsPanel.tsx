@@ -36,19 +36,24 @@ export function SettingsPanel() {
     if (data) setDraft(data);
   }, [data]);
 
+  const dirty = Boolean(draft) && JSON.stringify(draft) !== JSON.stringify(data);
+
+  const commit = () => {
+    if (draft) save.mutate(draft as unknown as Record<string, unknown>);
+  };
+
+  /* Above the early returns: a hook that only runs once the data has
+     arrived changes the hook count between renders, and React takes the
+     whole page down rather than re-rendering. */
+  useUnsavedGuard(dirty);
+  useSaveShortcut(dirty && !save.isPending, commit);
+
   if (isLoading) return <p className="amuted">Loading…</p>;
   if (error) return <p className="aerror">{(error as Error).message}</p>;
   if (!draft) return null;
 
   const set = <K extends keyof Row>(key: K, value: Row[K]) =>
     setDraft({ ...draft, [key]: value });
-
-  const dirty = JSON.stringify(draft) !== JSON.stringify(data);
-
-  const commit = () => save.mutate(draft as unknown as Record<string, unknown>);
-
-  useUnsavedGuard(dirty);
-  useSaveShortcut(dirty && !save.isPending, commit);
 
   return (
     <div className="apanel">
