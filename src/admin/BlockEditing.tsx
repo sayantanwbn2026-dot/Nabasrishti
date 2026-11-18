@@ -18,6 +18,11 @@ const BLOCK_TYPES: { value: BlockType; label: string; hint: string }[] = [
   { value: "quote", label: "Pull quote", hint: "A large centred quotation" },
   { value: "split", label: "Text beside image", hint: "Two columns" },
   { value: "specs", label: "Specification table", hint: "Label and value pairs" },
+  {
+    value: "compare",
+    label: "Before and after",
+    hint: "A slider between two images",
+  },
   { value: "spacer", label: "Spacer", hint: "Extra breathing room" },
 ];
 
@@ -36,6 +41,16 @@ const blankPayload = (type: BlockType): Record<string, unknown> => {
       return { heading: "", text: "", images: [{ url: "", alt: "" }] };
     case "specs":
       return { rows: [{ label: "", value: "" }] };
+    case "compare":
+      return {
+        before_url: "",
+        before_alt: "",
+        after_url: "",
+        after_alt: "",
+        before_label: "Concept",
+        after_label: "Built",
+        caption: "",
+      };
     case "spacer":
       return { height: 48 };
     default:
@@ -169,6 +184,50 @@ function BlockEditor({
           <ImageList
             value={(payload.images as Img[]) ?? []}
             onChange={(images) => set({ images })}
+          />
+        </>
+      );
+
+    case "compare":
+      return (
+        <>
+          <ImageField
+            label="Before image"
+            hint="The drawing, the plan, or the room as it was."
+            value={str("before_url")}
+            onChange={(before_url) => set({ before_url })}
+          />
+          <TextField
+            label="Before image description"
+            value={str("before_alt")}
+            onChange={(before_alt) => set({ before_alt })}
+          />
+          <ImageField
+            label="After image"
+            hint="The finished room. Both images should be the same shape."
+            value={str("after_url")}
+            onChange={(after_url) => set({ after_url })}
+          />
+          <TextField
+            label="After image description"
+            value={str("after_alt")}
+            onChange={(after_alt) => set({ after_alt })}
+          />
+          <TextField
+            label="Label on the left"
+            hint="Shown on the image itself. Leave empty for none."
+            value={str("before_label")}
+            onChange={(before_label) => set({ before_label })}
+          />
+          <TextField
+            label="Label on the right"
+            value={str("after_label")}
+            onChange={(after_label) => set({ after_label })}
+          />
+          <TextField
+            label="Caption"
+            value={str("caption")}
+            onChange={(caption) => set({ caption })}
           />
         </>
       );

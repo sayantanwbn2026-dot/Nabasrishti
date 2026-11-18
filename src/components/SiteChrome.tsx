@@ -52,7 +52,18 @@ export function WhatsAppFab({ settings }: { settings: SiteSettings }) {
    Logo preloader
    ------------------------------------------------------------------ */
 
-export function Preloader({ settings }: { settings: SiteSettings }) {
+export function Preloader({
+  settings,
+  /* True while the query is still serving its built-in placeholder. The
+     placeholder carries no logo, so the mark would render as the plain
+     wordmark and then swap to the real lockup a moment later — two
+     different curtains in a row. The curtain itself goes up instantly
+     either way; only the mark inside it waits. */
+  pending = false,
+}: {
+  settings: SiteSettings;
+  pending?: boolean;
+}) {
   const [done, setDone] = useState(false);
 
   const hold = Math.max(0, settings.preloader_duration_ms || 0);
@@ -90,7 +101,7 @@ export function Preloader({ settings }: { settings: SiteSettings }) {
           <motion.div
             className="preloader__mark"
             initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
+            animate={{ opacity: pending ? 0 : 1, y: pending ? 8 : 0 }}
             transition={{ duration: 0.7, ease: EASE_SOFT }}
           >
             {settings.logo_dark_url || settings.logo_url ? (

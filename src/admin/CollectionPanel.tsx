@@ -201,6 +201,46 @@ export function CollectionPanel({ spec }: { spec: CollectionSpec }) {
 }
 
 export const COLLECTIONS: Record<string, CollectionSpec> = {
+  transformations: {
+    table: "transformations",
+    title: "Transformations",
+    description:
+      "The before and after pairs behind “From Concept to Creation”. Each one becomes a slider the visitor can drag.",
+    titleKey: "title",
+    addLabel: "Add a pairing",
+    blank: {
+      title: "New pairing",
+      caption: "",
+      before_url: "",
+      before_alt: "",
+      after_url: "",
+      after_alt: "",
+    },
+    fields: [
+      { key: "title", label: "Name", type: "text" },
+      {
+        key: "caption",
+        label: "Caption",
+        type: "textarea",
+        rows: 2,
+        hint: "A line below the slider — where it is, or what changed.",
+      },
+      {
+        key: "before_url",
+        label: "Before image",
+        type: "image",
+        hint: "The drawing, the plan, or the room as it was.",
+      },
+      { key: "before_alt", label: "Before image description", type: "text" },
+      {
+        key: "after_url",
+        label: "After image",
+        type: "image",
+        hint: "The finished room. Both images should be the same shape.",
+      },
+      { key: "after_alt", label: "After image description", type: "text" },
+    ],
+  },
   services: {
     table: "services",
     title: "Services",

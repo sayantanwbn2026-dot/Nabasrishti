@@ -15,6 +15,7 @@ const CONTENT_TABLES = [
   "footer_links",
   "social_links",
   "nav_links",
+  "transformations",
 ] as const;
 
 /** A block change has to refresh the parent the site actually queries. */

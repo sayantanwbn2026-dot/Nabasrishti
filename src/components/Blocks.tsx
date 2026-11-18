@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { EASE_OUT } from "@/lib/motion";
+import { ImageComparison } from "./ImageComparison";
 import type { ProjectBlock } from "@/lib/content";
 
 /**
@@ -117,6 +118,27 @@ export function Block({ block }: { block: ProjectBlock }) {
             </div>
           ))}
         </dl>
+      );
+    }
+
+    case "compare": {
+      /* A before/after wipe inside the page. The caption sits under the
+         frame so the labels on the image itself can stay short. */
+      const caption = str(payload, "caption");
+      return (
+        <figure className="project-detail__compare">
+          <ImageComparison
+            beforeUrl={str(payload, "before_url")}
+            afterUrl={str(payload, "after_url")}
+            beforeAlt={str(payload, "before_alt")}
+            afterAlt={str(payload, "after_alt", "Finished interior")}
+            beforeLabel={str(payload, "before_label", "Concept")}
+            afterLabel={str(payload, "after_label", "Built")}
+          />
+          {caption ? (
+            <figcaption className="project-detail__caption">{caption}</figcaption>
+          ) : null}
+        </figure>
       );
     }
 

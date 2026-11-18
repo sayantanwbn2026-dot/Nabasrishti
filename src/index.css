@@ -1087,6 +1087,118 @@ p {
   z-index: 1;
 }
 
+/* Small captions burnt into the frame, so the control explains itself
+   without a legend underneath it. */
+.comparison-frame__tag {
+  position: absolute;
+  z-index: 2;
+  top: var(--space-sm);
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(5, 5, 5, 0.62);
+  color: #f3f3f3;
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+@supports (backdrop-filter: blur(6px)) {
+  .comparison-frame__tag {
+    background: rgba(5, 5, 5, 0.42);
+    backdrop-filter: blur(6px);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .comparison-frame__tag {
+    background: rgba(5, 5, 5, 0.86);
+    backdrop-filter: none;
+  }
+}
+
+.comparison-frame__tag--before {
+  left: var(--space-sm);
+}
+
+.comparison-frame__tag--after {
+  right: var(--space-sm);
+}
+
+.comparison-section__more {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-xl);
+}
+
+/* ---------------------------------------------------------------------
+   Transformations gallery
+   ------------------------------------------------------------------ */
+
+.transformations-detail__intro {
+  max-width: var(--measure);
+  margin-top: var(--space-sm);
+  color: var(--muted-light);
+  font-size: var(--text-base);
+  line-height: var(--lh-body);
+  text-wrap: pretty;
+}
+
+.transformations-detail__list {
+  display: grid;
+  gap: var(--space-3xl);
+  margin-top: var(--space-2xl);
+}
+
+.transformations-detail__item {
+  margin: 0;
+}
+
+/* The frame already carries its own top margin from the home page's use;
+   inside the gallery each item owns its spacing instead. */
+.transformations-detail__item .comparison-frame {
+  margin-top: 0;
+}
+
+.transformations-detail__caption {
+  margin-top: var(--space-md);
+  max-width: var(--measure);
+}
+
+.transformations-detail__caption h3 {
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: var(--weight-regular);
+  letter-spacing: var(--track-tight);
+  line-height: var(--lh-subhead);
+}
+
+.transformations-detail__caption p {
+  margin: var(--space-2xs) 0 0;
+  color: var(--muted-light);
+  font-size: var(--text-sm);
+  line-height: var(--lh-body);
+  text-wrap: pretty;
+}
+
+.transformations-detail__empty {
+  margin-top: var(--space-2xl);
+  max-width: var(--measure);
+  color: var(--muted-light);
+  line-height: var(--lh-body);
+}
+
+/* A comparison placed inside a project or journal page. */
+.project-detail__compare {
+  margin: 0;
+}
+
+.project-detail__compare .comparison-frame {
+  margin-top: 0;
+}
+
 .comparison-frame__divider {
   position: absolute;
   z-index: 2;

@@ -13,6 +13,7 @@ const SECTIONS = [
   { id: "site", label: "Site content" },
   { id: "projects", label: "Projects" },
   { id: "articles", label: "Journal" },
+  { id: "transformations", label: "Transformations" },
   { id: "services", label: "Services" },
   { id: "process_steps", label: "Process" },
   { id: "testimonials", label: "Testimonials" },

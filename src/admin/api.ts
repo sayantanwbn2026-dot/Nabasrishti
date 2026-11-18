@@ -6,6 +6,7 @@ export const TABLES = {
   site_settings: { order: null },
   projects: { order: "position" },
   project_blocks: { order: "position" },
+  transformations: { order: "position" },
   services: { order: "position" },
   process_steps: { order: "position" },
   testimonials: { order: "position" },

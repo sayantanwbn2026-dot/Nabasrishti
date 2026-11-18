@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "./supabase";
 import { site as fallbackSite } from "@/data/site";
 import { projects as fallbackProjects } from "@/data/projects";
+import { media } from "@/data/media";
 
 /* ---------------------------------------------------------------------
    Types mirroring the CMS tables.
@@ -58,6 +59,10 @@ export type SiteSettings = {
   logo_alt: string;
   logo_dark_url: string;
   show_logo_in_nav: boolean;
+  comparison_cta_label: string;
+  transformations_label: string;
+  transformations_heading: string;
+  transformations_intro: string;
   preloader_enabled: boolean;
   preloader_duration_ms: number;
   whatsapp_enabled_fab: boolean;
@@ -94,7 +99,8 @@ export type BlockType =
   | "quote"
   | "specs"
   | "split"
-  | "spacer";
+  | "spacer"
+  | "compare";
 
 export type ProjectBlock = {
   id: string;
@@ -126,6 +132,19 @@ export type CmsProject = {
   position: number;
   is_published: boolean;
   blocks?: ProjectBlock[];
+};
+
+/** One before/after pairing in the transformations gallery. */
+export type Transformation = {
+  id: string;
+  title: string;
+  caption: string;
+  before_url: string;
+  before_alt: string;
+  after_url: string;
+  after_alt: string;
+  position: number;
+  is_published: boolean;
 };
 
 export type Service = {
@@ -290,6 +309,11 @@ export const fallbackSettings: SiteSettings = {
   logo_alt: "Nabasrishti",
   logo_dark_url: "",
   show_logo_in_nav: true,
+  comparison_cta_label: "See more transformations",
+  transformations_label: "Before and after",
+  transformations_heading: "Every room has a second life",
+  transformations_intro:
+    "Drag each slider to move between the drawing we started from and the room as it stands today.",
   preloader_enabled: true,
   preloader_duration_ms: 6000,
   whatsapp_enabled_fab: true,
@@ -328,6 +352,21 @@ const CARD_LAYOUTS: CmsProject["card_layout"][] = [
   "wide-right",
 ];
 
+/** Shown when the gallery cannot be read from the CMS. */
+export const fallbackTransformations: Transformation[] = fallbackProjects
+  .slice(0, 4)
+  .map((project, index) => ({
+    id: `${project.id}-pair`,
+    title: project.title,
+    caption: project.location,
+    before_url: media.comparisonSketch,
+    before_alt: `Line drawing of ${project.title}`,
+    after_url: project.image,
+    after_alt: `${project.title} as built`,
+    position: (index + 1) * 10,
+    is_published: true,
+  }));
+
 export const fallbackCmsProjects: CmsProject[] = fallbackProjects.map(
   (project, index) => ({
     id: project.id,
@@ -350,6 +389,23 @@ export const fallbackCmsProjects: CmsProject[] = fallbackProjects.map(
     position: (index + 1) * 10,
     is_published: true,
     blocks: [
+      {
+        /* Every project page carries the drawing it grew from. */
+        id: `${project.id}-compare`,
+        project_id: project.id,
+        type: "compare",
+        position: 5,
+        is_published: true,
+        payload: {
+          before_url: media.comparisonSketch,
+          before_alt: `Line drawing of ${project.title}`,
+          after_url: project.image,
+          after_alt: `${project.title} as built`,
+          before_label: "Concept",
+          after_label: "Built",
+          caption: "Drag to move between the drawing and the finished room.",
+        },
+      },
       {
         id: `${project.id}-gallery`,
         project_id: project.id,
@@ -432,6 +488,15 @@ export function useServices() {
     queryFn: listQuery<Service>("services", []),
     staleTime: STALE,
     placeholderData: [],
+  });
+}
+
+export function useTransformations() {
+  return useQuery({
+    queryKey: ["transformations"],
+    queryFn: listQuery<Transformation>("transformations", fallbackTransformations),
+    staleTime: STALE,
+    placeholderData: fallbackTransformations,
   });
 }
 

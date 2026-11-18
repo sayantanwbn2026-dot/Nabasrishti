@@ -4,8 +4,6 @@ import {
   useEffect,
   useRef,
   useState,
-  type KeyboardEvent,
-  type PointerEvent,
   type ReactNode,
 } from "react";
 import { motion } from "framer-motion";
@@ -26,6 +24,7 @@ import {
   useFooterLinks,
   useProcessSteps,
   useProjects,
+  useTransformations,
   useServices,
   useNavLinks,
   useSiteSettings,
@@ -47,7 +46,9 @@ const AdminApp = lazy(() =>
   import("@/admin/AdminApp").then((module) => ({ default: module.AdminApp })),
 );
 import { ProjectModal } from "@/components/ProjectModal";
+import { TransformationsModal } from "@/components/TransformationsModal";
 import { ArticleModal } from "@/components/ArticleModal";
+import { ImageComparison } from "@/components/ImageComparison";
 import { Preloader, SocialLinks, WhatsAppFab } from "@/components/SiteChrome";
 import { ContactSection } from "@/components/ContactSection";
 import { FitText } from "@/components/FitText";
@@ -529,112 +530,6 @@ function ServicesAccordion({ items }: { items: typeof services }) {
   );
 }
 
-function ImageComparison({
-  beforeUrl,
-  afterUrl,
-}: {
-  beforeUrl: string;
-  afterUrl: string;
-}) {
-  const [position, setPosition] = useState(53);
-  const isDragging = useRef(false);
-  const frameRef = useRef<HTMLDivElement>(null);
-
-  const setFromClientX = (clientX: number) => {
-    const frame = frameRef.current;
-    if (!frame) return;
-    const bounds = frame.getBoundingClientRect();
-    const next = ((clientX - bounds.left) / bounds.width) * 100;
-    setPosition(Math.min(100, Math.max(0, next)));
-  };
-
-  const startDrag = (event: PointerEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    isDragging.current = true;
-    event.currentTarget.setPointerCapture(event.pointerId);
-    setFromClientX(event.clientX);
-  };
-
-  const moveDrag = (event: PointerEvent<HTMLButtonElement>) => {
-    if (isDragging.current) setFromClientX(event.clientX);
-  };
-
-  const stopDrag = (event: PointerEvent<HTMLButtonElement>) => {
-    isDragging.current = false;
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    }
-  };
-
-  const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
-    const step = event.shiftKey ? 5 : 1;
-    if (event.key === "ArrowLeft") {
-      event.preventDefault();
-      setPosition((current) => Math.max(0, current - step));
-    } else if (event.key === "ArrowRight") {
-      event.preventDefault();
-      setPosition((current) => Math.min(100, current + step));
-    } else if (event.key === "Home") {
-      event.preventDefault();
-      setPosition(0);
-    } else if (event.key === "End") {
-      event.preventDefault();
-      setPosition(100);
-    }
-  };
-
-  return (
-    <div className="comparison-frame" ref={frameRef}>
-      <img
-        className="comparison-frame__image"
-        src={afterUrl || media.hero}
-        alt="Finished interior"
-        width="2150"
-        height="1229"
-        loading="lazy"
-        decoding="async"
-      />
-      <img
-        className="comparison-frame__image comparison-frame__sketch"
-        src={beforeUrl || media.comparisonSketch}
-        alt=""
-        aria-hidden="true"
-        width="1600"
-        height="914"
-        loading="lazy"
-        decoding="async"
-        style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}
-      />
-      <div
-        className="comparison-frame__divider"
-        style={{ left: `${position}%` }}
-        aria-hidden="true"
-      />
-      <button
-        className="comparison-frame__handle"
-        type="button"
-        role="slider"
-        aria-label="Adjust sketch and finished interior comparison"
-        aria-orientation="horizontal"
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={Math.round(position)}
-        aria-valuetext={`${Math.round(position)} percent sketch visible`}
-        style={{ left: `${position}%` }}
-        onPointerDown={startDrag}
-        onPointerMove={moveDrag}
-        onPointerUp={stopDrag}
-        onPointerCancel={stopDrag}
-        onKeyDown={handleKeyDown}
-      >
-        <svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
-          <path d="m8 5-5 5 5 5M12 5l5 5-5 5" />
-        </svg>
-      </button>
-    </div>
-  );
-}
-
 function TestimonialsSection({
   onEnquire,
   items,
@@ -865,8 +760,10 @@ function HomePage() {
   // Animates clicks on in-page links.
   useSmoothAnchors();
 
-  const { data: settings = fallbackSettings } = useSiteSettings();
+  const { data: settings = fallbackSettings, isPlaceholderData: settingsPending } =
+    useSiteSettings();
   const { data: cmsProjects = [] } = useProjects();
+  const { data: cmsTransformations = [] } = useTransformations();
   const { data: cmsServices = [] } = useServices();
   const { data: cmsSteps = [] } = useProcessSteps();
   const { data: cmsTestimonials = [] } = useTestimonials();
@@ -923,12 +820,13 @@ function HomePage() {
 
   const [activeProject, setActiveProject] = useState<CmsProject | null>(null);
   const [activeArticle, setActiveArticle] = useState<CmsArticle | null>(null);
+  const [transformationsOpen, setTransformationsOpen] = useState(false);
   const [enquiryContext, setEnquiryContext] = useState<string | undefined>();
   // The timed prompt holds off while a project is open — two stacked
   // dialogs would be the worst version of this pattern.
   const [enquiryOpen, setEnquiryOpen] = useDelayedEnquiry(
     settings.enquiry_delay_ms || ENQUIRY_DELAY_MS,
-    activeProject !== null || activeArticle !== null,
+    activeProject !== null || activeArticle !== null || transformationsOpen,
   );
 
   const openEnquiry = (context?: string) => {
@@ -1126,7 +1024,18 @@ function HomePage() {
               <ImageComparison
                 beforeUrl={settings.comparison_before_url}
                 afterUrl={settings.comparison_after_url}
+                beforeLabel={settings.comparison_before_label}
+                afterLabel={settings.comparison_after_label}
               />
+            </Reveal>
+            <Reveal className="comparison-section__more" delay={0.12}>
+              <button
+                type="button"
+                className="button button-light"
+                onClick={() => setTransformationsOpen(true)}
+              >
+                {settings.comparison_cta_label}
+              </button>
             </Reveal>
           </div>
         </section>
@@ -1260,6 +1169,16 @@ function HomePage() {
           openEnquiry(project.title);
         }}
       />
+      <TransformationsModal
+        open={transformationsOpen}
+        onClose={() => setTransformationsOpen(false)}
+        settings={settings}
+        items={cmsTransformations}
+        onEnquire={(context) => {
+          setTransformationsOpen(false);
+          openEnquiry(context);
+        }}
+      />
       <ArticleModal
         article={activeArticle}
         onClose={() => setActiveArticle(null)}
@@ -1274,7 +1193,7 @@ function HomePage() {
         context={enquiryContext}
       />
       <WhatsAppFab settings={settings} />
-      <Preloader settings={settings} />
+      <Preloader settings={settings} pending={settingsPending} />
     </>
   );
 }
