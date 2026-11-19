@@ -520,7 +520,7 @@ p {
   margin-inline: auto;
   /* Held well short of the right edge so the services column can share
      this row without the two ever meeting. */
-  max-width: min(calc(100% - (var(--gutter) * 2)), 640px);
+  max-width: min(calc(100% - (var(--gutter) * 2)), 720px);
   margin-right: auto;
   margin-left: max(var(--gutter), calc((100% - var(--page-width)) / 2));
   padding: 0 0 var(--space-2xl);
@@ -540,8 +540,10 @@ p {
 
 .hero__content h1 {
   display: grid;
-  /* The two lines are one idea, but the wordmark's cap height needs a
-     little room beneath it or the keyword line reads as crowding it. */
+  /* The name and the line beneath it are one thought: close enough to
+     read as a pair, with the clear step saved for the action below. At
+     display size the cap height needs more than a token 16px under it,
+     or the sentence looks stuck to the word. */
   gap: var(--space-md);
   margin: 0;
 }
@@ -550,8 +552,8 @@ p {
   display: block;
   /* A whisper of shadow for the brightest frames; the wash does the rest. */
   text-shadow: 0 2px 28px rgba(0, 0, 0, 0.35);
-  font-size: clamp(2rem, 5.4vw, 4.75rem);
-  font-weight: var(--weight-light);
+  font-size: clamp(2.35rem, 6.5vw, 5.75rem);
+  font-weight: var(--weight-regular);
   /* A shade more open than before: at this size the letters can breathe
      without reading as spaced-out caps. */
   letter-spacing: 0.04em;
@@ -684,7 +686,7 @@ p {
   justify-content: center;
   gap: var(--space-sm) var(--space-lg);
   justify-content: flex-start;
-  margin-top: var(--space-xl);
+  margin-top: var(--space-lg);
 }
 
 .hero__cta-primary {
