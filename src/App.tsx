@@ -890,7 +890,10 @@ function HomePage() {
                 screens and gives the photograph a little tooth. */}
             <div className="hero__grain" aria-hidden="true" />
 
-            <Parallax className="hero__parallax" distance={90}>
+            {/* A gentle drift only: the title now sits on the floor of the
+                frame beside the services, and a large travel left the two
+                visibly out of line at rest. */}
+            <Parallax className="hero__parallax" distance={34}>
               <motion.div
                 className="hero__content"
                 variants={heroStagger}
@@ -1101,7 +1104,9 @@ function HomePage() {
                     className="process-card"
                     key={step.number}
                   >
-                    <p className="process-card__number">{step.number}</p>
+                    <p className="process-card__number" aria-hidden="true">
+                      {step.number}
+                    </p>
                     <div className="process-card__content">
                       <h3>{step.title}</h3>
                       <p>{step.description}</p>

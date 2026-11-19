@@ -192,7 +192,11 @@ a:focus-visible {
   text-transform: uppercase;
 }
 
-.light-section .section-label {
+/* A paper panel is a light surface too, but it is not a `.light-section`,
+   so the enquiry form's eyebrow kept the dark-section colour and sat at
+   3.37:1 on cream. */
+.light-section .section-label,
+.modal__panel-paper .section-label {
   color: var(--ink-tertiary);
 }
 
@@ -363,10 +367,6 @@ p {
   .site-header.is-lifted.site-header-light {
     background: rgba(252, 250, 243, 0.9);
   }
-
-  .hero__rail {
-    background: rgba(6, 6, 5, 0.52);
-  }
 }
 
 .site-header__inner {
@@ -466,7 +466,9 @@ p {
   height: 100svh;
   overflow: hidden;
   isolation: isolate;
-  place-items: center;
+  /* The copy sits on the floor of the frame, left aligned, with the
+     services and the scroll cue sharing that baseline on the right. */
+  place-items: end stretch;
   background: #26221d;
   color: #f5f4f0;
 }
@@ -491,32 +493,38 @@ p {
    2. a vertical gradient that anchors the header and the lower edge. */
 .hero__shade {
   background:
-    radial-gradient(
-      ellipse 78% 52% at 50% 52%,
-      rgba(8, 7, 6, 0.58) 0%,
-      rgba(8, 7, 6, 0.42) 42%,
-      rgba(8, 7, 6, 0.12) 78%,
-      rgba(8, 7, 6, 0) 100%
+    /* A black ramp up from the floor. The title, the button and the
+       services all sit inside it, so none of them has to compete with
+       whatever the photograph happens to be doing behind them — a bright
+       window, a pale wall — while the top two thirds stay clear. */
+    linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.88) 0%,
+      rgba(0, 0, 0, 0.74) 12%,
+      rgba(0, 0, 0, 0.5) 28%,
+      rgba(0, 0, 0, 0.24) 45%,
+      rgba(0, 0, 0, 0.07) 60%,
+      rgba(0, 0, 0, 0) 74%
     ),
+    /* And just enough at the top to hold the navigation. */
     linear-gradient(
       180deg,
-      rgba(10, 9, 7, 0.52) 0%,
-      rgba(10, 9, 7, 0.16) 32%,
-      rgba(10, 9, 7, 0.2) 62%,
-      rgba(10, 9, 7, 0.46) 100%
+      rgba(0, 0, 0, 0.44) 0%,
+      rgba(0, 0, 0, 0.06) 24%,
+      rgba(0, 0, 0, 0) 44%
     );
 }
 
 .hero__content {
   width: min(calc(100% - (var(--gutter) * 2)), var(--page-width));
-  /* Without auto margins this constrained box aligns left inside the
-     full-width parallax wrapper, putting the whole title stack half a
-     gutter left of true centre. */
   margin-inline: auto;
-  /* Optically centred: the baseline rail occupies the lower edge, so the
-     title sits a little above true centre. */
-  padding: 0 0 var(--space-3xl);
-  text-align: center;
+  /* Held well short of the right edge so the services column can share
+     this row without the two ever meeting. */
+  max-width: min(calc(100% - (var(--gutter) * 2)), 640px);
+  margin-right: auto;
+  margin-left: max(var(--gutter), calc((100% - var(--page-width)) / 2));
+  padding: 0 0 var(--space-2xl);
+  text-align: left;
 }
 
 /* 140x140 tile of monochrome noise, held well below visibility. */
@@ -532,6 +540,8 @@ p {
 
 .hero__content h1 {
   display: grid;
+  /* The two lines are one idea, but the wordmark's cap height needs a
+     little room beneath it or the keyword line reads as crowding it. */
   gap: var(--space-md);
   margin: 0;
 }
@@ -540,12 +550,13 @@ p {
   display: block;
   /* A whisper of shadow for the brightest frames; the wash does the rest. */
   text-shadow: 0 2px 28px rgba(0, 0, 0, 0.35);
-  font-size: clamp(2.3rem, 9.4vw, 8.5rem);
+  font-size: clamp(2rem, 5.4vw, 4.75rem);
   font-weight: var(--weight-light);
-  /* Tightened: the wordmark now reads as one word rather than spaced caps. */
-  letter-spacing: 0.015em;
+  /* A shade more open than before: at this size the letters can breathe
+     without reading as spaced-out caps. */
+  letter-spacing: 0.04em;
   /* Tracking adds space after the final letter; this re-centres the word. */
-  text-indent: 0.015em;
+  text-indent: 0.04em;
   line-height: 1;
   text-transform: uppercase;
 }
@@ -556,7 +567,7 @@ p {
 .hero__headline {
   display: block;
   max-width: none;
-  margin-inline: auto;
+  margin-inline: 0;
   color: rgba(248, 247, 243, 0.82);
   font-size: var(--text-md);
   font-weight: var(--weight-regular);
@@ -584,9 +595,9 @@ p {
   text-wrap: balance;
 }
 
-/* Baseline rail: a frosted bar across the foot of the hero, carrying the
-   services and the scroll cue. Full-bleed, with its contents held to the
-   page shell. */
+/* Baseline rail: the services and the scroll cue along the foot of the
+   hero, set directly on the photograph. Full-bleed, with its contents held
+   to the page shell. */
 .hero__rail {
   position: absolute;
   z-index: 2;
@@ -594,35 +605,47 @@ p {
   bottom: 0;
   left: 0;
   width: 100%;
-  padding-block: var(--space-sm);
-  border-top: 1px solid rgba(248, 247, 243, 0.14);
-  background: rgba(6, 6, 5, 0.34);
-  -webkit-backdrop-filter: saturate(130%) blur(14px);
-  backdrop-filter: saturate(130%) blur(14px);
+  /* No bar, no rule, no blur. The photograph runs to the bottom edge of
+     the screen and this type sits on it; the wash below carries it.
+     Shares its baseline with the title block opposite. */
+  padding-block: 0 var(--space-2xl);
+  pointer-events: none;
 }
 
 .hero__rail-inner {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-md);
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-sm);
   width: min(calc(100% - (var(--gutter) * 2)), var(--page-width));
   margin-inline: auto;
 }
 
-/* The bar does the separating now, so the type needs less shadow of its own. */
-.hero__rail .hero__highlights li,
-.hero__rail .hero__scroll {
-  color: rgba(248, 247, 243, 0.86);
-  text-shadow: none;
+/* Only the type itself should take clicks; the rail is a full-width box
+   lying over the hero and would otherwise swallow them. */
+.hero__rail-inner > * {
+  pointer-events: auto;
 }
 
-/* Where the blur cannot be painted, lean on opacity instead so the bar is
-   never a flat transparent strip with unreadable type over it. */
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .hero__rail {
-    background: rgba(6, 6, 5, 0.66);
-  }
+/* A short column against the right edge rather than a row along the
+   bottom, so the title has the floor to itself. */
+.hero__rail .hero__highlights {
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-3xs);
+  text-align: right;
+}
+
+/* The interpuncts belong to a row; in a column the stacking separates. */
+.hero__rail .hero__highlights li + li::before {
+  content: none;
+}
+
+/* Sitting directly on the photograph now, so each carries its own shadow. */
+.hero__rail .hero__highlights li,
+.hero__rail .hero__scroll {
+  color: rgba(248, 247, 243, 0.8);
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.8);
 }
 
 /* Service highlights — audit item 4. */
@@ -659,12 +682,13 @@ p {
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: var(--space-sm) var(--space-xl);
+  gap: var(--space-sm) var(--space-lg);
+  justify-content: flex-start;
   margin-top: var(--space-xl);
 }
 
 .hero__cta-primary {
-  min-width: 240px;
+  min-width: 216px;
 }
 
 .hero__cta-call {
@@ -672,8 +696,8 @@ p {
   align-items: center;
   gap: var(--space-2xs);
   padding-bottom: 3px;
-  border-bottom: 1px solid rgba(248, 247, 243, 0.35);
-  color: rgba(248, 247, 243, 0.92);
+  border-bottom: 1px solid rgba(248, 247, 243, 0.26);
+  color: rgba(248, 247, 243, 0.78);
   font-size: var(--text-2xs);
   font-weight: var(--weight-medium);
   letter-spacing: var(--track-micro);
@@ -1813,7 +1837,10 @@ p {
   }
 
   .hero__content {
-    padding-top: 50px;
+    /* The title block keeps the floor; the services sit just beneath it,
+       so it has to clear them. */
+    padding-bottom: 96px;
+    max-width: none;
   }
 
   .hero__wordmark {
@@ -1835,10 +1862,10 @@ p {
 
   .hero__actions {
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     width: min(100%, 320px);
     margin-top: var(--space-lg);
-    margin-inline: auto;
+    margin-inline: 0;
   }
 
   .hero__cta-primary {
@@ -1846,23 +1873,31 @@ p {
     min-width: 0;
   }
 
-  .hero__content {
-    padding-bottom: var(--space-2xl);
-  }
-
-  /* No room for two columns — services centre and the scroll cue goes. */
+  /* No room for a column beside the title — the services lie under it as
+     a single quiet line, and the scroll cue goes. */
   .hero__rail {
     bottom: 0;
-    padding-block: var(--space-xs);
+    padding-block: 0 var(--space-lg);
   }
 
   .hero__rail-inner {
-    justify-content: center;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
   }
 
-  .hero__highlights {
-    justify-content: center;
-    gap: var(--space-3xs) var(--space-md);
+  .hero__rail .hero__highlights {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    /* Sized so the two services hold one line at 360px rather than
+       stacking into a second row under the title. */
+    gap: var(--space-3xs) var(--space-sm);
+    text-align: left;
+  }
+
+  .hero__rail .hero__highlights li {
+    font-size: 11px;
   }
 
   /* The separator is absolutely positioned, so when the list wraps it can
