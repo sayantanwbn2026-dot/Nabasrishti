@@ -493,18 +493,28 @@ p {
    2. a vertical gradient that anchors the header and the lower edge. */
 .hero__shade {
   background:
-    /* A black ramp up from the floor. The title, the button and the
-       services all sit inside it, so none of them has to compete with
-       whatever the photograph happens to be doing behind them — a bright
-       window, a pale wall — while the top two thirds stay clear. */
+    /* Anchored in the bottom-left corner, where the name sits: the
+       darkest part of the frame is exactly where the largest type is. */
+    radial-gradient(
+      120% 95% at 0% 100%,
+      rgba(0, 0, 0, 0.84) 0%,
+      rgba(0, 0, 0, 0.66) 28%,
+      rgba(0, 0, 0, 0.4) 50%,
+      rgba(0, 0, 0, 0.14) 70%,
+      rgba(0, 0, 0, 0) 88%
+    ),
+    /* And a ramp up from the whole floor, so the services and the scroll
+       cue on the right are carried too — the corner wash barely reaches
+       them. Between them nothing has to compete with whatever the
+       photograph is doing behind it, while the top stays clear. */
     linear-gradient(
       to top,
-      rgba(0, 0, 0, 0.88) 0%,
-      rgba(0, 0, 0, 0.74) 12%,
-      rgba(0, 0, 0, 0.5) 28%,
-      rgba(0, 0, 0, 0.24) 45%,
-      rgba(0, 0, 0, 0.07) 60%,
-      rgba(0, 0, 0, 0) 74%
+      rgba(0, 0, 0, 0.82) 0%,
+      rgba(0, 0, 0, 0.7) 10%,
+      rgba(0, 0, 0, 0.5) 24%,
+      rgba(0, 0, 0, 0.26) 42%,
+      rgba(0, 0, 0, 0.08) 60%,
+      rgba(0, 0, 0, 0) 76%
     ),
     /* And just enough at the top to hold the navigation. */
     linear-gradient(
@@ -552,13 +562,16 @@ p {
   display: block;
   /* A whisper of shadow for the brightest frames; the wash does the rest. */
   text-shadow: 0 2px 28px rgba(0, 0, 0, 0.35);
-  font-size: clamp(2.35rem, 6.5vw, 5.75rem);
+  /* The floor governs every phone — 6.5vw is only 24px at 375 — so the
+     name is sized by this number, not the middle one, until about 640px
+     where the two meet and the curve takes over smoothly. */
+  font-size: clamp(2.6rem, 6.5vw, 5.75rem);
   font-weight: var(--weight-regular);
-  /* A shade more open than before: at this size the letters can breathe
-     without reading as spaced-out caps. */
-  letter-spacing: 0.04em;
-  /* Tracking adds space after the final letter; this re-centres the word. */
-  text-indent: 0.04em;
+  /* Drawn tight so the name reads as one compact block. Caps at display
+     size carry negative tracking well; the counters stay open.
+     The old text-indent corrected for trailing letter-space when the
+     word was centred — left aligned, it only pushed the N off the grid. */
+  letter-spacing: -0.012em;
   line-height: 1;
   text-transform: uppercase;
 }
@@ -1846,8 +1859,9 @@ p {
   }
 
   .hero__wordmark {
-    letter-spacing: 0.01em;
-    text-indent: 0.01em;
+    /* Easing off as the size drops: tight tracking costs legibility
+       faster at 38px than at 92px. */
+    letter-spacing: -0.006em;
   }
 
   .hero__headline {
@@ -2164,8 +2178,7 @@ p {
 
 @media (max-width: 480px) {
   .hero__wordmark {
-    letter-spacing: 0.005em;
-    text-indent: 0.005em;
+    letter-spacing: -0.003em;
   }
 
   .studio-stat__label {
