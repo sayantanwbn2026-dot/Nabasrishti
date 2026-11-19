@@ -333,7 +333,7 @@ export const fallbackSettings: SiteSettings = {
   transformations_intro:
     "Drag each slider to move between the drawing we started from and the room as it stands today.",
   preloader_enabled: true,
-  preloader_duration_ms: 6000,
+  preloader_duration_ms: 3000,
   whatsapp_enabled_fab: true,
   whatsapp_message:
     "Hello! I would like to discuss an interior design project.",

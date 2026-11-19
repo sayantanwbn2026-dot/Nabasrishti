@@ -154,7 +154,7 @@ export function SettingsPanel() {
             />
             <NumberField
               label="Loading screen length (milliseconds)"
-              hint="How long the logo is held before the site appears. 6000 = 6 seconds. Set the switch above off to skip it entirely."
+              hint="How long the logo is held before the site appears. 3000 = 3 seconds. The enquiry form's own delay starts counting when this ends. Set the switch above off to skip it entirely."
               value={draft.preloader_duration_ms}
               step={500}
               onChange={(v) => set("preloader_duration_ms", v)}

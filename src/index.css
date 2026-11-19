@@ -3109,7 +3109,7 @@ p {
   transform-origin: left;
   /* Duration is set inline from the CMS so the bar lands as the curtain
      lifts; this is only the fallback. */
-  animation: preloader-fill 6s cubic-bezier(0.33, 0, 0.1, 1) forwards;
+  animation: preloader-fill 3s cubic-bezier(0.33, 0, 0.1, 1) forwards;
 }
 
 @keyframes preloader-fill {
