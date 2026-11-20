@@ -1264,18 +1264,31 @@ p {
   margin-top: 0;
 }
 
-.carousel__controls {
-  display: flex;
+/* Arrow, picture, arrow — the arrows centred against the frame's height
+   rather than stacked beneath it. */
+.carousel__viewport {
+  display: grid;
   align-items: center;
-  justify-content: center;
-  gap: var(--space-lg);
-  margin-top: var(--space-lg);
+  gap: var(--space-md);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.carousel__viewport--stepped {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.carousel__count {
+  margin-top: var(--space-md);
+  text-align: center;
 }
 
 .carousel__arrow {
   display: grid;
   width: 48px;
   height: 48px;
+  /* Sits in its own column beside the picture; the grid's align-items
+     centres it against the frame. */
+  align-self: center;
   padding: 0;
   /* 0.3 put the ring at 2.4:1 against the section — under the 3:1 a
      control's own boundary wants, and too faint to read as clickable. */
@@ -1309,7 +1322,6 @@ p {
 }
 
 .carousel__count {
-  margin: 0;
   color: var(--muted-light);
   font-size: var(--text-2xs);
   font-weight: var(--weight-medium);
@@ -1324,6 +1336,43 @@ p {
 .carousel__count-sep {
   margin: 0 6px;
   opacity: 0.5;
+}
+
+/* On a phone there is no room to put a 48px column either side of the
+   picture — it would leave the frame about 215px wide — so the arrows lie
+   on the image instead, still centred against it. */
+@media (max-width: 760px) {
+  .carousel__viewport--stepped {
+    position: relative;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .carousel__arrow {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    width: 44px;
+    height: 44px;
+    border-color: rgba(248, 247, 243, 0.5);
+    background: rgba(6, 6, 5, 0.42);
+    transform: translateY(-50%);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+  }
+
+  .carousel__arrow--prev {
+    left: var(--space-2xs);
+  }
+
+  .carousel__arrow--next {
+    right: var(--space-2xs);
+  }
+
+  /* The comparison handle travels the full width, so where the two meet
+     at the extremes the handle must stay the thing you can grab. */
+  .comparison-frame__handle {
+    z-index: 3;
+  }
 }
 
 .carousel__caption {

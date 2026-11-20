@@ -62,35 +62,14 @@ export function TransformationsCarousel({ settings, items }: Props) {
         {settings.comparison_heading}
       </span>
 
-      <div className="carousel__stage">
-        <AnimatePresence initial={false} mode="wait" custom={direction}>
-          <motion.div
-            className="carousel__slide"
-            key={current.id}
-            custom={direction}
-            initial={{ opacity: 0, x: direction * 28 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: direction * -28 }}
-            transition={{ duration: 0.42, ease: EASE_OUT }}
-          >
-            <ImageComparison
-              beforeUrl={current.before_url}
-              afterUrl={current.after_url}
-              beforeAlt={current.before_alt}
-              afterAlt={current.after_alt || current.title || "Finished interior"}
-              beforeLabel={settings.comparison_before_label}
-              afterLabel={settings.comparison_after_label}
-              eager={index === 0}
-            />
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
-      {many ? (
-        <div className="carousel__controls">
+      {/* Arrows flank the picture rather than sitting under it. Keeping
+          them outside the frame also keeps them off the comparison
+          slider's handle, which travels the full width of the image. */}
+      <div className={`carousel__viewport${many ? " carousel__viewport--stepped" : ""}`}>
+        {many ? (
           <button
             type="button"
-            className="carousel__arrow"
+            className="carousel__arrow carousel__arrow--prev"
             onClick={() => step(-1)}
             aria-label="Previous transformation"
           >
@@ -98,26 +77,36 @@ export function TransformationsCarousel({ settings, items }: Props) {
               <path d="M12 4 6 10l6 6" />
             </svg>
           </button>
+        ) : null}
 
-          {/* Announced on change so the position is not sighted-only. */}
-          <p className="carousel__count" aria-live="polite" aria-atomic="true">
-            <span className="carousel__count-now">
-              {String(index + 1).padStart(2, "0")}
-            </span>
-            <span className="carousel__count-sep" aria-hidden="true">
-              /
-            </span>
-            <span className="carousel__count-all">
-              {String(total).padStart(2, "0")}
-            </span>
-            <span className="visually-hidden">
-              {current.title ? ` — ${current.title}` : ""}
-            </span>
-          </p>
+        <div className="carousel__stage">
+          <AnimatePresence initial={false} mode="wait" custom={direction}>
+            <motion.div
+              className="carousel__slide"
+              key={current.id}
+              custom={direction}
+              initial={{ opacity: 0, x: direction * 28 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: direction * -28 }}
+              transition={{ duration: 0.42, ease: EASE_OUT }}
+            >
+              <ImageComparison
+                beforeUrl={current.before_url}
+                afterUrl={current.after_url}
+                beforeAlt={current.before_alt}
+                afterAlt={current.after_alt || current.title || "Finished interior"}
+                beforeLabel={settings.comparison_before_label}
+                afterLabel={settings.comparison_after_label}
+                eager={index === 0}
+              />
+            </motion.div>
+          </AnimatePresence>
+        </div>
 
+        {many ? (
           <button
             type="button"
-            className="carousel__arrow"
+            className="carousel__arrow carousel__arrow--next"
             onClick={() => step(1)}
             aria-label="Next transformation"
           >
@@ -125,7 +114,25 @@ export function TransformationsCarousel({ settings, items }: Props) {
               <path d="m8 4 6 6-6 6" />
             </svg>
           </button>
-        </div>
+        ) : null}
+      </div>
+
+      {many ? (
+        /* Announced on change so the position is not sighted-only. */
+        <p className="carousel__count" aria-live="polite" aria-atomic="true">
+          <span className="carousel__count-now">
+            {String(index + 1).padStart(2, "0")}
+          </span>
+          <span className="carousel__count-sep" aria-hidden="true">
+            /
+          </span>
+          <span className="carousel__count-all">
+            {String(total).padStart(2, "0")}
+          </span>
+          <span className="visually-hidden">
+            {current.title ? ` — ${current.title}` : ""}
+          </span>
+        </p>
       ) : null}
 
       {current.title || current.caption ? (
