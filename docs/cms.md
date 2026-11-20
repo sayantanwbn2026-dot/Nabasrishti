@@ -125,9 +125,15 @@ cleanly in Excel and Google Sheets, and mobile numbers keep their leading
 digits.
 
 ### Transformations
-The before and after pairs behind "From Concept to Creation". Each one
-becomes a slider on the page the button opens. Both images in a pair
-should be the same shape, or the slider will crop one of them.
+The before and after pairs in the "From Concept to Creation" band. The
+section is a carousel: one pair at a time, with arrows either side to step
+through them, and the counter underneath showing where you are. Reorder
+them here and the carousel follows.
+
+Both images in a pair should be the same shape, or the slider will crop
+one of them. With nothing in this list the band falls back to the single
+pair set under **Site content → Logo & chrome**, and the arrows do not
+appear.
 
 ### Journal
 Posts work exactly like projects: a card in the grid, and a full page built

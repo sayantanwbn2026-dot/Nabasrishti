@@ -49,9 +49,8 @@ const AdminApp = lazy(() =>
   import("@/admin/AdminApp").then((module) => ({ default: module.AdminApp })),
 );
 import { ProjectModal } from "@/components/ProjectModal";
-import { TransformationsModal } from "@/components/TransformationsModal";
+import { TransformationsCarousel } from "@/components/TransformationsCarousel";
 import { ArticleModal } from "@/components/ArticleModal";
-import { ImageComparison } from "@/components/ImageComparison";
 import { Preloader, SocialLinks, WhatsAppFab } from "@/components/SiteChrome";
 import { ContactSection } from "@/components/ContactSection";
 import { FitText } from "@/components/FitText";
@@ -849,7 +848,6 @@ function HomePage() {
 
   const [activeProject, setActiveProject] = useState<CmsProject | null>(null);
   const [activeArticle, setActiveArticle] = useState<CmsArticle | null>(null);
-  const [transformationsOpen, setTransformationsOpen] = useState(false);
 
   /* The enquiry prompt counts from here, not from mount: the visitor has
      not landed on anything until the curtain lifts. */
@@ -859,7 +857,7 @@ function HomePage() {
   // dialogs would be the worst version of this pattern.
   const [enquiryOpen, setEnquiryOpen] = useDelayedEnquiry(
     settings.enquiry_delay_ms || ENQUIRY_DELAY_MS,
-    activeProject !== null || activeArticle !== null || transformationsOpen,
+    activeProject !== null || activeArticle !== null,
     introDone,
   );
 
@@ -1069,21 +1067,10 @@ function HomePage() {
                 {settings.comparison_heading}
               </Reveal>
               <Reveal preset="image" delay={0.08}>
-                <ImageComparison
-                  beforeUrl={settings.comparison_before_url}
-                  afterUrl={settings.comparison_after_url}
-                  beforeLabel={settings.comparison_before_label}
-                  afterLabel={settings.comparison_after_label}
+                <TransformationsCarousel
+                  settings={settings}
+                  items={cmsTransformations}
                 />
-              </Reveal>
-              <Reveal className="comparison-section__more" delay={0.12}>
-                <button
-                  type="button"
-                  className="button button-light"
-                  onClick={() => setTransformationsOpen(true)}
-                >
-                  {settings.comparison_cta_label}
-                </button>
               </Reveal>
             </div>
           </section>
@@ -1257,16 +1244,6 @@ function HomePage() {
         onEnquire={(project) => {
           setActiveProject(null);
           openEnquiry(project.title);
-        }}
-      />
-      <TransformationsModal
-        open={transformationsOpen}
-        onClose={() => setTransformationsOpen(false)}
-        settings={settings}
-        items={cmsTransformations}
-        onEnquire={(context) => {
-          setTransformationsOpen(false);
-          openEnquiry(context);
         }}
       />
       <ArticleModal

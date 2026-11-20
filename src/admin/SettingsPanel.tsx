@@ -281,11 +281,7 @@ export function SettingsPanel() {
             <TextArea label="Projects heading" value={draft.projects_heading} onChange={(v) => set("projects_heading", v)} rows={2} />
             <TextField label="Services label" value={draft.services_label} onChange={(v) => set("services_label", v)} />
             <TextField label="Services heading" value={draft.services_heading} onChange={(v) => set("services_heading", v)} />
-            <TextField label="Before/after heading" value={draft.comparison_heading} onChange={(v) => set("comparison_heading", v)} />
-            <TextField label="Before/after button" hint="Opens the full gallery of pairings. Add the pairings themselves under Transformations." value={draft.comparison_cta_label} onChange={(v) => set("comparison_cta_label", v)} />
-            <TextField label="Transformations label" value={draft.transformations_label} onChange={(v) => set("transformations_label", v)} />
-            <TextField label="Transformations heading" value={draft.transformations_heading} onChange={(v) => set("transformations_heading", v)} />
-            <TextArea label="Transformations intro" value={draft.transformations_intro} onChange={(v) => set("transformations_intro", v)} rows={2} />
+            <TextField label="Before/after heading" hint="Heads the carousel. Add the pairs it steps through under Transformations." value={draft.comparison_heading} onChange={(v) => set("comparison_heading", v)} />
             <TextField label="Process label" value={draft.process_label} onChange={(v) => set("process_label", v)} />
             <TextArea label="Process heading" value={draft.process_heading} onChange={(v) => set("process_heading", v)} rows={2} />
             <TextField label="Testimonials label" value={draft.testimonials_label} onChange={(v) => set("testimonials_label", v)} />
