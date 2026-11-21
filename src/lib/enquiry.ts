@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { getAttribution } from "./attribution";
 
 export const SERVICE_OPTIONS = [
   "1 BHK Interior",
@@ -44,12 +45,16 @@ export function validateEnquiry(values: Enquiry): FieldErrors {
 }
 
 /**
- * Sends the enquiry to the Google Sheet (Ads audit item 8).
+ * Records the enquiry: the CMS first, then the Google Sheet.
+ *
+ * The CMS is the studio's own copy and is written whether or not the sheet
+ * is configured. The sheet is the marketing team's copy — they do not have
+ * CMS logins, and it is where campaign reporting happens — so it also
+ * carries the campaign the visitor arrived on.
  *
  * Point VITE_ENQUIRY_ENDPOINT at the Apps Script Web App URL from
- * docs/google-sheets-setup.md. With no endpoint configured the call resolves
- * locally so the form can be exercised end to end — but nothing is recorded,
- * so the site must not go live in that state.
+ * docs/google-sheets-setup.md. A lead is only ever rejected when neither
+ * destination can take it; losing the sheet alone is logged, not surfaced.
  */
 export async function submitEnquiry(values: Enquiry): Promise<void> {
   const endpoint = import.meta.env.VITE_ENQUIRY_ENDPOINT as string | undefined;
@@ -59,10 +64,13 @@ export async function submitEnquiry(values: Enquiry): Promise<void> {
     mobile: values.mobile,
     service: values.service,
     comments: values.comments.trim(),
-    // Which CTA produced the lead, for campaign analysis.
+    // Which CTA produced the lead.
     source: values.context ?? "Timed pop-up",
     page: typeof window === "undefined" ? "" : window.location.pathname,
     submittedAt: new Date().toISOString(),
+    /* Which advert paid for it. Read when the visitor first landed, since
+       the query string is gone by the time they reach the form. */
+    ...getAttribution(),
   };
 
   /* Every lead is written to the CMS first: that is the studio's own
@@ -94,11 +102,23 @@ export async function submitEnquiry(values: Enquiry): Promise<void> {
 
   /* Apps Script Web Apps answer the CORS preflight poorly, so this posts as
      text/plain (a "simple" request). doPost still receives the JSON body. */
-  const response = await fetch(endpoint, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify(payload),
-  });
+  let response: Response;
+  try {
+    response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload),
+      /* Apps Script can be slow to wake. The visitor should not sit on a
+         spinner waiting for a copy of a lead the studio already holds. */
+      signal: AbortSignal.timeout(8000),
+    });
+  } catch (networkError) {
+    if (!storedInCms) {
+      throw new Error("Enquiry could not be recorded.");
+    }
+    console.error("[enquiry] sheets webhook unreachable:", networkError);
+    return;
+  }
 
   if (!response.ok && !storedInCms) {
     throw new Error(`Enquiry failed with status ${response.status}`);

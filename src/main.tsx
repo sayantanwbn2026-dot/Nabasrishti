@@ -6,6 +6,12 @@ import "lenis/dist/lenis.css";
 import "./index.css";
 import { SmoothScroll } from "@/components/motion";
 import App from "./App";
+import { captureAttribution } from "@/lib/attribution";
+
+/* Before React renders anything. The campaign is in the query string on
+   arrival and gone as soon as the visitor clicks a link, so there is no
+   later point at which it could still be read. */
+captureAttribution();
 
 const queryClient = new QueryClient({
   defaultOptions: {
