@@ -7,15 +7,17 @@ import {
   useSaveRow,
   type TableName,
 } from "./api";
-import { ImageField, TextArea, TextField, Toggle } from "./Fields";
+import { ImageField, StringList, TextArea, TextField, Toggle } from "./Fields";
 import { confirmDiscard, useSaveShortcut, useUnsavedGuard } from "./unsaved";
 
 type FieldSpec = {
   key: string;
   label: string;
-  type: "text" | "textarea" | "image";
+  type: "text" | "textarea" | "image" | "list";
   hint?: string;
   rows?: number;
+  /** For list fields: the wording on the add button. */
+  addLabel?: string;
 };
 
 export type CollectionSpec = {
@@ -155,6 +157,25 @@ export function CollectionPanel({ spec }: { spec: CollectionSpec }) {
                           />
                         );
                       }
+                      if (field.type === "list") {
+                        /* A text[] column — the editor needs rows it can
+                           add to and reorder, not a comma-separated box. */
+                        const list = Array.isArray(draft[field.key])
+                          ? (draft[field.key] as string[])
+                          : [];
+                        return (
+                          <StringList
+                            key={field.key}
+                            label={field.label}
+                            hint={field.hint}
+                            addLabel={field.addLabel ?? "Add line"}
+                            value={list}
+                            onChange={(next) =>
+                              setDraft({ ...draft, [field.key]: next })
+                            }
+                          />
+                        );
+                      }
                       if (field.type === "image") {
                         return (
                           <ImageField
@@ -215,6 +236,60 @@ export function CollectionPanel({ spec }: { spec: CollectionSpec }) {
 }
 
 export const COLLECTIONS: Record<string, CollectionSpec> = {
+  pricing_packages: {
+    table: "pricing_packages",
+    title: "Pricing",
+    description:
+      "The packages on the pricing band. Each button carries its package name into the enquiry, so you can see which one brought the lead.",
+    titleKey: "name",
+    addLabel: "Add a package",
+    blank: {
+      name: "New package",
+      price: "",
+      price_prefix: "Starting from",
+      price_unit: "",
+      summary: "",
+      inclusions: [],
+      badge: "",
+      cta_label: "Get a free quote",
+    },
+    fields: [
+      { key: "name", label: "Package name", type: "text" },
+      {
+        key: "price",
+        label: "Price",
+        type: "text",
+        hint: "Written as you want it read — ₹1,350, or On request.",
+      },
+      {
+        key: "price_prefix",
+        label: "Words before the price",
+        type: "text",
+        hint: "Starting from, From, or leave blank.",
+      },
+      {
+        key: "price_unit",
+        label: "Words after the price",
+        type: "text",
+        hint: "per sq ft, one-off, and so on.",
+      },
+      { key: "summary", label: "Summary", type: "textarea", rows: 3 },
+      {
+        key: "inclusions",
+        label: "What it includes",
+        type: "list",
+        addLabel: "Add an inclusion",
+        hint: "One line each. These are what make the price believable.",
+      },
+      {
+        key: "badge",
+        label: "Flag",
+        type: "text",
+        hint: "A short line like “Most chosen”. Leave blank on all but one — it outlines the card and darkens its button.",
+      },
+      { key: "cta_label", label: "Button", type: "text" },
+    ],
+  },
   sketches: {
     table: "sketches",
     title: "3D sketches",

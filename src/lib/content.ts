@@ -59,6 +59,13 @@ export type SiteSettings = {
   logo_alt: string;
   logo_dark_url: string;
   show_logo_in_nav: boolean;
+  pricing_label: string;
+  pricing_heading: string;
+  pricing_aside: string;
+  pricing_note: string;
+  pricing_offer: string;
+  cta_pricing_label: string;
+  price_range: string;
   sketches_label: string;
   sketches_heading: string;
   comparison_cta_label: string;
@@ -137,6 +144,22 @@ export type CmsProject = {
   seo_description: string;
   share_image_url: string;
   blocks?: ProjectBlock[];
+};
+
+/** A package on the pricing band. */
+export type PricingPackage = {
+  id: string;
+  name: string;
+  /** Text, not a number: "₹1,350" and "On request" both have to fit. */
+  price: string;
+  price_prefix: string;
+  price_unit: string;
+  summary: string;
+  inclusions: string[];
+  badge: string;
+  cta_label: string;
+  position: number;
+  is_published: boolean;
 };
 
 /** One view in the moving gallery of 3D sketches. */
@@ -340,6 +363,15 @@ export const fallbackSettings: SiteSettings = {
   logo_alt: "Nabasrishti",
   logo_dark_url: "",
   show_logo_in_nav: true,
+  pricing_label: "What it costs",
+  pricing_heading: "Clear prices, before you ask",
+  pricing_aside:
+    "Every home is different, so these are starting points rather than quotes. Tell us the size and the scope and we will put a figure to it within a day.",
+  pricing_note:
+    "Prices are indicative and vary with area, materials and site condition. A written quote follows the site visit, and there is no charge for either.",
+  pricing_offer: "",
+  cta_pricing_label: "Get a free quote",
+  price_range: "₹₹",
   sketches_label: "In three dimensions",
   sketches_heading: "Sketched before it is built",
   comparison_cta_label: "See more transformations",
@@ -392,6 +424,7 @@ export const fallbackHomeSections: HomeSection[] = [
   ["studio", "Studio", false],
   ["projects", "Projects", false],
   ["services", "Services", false],
+  ["pricing", "Pricing", false],
   ["comparison", "Before and after", false],
   ["process", "Process", false],
   ["testimonials", "Our stories", false],
@@ -556,6 +589,15 @@ export function useHomeSections() {
     queryFn: listQuery<HomeSection>("home_sections", fallbackHomeSections),
     staleTime: STALE,
     placeholderData: fallbackHomeSections,
+  });
+}
+
+export function usePricing() {
+  return useQuery({
+    queryKey: ["pricing_packages"],
+    queryFn: listQuery<PricingPackage>("pricing_packages", []),
+    staleTime: STALE,
+    placeholderData: [],
   });
 }
 

@@ -287,6 +287,12 @@ export function SettingsPanel() {
             <TextField label="Testimonials label" value={draft.testimonials_label} onChange={(v) => set("testimonials_label", v)} />
             <TextField label="Testimonials heading" value={draft.testimonials_heading} onChange={(v) => set("testimonials_heading", v)} />
             <TextArea label="Testimonials aside" value={draft.testimonials_aside} onChange={(v) => set("testimonials_aside", v)} rows={2} />
+            <TextField label="Pricing label" value={draft.pricing_label} onChange={(v) => set("pricing_label", v)} />
+            <TextField label="Pricing heading" value={draft.pricing_heading} onChange={(v) => set("pricing_heading", v)} />
+            <TextArea label="Pricing intro" hint="Sits beside the heading. Good place to say these are starting points, not quotes." value={draft.pricing_aside} onChange={(v) => set("pricing_aside", v)} rows={3} />
+            <TextArea label="Current offer" hint="Shown as a notice above the packages. Leave blank and the notice disappears." value={draft.pricing_offer} onChange={(v) => set("pricing_offer", v)} rows={2} />
+            <TextArea label="Pricing small print" hint="Under the packages. What the figures do and do not cover." value={draft.pricing_note} onChange={(v) => set("pricing_note", v)} rows={3} />
+            <TextField label="Default pricing button" hint="Used when a package has no button wording of its own." value={draft.cta_pricing_label} onChange={(v) => set("cta_pricing_label", v)} />
             <TextField label="3D sketches label" value={draft.sketches_label} onChange={(v) => set("sketches_label", v)} />
             <TextField label="3D sketches heading" hint="Heads the moving gallery. Add the images under 3D sketches." value={draft.sketches_heading} onChange={(v) => set("sketches_heading", v)} />
             <TextField label="Journal label" value={draft.journal_label} onChange={(v) => set("journal_label", v)} />
@@ -384,6 +390,12 @@ export function SettingsPanel() {
               hint="Also the headline in Google results."
               value={draft.meta_title}
               onChange={(v) => set("meta_title", v)}
+            />
+            <TextField
+              label="Price range"
+              hint="Shown by Google against the business listing. Rupee signs, not figures — ₹₹ for mid-range, ₹₹₹ for premium."
+              value={draft.price_range}
+              onChange={(v) => set("price_range", v)}
             />
             <TextArea
               label="Search description"

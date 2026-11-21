@@ -9,6 +9,7 @@ export const TABLES = {
   home_sections: { order: "position" },
   transformations: { order: "position" },
   sketches: { order: "position" },
+  pricing_packages: { order: "position" },
   services: { order: "position" },
   process_steps: { order: "position" },
   testimonials: { order: "position" },

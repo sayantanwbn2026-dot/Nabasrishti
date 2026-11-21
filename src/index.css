@@ -247,6 +247,14 @@ p {
   line-height: var(--lh-body);
 }
 
+/* The colour above is for dark bands. On paper it reads at 2.31:1, so a
+   light section needs the ink tone — the same correction `.section-label`
+   already carries. */
+.light-section .section-aside,
+.modal__panel-paper .section-aside {
+  color: var(--ink-secondary);
+}
+
 .button {
   display: inline-flex;
   min-height: 50px;
@@ -281,6 +289,20 @@ p {
 .button-outline:hover {
   border-color: #fff;
   background: rgba(255, 255, 255, 0.1);
+}
+
+/* The outline above is white, for dark bands. Pricing sits on paper and
+   needs the same shape in ink. */
+.button-outline-dark {
+  border-color: rgba(20, 20, 19, 0.4);
+  background: transparent;
+  color: var(--ink);
+}
+
+.button-outline-dark:hover,
+.button-outline-dark:focus-visible {
+  border-color: var(--ink);
+  background: rgba(20, 20, 19, 0.05);
 }
 
 .button-dark {
@@ -1245,6 +1267,170 @@ p {
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+/* --- Pricing ---------------------------------------------------------- */
+
+.pricing-section {
+  padding: var(--section-y) 0;
+}
+
+.pricing-heading {
+  margin-bottom: var(--space-xl);
+}
+
+/* The current offer, if there is one. Reads as a notice rather than
+   another card competing with the packages. */
+.pricing-offer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-xs) var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-xl);
+  border: 1px solid rgba(20, 20, 19, 0.16);
+  background: #f3efe2;
+}
+
+.pricing-offer__flag {
+  color: var(--ink);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+
+.pricing-offer p {
+  margin: 0;
+  flex: 1 1 16rem;
+  color: var(--ink-secondary);
+  font-size: var(--text-sm);
+  line-height: var(--lh-ui);
+  text-wrap: pretty;
+}
+
+.pricing-grid {
+  display: grid;
+  gap: var(--space-md);
+  grid-template-columns: repeat(auto-fit, minmax(258px, 1fr));
+  align-items: stretch;
+}
+
+.pricing-card {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-lg) var(--space-md) var(--space-md);
+  border: 1px solid var(--rule-light);
+  background: #fff;
+}
+
+/* The one the studio wants read first. */
+.pricing-card--featured {
+  border-color: var(--ink);
+}
+
+.pricing-card__badge {
+  margin: 0 0 var(--space-xs);
+  color: var(--ink);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+
+.pricing-card__name {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-regular);
+  letter-spacing: var(--track-snug);
+}
+
+.pricing-card__price {
+  display: grid;
+  gap: 2px;
+  margin: var(--space-sm) 0 0;
+}
+
+.pricing-card__prefix,
+.pricing-card__unit {
+  color: var(--ink-tertiary);
+  font-size: var(--text-2xs);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+
+.pricing-card__figure {
+  color: var(--ink);
+  font-size: var(--display-xs);
+  font-weight: var(--weight-light);
+  letter-spacing: var(--track-tight);
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.pricing-card__summary {
+  margin: var(--space-sm) 0 0;
+  color: var(--ink-secondary);
+  font-size: var(--text-sm);
+  line-height: var(--lh-body);
+  text-wrap: pretty;
+}
+
+.pricing-card__list {
+  display: grid;
+  gap: var(--space-2xs);
+  margin: var(--space-md) 0 0;
+  padding: var(--space-md) 0 0;
+  border-top: 1px solid var(--rule-light);
+  list-style: none;
+}
+
+.pricing-card__list li {
+  position: relative;
+  padding-left: var(--space-md);
+  color: var(--ink-secondary);
+  font-size: var(--text-sm);
+  line-height: var(--lh-ui);
+}
+
+.pricing-card__list li::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: var(--ink);
+  content: "—";
+}
+
+/* Pushed to the foot so every card's button sits on one line, whatever
+   the lists above them do. */
+.pricing-card__cta {
+  width: 100%;
+  margin-top: auto;
+  padding-top: var(--space-md);
+  padding-bottom: var(--space-md);
+}
+
+.pricing-card__list + .pricing-card__cta {
+  margin-top: var(--space-lg);
+}
+
+.pricing-note {
+  max-width: var(--measure);
+  margin: var(--space-xl) 0 0;
+  color: var(--ink-tertiary);
+  font-size: var(--text-xs);
+  line-height: var(--lh-body);
+  text-wrap: pretty;
+}
+
+@media (max-width: 760px) {
+  .pricing-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pricing-heading {
+    margin-bottom: var(--space-lg);
+  }
 }
 
 /* --- 3D sketch gallery ------------------------------------------------ */

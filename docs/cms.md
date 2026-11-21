@@ -135,6 +135,24 @@ one of them. With nothing in this list the band falls back to the single
 pair set under **Site content → Logo & chrome**, and the arrows do not
 appear.
 
+### Pricing
+The packages on the pricing band, between Services and the before/after
+slider. Each one has a price written as you want it read — `₹1,350`, or
+`On request` — with words either side of it (`Starting from`, `per sq ft`),
+a summary, and a list of what the figure covers.
+
+**Flag** puts a line like "Most chosen" on a card, outlines it and darkens
+its button. Use it on one card only, or it stops meaning anything.
+
+Each button carries its own package name into the enquiry, so **Enquiries**
+shows `Pricing — Signature` rather than just `Pricing`. That is how you see
+which package is actually bringing the leads.
+
+The heading, the intro, the small print under the packages and the **current
+offer** live under **Site content → Section headings**. Leave the offer blank
+and the notice disappears. Under **SEO** there is a **Price range** — rupee
+signs rather than figures, which is what Google shows against the business.
+
 ### 3D sketches
 The gallery under the journal that drifts sideways on its own. Add the
 views here and reorder them with ↑ ↓.

@@ -18,6 +18,7 @@ const CONTENT_TABLES = [
   "transformations",
   "home_sections",
   "sketches",
+  "pricing_packages",
 ] as const;
 
 /** A block change has to refresh the parent the site actually queries. */

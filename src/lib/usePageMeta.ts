@@ -85,6 +85,7 @@ export function useStructuredData(business: {
   address: string;
   areaServed: string;
   sameAs: string[];
+  priceRange: string;
 }) {
   const key = JSON.stringify(business);
 
@@ -115,6 +116,7 @@ export function useStructuredData(business: {
     // Only state what we actually hold: an empty field is worse than none.
     if (business.phoneDigits) data.telephone = `+${business.phoneDigits}`;
     if (business.email) data.email = business.email;
+    if (business.priceRange) data.priceRange = business.priceRange;
     /* A social link that is only a domain is the network's front page, not
        this studio's profile. Telling Google that instagram.com *is* the
        business is worse than saying nothing, so those are left out. */

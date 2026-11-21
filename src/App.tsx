@@ -25,6 +25,7 @@ import {
   useFooterLinks,
   useProcessSteps,
   useHomeSections,
+  usePricing,
   useProjects,
   useSketches,
   useTransformations,
@@ -52,6 +53,7 @@ const AdminApp = lazy(() =>
 import { ProjectModal } from "@/components/ProjectModal";
 import { TransformationsCarousel } from "@/components/TransformationsCarousel";
 import { SketchGallery } from "@/components/SketchGallery";
+import { PricingSection } from "@/components/PricingSection";
 import { ArticleModal } from "@/components/ArticleModal";
 import { Preloader, SocialLinks, WhatsAppFab } from "@/components/SiteChrome";
 import { ContactSection } from "@/components/ContactSection";
@@ -774,6 +776,7 @@ function HomePage() {
   const { data: cmsProjects = [] } = useProjects();
   const { data: cmsTransformations = [] } = useTransformations();
   const { data: cmsSketches = [] } = useSketches();
+  const { data: cmsPricing = [] } = usePricing();
   const { data: cmsSections = [] } = useHomeSections();
 
   const { data: cmsServices = [] } = useServices();
@@ -800,6 +803,7 @@ function HomePage() {
     address: settings.contact_address,
     areaServed: settings.location,
     sameAs: cmsSocials.filter((s) => s.is_published && s.url).map((s) => s.url),
+    priceRange: settings.price_range,
   });
   const { data: cmsNavLinks = [] } = useNavLinks();
   const navItems = cmsNavLinks.length
@@ -1060,6 +1064,15 @@ function HomePage() {
               />
             </div>
           </section>
+      </>
+    ),
+    pricing: (
+      <>
+          <PricingSection
+            settings={settings}
+            packages={cmsPricing}
+            onEnquire={openEnquiry}
+          />
       </>
     ),
     comparison: (

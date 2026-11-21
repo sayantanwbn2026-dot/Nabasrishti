@@ -18,6 +18,7 @@ const SECTIONS = [
   { id: "projects", label: "Projects" },
   { id: "articles", label: "Journal" },
   { id: "transformations", label: "Transformations" },
+  { id: "pricing_packages", label: "Pricing" },
   { id: "sketches", label: "3D sketches" },
   { id: "services", label: "Services" },
   { id: "process_steps", label: "Process" },
