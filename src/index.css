@@ -1468,8 +1468,9 @@ p {
 }
 
 .sketches__head h2 {
-  max-width: 20ch;
-  margin: 0;
+  /* Size and weight come from `.section-heading`; this only stops the
+     line running the full width, since this band carries no aside. */
+  max-width: 24ch;
 }
 
 .sketches__viewport {

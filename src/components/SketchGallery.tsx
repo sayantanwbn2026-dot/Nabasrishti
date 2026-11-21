@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Reveal } from "./motion";
 import { useReducedMotion } from "framer-motion";
 import type { Sketch } from "@/lib/content";
 
@@ -78,9 +79,15 @@ export function SketchGallery({
 
   return (
     <div className="sketches">
-      <div className="page-shell sketches__head">
-        <p className="section-label">{label}</p>
-        <h2>{heading}</h2>
+      <div className="page-shell">
+        {/* The same heading block every other band uses, so this one is
+            not the odd section with a smaller title. */}
+        <Reveal className="section-heading sketches__head">
+          <div>
+            <p className="section-label">{label}</p>
+            <h2>{heading}</h2>
+          </div>
+        </Reveal>
       </div>
 
       <div
