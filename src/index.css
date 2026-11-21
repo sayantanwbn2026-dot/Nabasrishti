@@ -2349,31 +2349,85 @@ p {
     transform: translateY(-3.5px) rotate(-45deg);
   }
 
+  /* --- Phone hero ------------------------------------------------------
+     A phone shows a 26%-wide upright slice of a 16:9 photograph, so the
+     desktop framing cannot simply be narrowed: whatever sits at the
+     crop's centre is the whole picture. Everything below re-frames that
+     slice, then builds the type around where the light actually falls. */
+
   .hero {
     min-height: 570px;
   }
 
+  /* The studio photograph is a dark room with one lit opening to the
+     right of centre. Cropped at 57% the phone landed on bare wall and
+     the hero read as a black rectangle; 78% puts the light in frame and
+     keeps the shadowed floor under the type. */
   .hero__image {
-    object-position: 57% center;
+    object-position: 78% 50%;
+  }
+
+  /* One ramp instead of the desktop corner wash. A radial anchored in
+     the bottom-left corner covers a 375px-wide screen almost entirely,
+     so it stopped being a corner and just greyed the photograph down.
+
+     Measured in pixels from the floor, not percentages. The type block
+     is the same ~360px tall on every phone while the hero is not, so a
+     percentage ramp that cleared the name on a 812px screen let the lit
+     panel ride up behind it on a 667px one. Pixels keep the dark band
+     and the thing it protects the same size. */
+  .hero__shade {
+    background:
+      linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.9) 0,
+        rgba(0, 0, 0, 0.84) 140px,
+        rgba(0, 0, 0, 0.66) 280px,
+        rgba(0, 0, 0, 0.4) 390px,
+        rgba(0, 0, 0, 0.16) 480px,
+        rgba(0, 0, 0, 0) 580px
+      ),
+      /* Barely anything at the top: enough to hold the mark and the
+         menu button, not enough to dull the lit panel behind them. */
+      linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.42) 0%,
+        rgba(0, 0, 0, 0.1) 18%,
+        rgba(0, 0, 0, 0) 34%
+      );
   }
 
   .hero__content {
-    /* The title block keeps the floor; the services sit just beneath it,
-       so it has to clear them. */
-    padding-bottom: 96px;
     max-width: none;
+    /* Clears the services line below. Measured against the rail rather
+       than guessed: the old 96px pushed the stack past the bottom of
+       the hero and the last few pixels were cropped. */
+    padding-bottom: 84px;
   }
 
+  .hero__content h1 {
+    gap: var(--space-sm);
+  }
+
+  /* Sized to very nearly span the column, which is what makes the name
+     read as a mark rather than a line of text. At 375px this lands a
+     hair inside the gutters; the ceiling stops it outgrowing the
+     headline on a tablet. */
   .hero__wordmark {
-    /* Easing off as the size drops: tight tracking costs legibility
-       faster at 38px than at 92px. */
-    letter-spacing: -0.006em;
+    font-size: clamp(2.85rem, 12.4vw, 3.5rem);
+    font-weight: var(--weight-regular);
+    /* Tight enough to hold together at this size without the counters
+       closing up — eased off again under 480px. */
+    letter-spacing: -0.016em;
+    text-shadow: 0 2px 24px rgba(0, 0, 0, 0.5);
   }
 
   .hero__headline {
     /* No room to hold one line at phone widths — let it wrap to two. */
-    font-size: var(--text-base);
-    max-width: 22ch;
+    font-size: var(--text-sm);
+    max-width: 24ch;
+    color: rgba(248, 247, 243, 0.76);
+    letter-spacing: var(--track-label);
     text-wrap: balance;
     white-space: normal;
   }
@@ -2382,17 +2436,27 @@ p {
     padding: var(--space-2xl) 0;
   }
 
+  /* The call sits under the button rather than beside it, so both are
+     full-width targets and the eye travels straight down. */
   .hero__actions {
     flex-direction: column;
-    align-items: stretch;
-    width: min(100%, 320px);
-    margin-top: var(--space-lg);
+    align-items: flex-start;
+    width: 100%;
+    gap: var(--space-md);
+    margin-top: var(--space-xl);
     margin-inline: 0;
   }
 
   .hero__cta-primary {
-    width: 100%;
+    width: min(100%, 320px);
     min-width: 0;
+  }
+
+  /* A touch larger than the 11px rail type: this one is tappable and
+     has to clear the 24px minimum on its own. */
+  .hero__cta-call {
+    padding-block: 4px;
+    font-size: var(--text-2xs);
   }
 
   /* No room for a column beside the title — the services lie under it as
@@ -2420,6 +2484,7 @@ p {
 
   .hero__rail .hero__highlights li {
     font-size: 11px;
+    color: rgba(248, 247, 243, 0.68);
   }
 
   /* The separator is absolutely positioned, so when the list wraps it can
@@ -2684,7 +2749,21 @@ p {
 
 @media (max-width: 480px) {
   .hero__wordmark {
-    letter-spacing: -0.003em;
+    /* The tracking that holds a 46px name together starts closing the
+       counters as the size drops, so it is eased back out here. */
+    letter-spacing: -0.008em;
+  }
+
+  /* Both services hold one line down to 360px at this size; at 11px the
+     pair measured 326px against 320px of column and the second one
+     dropped to a line of its own. */
+  .hero__rail .hero__highlights {
+    gap: var(--space-3xs) var(--space-2xs);
+  }
+
+  .hero__rail .hero__highlights li {
+    font-size: 10px;
+    letter-spacing: 0.05em;
   }
 
   .studio-stat__label {
