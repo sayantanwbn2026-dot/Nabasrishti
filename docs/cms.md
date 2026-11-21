@@ -135,6 +135,16 @@ one of them. With nothing in this list the band falls back to the single
 pair set under **Site content → Logo & chrome**, and the arrows do not
 appear.
 
+### 3D sketches
+The gallery under the journal that drifts sideways on its own. Add the
+views here and reorder them with ↑ ↓.
+
+Draw them at **4:3** — anything taller or wider is cropped to that shape.
+The strip pauses when a visitor points at it or tabs into it, and there is
+a Pause button for touch screens, which cannot hover. Empty the list and
+the whole band disappears from the page rather than leaving a blank
+stripe.
+
 ### Journal
 Posts work exactly like projects: a card in the grid, and a full page built
 from the same sections. Summary, author and reading time appear in the meta

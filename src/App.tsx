@@ -26,6 +26,7 @@ import {
   useProcessSteps,
   useHomeSections,
   useProjects,
+  useSketches,
   useTransformations,
   useServices,
   useNavLinks,
@@ -50,6 +51,7 @@ const AdminApp = lazy(() =>
 );
 import { ProjectModal } from "@/components/ProjectModal";
 import { TransformationsCarousel } from "@/components/TransformationsCarousel";
+import { SketchGallery } from "@/components/SketchGallery";
 import { ArticleModal } from "@/components/ArticleModal";
 import { Preloader, SocialLinks, WhatsAppFab } from "@/components/SiteChrome";
 import { ContactSection } from "@/components/ContactSection";
@@ -771,6 +773,7 @@ function HomePage() {
     useSiteSettings();
   const { data: cmsProjects = [] } = useProjects();
   const { data: cmsTransformations = [] } = useTransformations();
+  const { data: cmsSketches = [] } = useSketches();
   const { data: cmsSections = [] } = useHomeSections();
 
   const { data: cmsServices = [] } = useServices();
@@ -1169,6 +1172,21 @@ function HomePage() {
               />
             </div>
           </section>
+      </>
+    ),
+    sketches: (
+      <>
+          {/* Empty the collection and the band goes with it, rather than
+              leaving a dark stripe with nothing in it. */}
+          {cmsSketches.some((item) => item.is_published && item.image_url) ? (
+            <section className="sketches-section dark-section" id="sketches">
+              <SketchGallery
+                items={cmsSketches}
+                label={settings.sketches_label}
+                heading={settings.sketches_heading}
+              />
+            </section>
+          ) : null}
       </>
     ),
     contact: (

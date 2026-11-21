@@ -215,6 +215,31 @@ export function CollectionPanel({ spec }: { spec: CollectionSpec }) {
 }
 
 export const COLLECTIONS: Record<string, CollectionSpec> = {
+  sketches: {
+    table: "sketches",
+    title: "3D sketches",
+    description:
+      "The gallery that drifts sideways under the journal. Drawn at 4:3 — anything else is cropped to fit.",
+    titleKey: "title",
+    addLabel: "Add a sketch",
+    blank: { title: "New sketch", caption: "", image_url: "", image_alt: "" },
+    fields: [
+      { key: "title", label: "Name", type: "text" },
+      {
+        key: "caption",
+        label: "Caption",
+        type: "text",
+        hint: "A short line under the image — the room, or the project.",
+      },
+      {
+        key: "image_url",
+        label: "Sketch",
+        type: "image",
+        hint: "4:3 works best. Taller or wider images are cropped to it.",
+      },
+      { key: "image_alt", label: "Image description", type: "text" },
+    ],
+  },
   transformations: {
     table: "transformations",
     title: "Transformations",

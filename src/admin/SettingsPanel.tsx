@@ -287,6 +287,8 @@ export function SettingsPanel() {
             <TextField label="Testimonials label" value={draft.testimonials_label} onChange={(v) => set("testimonials_label", v)} />
             <TextField label="Testimonials heading" value={draft.testimonials_heading} onChange={(v) => set("testimonials_heading", v)} />
             <TextArea label="Testimonials aside" value={draft.testimonials_aside} onChange={(v) => set("testimonials_aside", v)} rows={2} />
+            <TextField label="3D sketches label" value={draft.sketches_label} onChange={(v) => set("sketches_label", v)} />
+            <TextField label="3D sketches heading" hint="Heads the moving gallery. Add the images under 3D sketches." value={draft.sketches_heading} onChange={(v) => set("sketches_heading", v)} />
             <TextField label="Journal label" value={draft.journal_label} onChange={(v) => set("journal_label", v)} />
             <TextField label="Journal heading" value={draft.journal_heading} onChange={(v) => set("journal_heading", v)} />
             <TextArea label="Journal aside" value={draft.journal_aside} onChange={(v) => set("journal_aside", v)} rows={2} />

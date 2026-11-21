@@ -8,6 +8,7 @@ export const TABLES = {
   project_blocks: { order: "position" },
   home_sections: { order: "position" },
   transformations: { order: "position" },
+  sketches: { order: "position" },
   services: { order: "position" },
   process_steps: { order: "position" },
   testimonials: { order: "position" },

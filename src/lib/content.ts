@@ -59,6 +59,8 @@ export type SiteSettings = {
   logo_alt: string;
   logo_dark_url: string;
   show_logo_in_nav: boolean;
+  sketches_label: string;
+  sketches_heading: string;
   comparison_cta_label: string;
   transformations_label: string;
   transformations_heading: string;
@@ -135,6 +137,17 @@ export type CmsProject = {
   seo_description: string;
   share_image_url: string;
   blocks?: ProjectBlock[];
+};
+
+/** One view in the moving gallery of 3D sketches. */
+export type Sketch = {
+  id: string;
+  title: string;
+  caption: string;
+  image_url: string;
+  image_alt: string;
+  position: number;
+  is_published: boolean;
 };
 
 /** A band on the home page, in the order the CMS puts it. */
@@ -327,6 +340,8 @@ export const fallbackSettings: SiteSettings = {
   logo_alt: "Nabasrishti",
   logo_dark_url: "",
   show_logo_in_nav: true,
+  sketches_label: "In three dimensions",
+  sketches_heading: "Sketched before it is built",
   comparison_cta_label: "See more transformations",
   transformations_label: "Before and after",
   transformations_heading: "Every room has a second life",
@@ -381,6 +396,7 @@ export const fallbackHomeSections: HomeSection[] = [
   ["process", "Process", false],
   ["testimonials", "Our stories", false],
   ["journal", "Journal", false],
+  ["sketches", "3D sketches", false],
   ["contact", "Contact and map", false],
   ["closing", "Closing banner", true],
 ].map(([key, label, locked], index) => ({
@@ -540,6 +556,15 @@ export function useHomeSections() {
     queryFn: listQuery<HomeSection>("home_sections", fallbackHomeSections),
     staleTime: STALE,
     placeholderData: fallbackHomeSections,
+  });
+}
+
+export function useSketches() {
+  return useQuery({
+    queryKey: ["sketches"],
+    queryFn: listQuery<Sketch>("sketches", []),
+    staleTime: STALE,
+    placeholderData: [],
   });
 }
 

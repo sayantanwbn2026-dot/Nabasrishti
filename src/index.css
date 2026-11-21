@@ -1247,6 +1247,144 @@ p {
   white-space: nowrap;
 }
 
+/* --- 3D sketch gallery ------------------------------------------------ */
+
+.sketches-section {
+  /* Full bleed: the strip runs off both edges of the screen, so the
+     section cannot be held inside the page shell. */
+  padding: var(--section-y) 0;
+  overflow: hidden;
+}
+
+.sketches__head {
+  margin-bottom: var(--space-2xl);
+}
+
+.sketches__head h2 {
+  max-width: 20ch;
+  margin: 0;
+}
+
+.sketches__viewport {
+  position: relative;
+}
+
+/* Fades the strip into the section at both ends rather than cutting it,
+   so it reads as continuing past the screen. */
+@supports (mask-image: linear-gradient(to right, transparent, black)) {
+  .sketches__viewport {
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 7%,
+      #000 93%,
+      transparent 100%
+    );
+  }
+}
+
+.sketches__track {
+  display: flex;
+  gap: var(--space-md);
+  /* The first card lines up with the heading above it. */
+  padding: 0 max(var(--gutter), calc((100% - var(--page-width)) / 2));
+  margin: 0;
+  list-style: none;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  /* Lenis must not take this over; it is its own scroller. */
+  touch-action: pan-x;
+}
+
+.sketches__track::-webkit-scrollbar {
+  display: none;
+}
+
+.sketches__item {
+  flex: 0 0 auto;
+  width: clamp(252px, 27vw, 400px);
+}
+
+.sketches__item figure {
+  margin: 0;
+}
+
+.sketches__item img {
+  display: block;
+  width: 100%;
+  /* The ratio the sketches are drawn at. */
+  aspect-ratio: 4 / 3;
+  background: #15140f;
+  object-fit: cover;
+  user-select: none;
+}
+
+.sketches__item figcaption {
+  display: grid;
+  gap: 2px;
+  margin-top: var(--space-xs);
+}
+
+.sketches__item figcaption strong {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--track-snug);
+}
+
+.sketches__item figcaption span {
+  color: var(--muted-light);
+  font-size: var(--text-2xs);
+  letter-spacing: var(--track-micro);
+  line-height: var(--lh-ui);
+}
+
+.sketches__controls {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-lg);
+}
+
+.sketches__toggle {
+  padding: 9px var(--space-sm);
+  border: 1px solid rgba(248, 247, 243, 0.42);
+  background: transparent;
+  color: rgba(248, 247, 243, 0.86);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  transition:
+    border-color 220ms ease,
+    background-color 220ms ease,
+    color 220ms ease;
+}
+
+.sketches__toggle:hover,
+.sketches__toggle:focus-visible {
+  border-color: rgba(248, 247, 243, 0.86);
+  background: rgba(248, 247, 243, 0.08);
+  color: #fff;
+}
+
+@media (max-width: 760px) {
+  .sketches__head {
+    margin-bottom: var(--space-xl);
+  }
+
+  .sketches__track {
+    gap: var(--space-sm);
+  }
+
+  /* Wide enough that the next card always shows at the edge, which is
+     what tells a visitor the strip keeps going. */
+  .sketches__item {
+    width: min(74vw, 320px);
+  }
+}
+
 /* --- Transformations carousel ---------------------------------------- */
 
 .carousel {
