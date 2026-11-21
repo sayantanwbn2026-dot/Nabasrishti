@@ -1310,6 +1310,11 @@ p {
 }
 
 .pricing-grid {
+  /* The height the flag occupies, reserved on the cards that have none so
+     every name and figure sits on one line — the whole point of the band
+     is comparing those figures. */
+  --badge-row: 18px;
+
   display: grid;
   gap: var(--space-md);
   grid-template-columns: repeat(auto-fit, minmax(258px, 1fr));
@@ -1319,7 +1324,7 @@ p {
 .pricing-card {
   display: flex;
   flex-direction: column;
-  padding: var(--space-lg) var(--space-md) var(--space-md);
+  padding: var(--space-md);
   border: 1px solid var(--rule-light);
   background: #fff;
 }
@@ -1330,12 +1335,21 @@ p {
 }
 
 .pricing-card__badge {
+  min-height: var(--badge-row);
   margin: 0 0 var(--space-xs);
   color: var(--ink);
   font-size: var(--text-2xs);
   font-weight: var(--weight-medium);
   letter-spacing: var(--track-label);
+  line-height: var(--badge-row);
   text-transform: uppercase;
+}
+
+.pricing-card:not(.pricing-card--featured)::before {
+  display: block;
+  height: var(--badge-row);
+  margin-bottom: var(--space-xs);
+  content: "";
 }
 
 .pricing-card__name {
@@ -1347,39 +1361,44 @@ p {
 
 .pricing-card__price {
   display: grid;
-  gap: 2px;
-  margin: var(--space-sm) 0 0;
+  gap: 4px;
+  margin: var(--space-xs) 0 0;
 }
 
-.pricing-card__prefix,
-.pricing-card__unit {
+.pricing-card__prefix {
   color: var(--ink-tertiary);
   font-size: var(--text-2xs);
   letter-spacing: var(--track-label);
   text-transform: uppercase;
 }
 
+/* The figure carries the card. Everything else on it is support. */
 .pricing-card__figure {
   color: var(--ink);
-  font-size: var(--display-xs);
+  font-size: var(--display-sm);
   font-weight: var(--weight-light);
   letter-spacing: var(--track-tight);
-  line-height: 1.1;
+  line-height: 1;
   font-variant-numeric: tabular-nums;
 }
 
-.pricing-card__summary {
-  margin: var(--space-sm) 0 0;
-  color: var(--ink-secondary);
-  font-size: var(--text-sm);
-  line-height: var(--lh-body);
-  text-wrap: pretty;
+/* Rides alongside the figure rather than taking a line of its own. */
+.pricing-card__unit {
+  margin-left: 6px;
+  color: var(--ink-tertiary);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .pricing-card__list {
   display: grid;
-  gap: var(--space-2xs);
-  margin: var(--space-md) 0 0;
+  gap: 7px;
+  /* The gap to the button is the list's to give, not the button's to
+     take: the button needs its auto margin free to reach the foot. */
+  margin: var(--space-md) 0 var(--space-lg);
   padding: var(--space-md) 0 0;
   border-top: 1px solid var(--rule-light);
   list-style: none;
@@ -1387,9 +1406,9 @@ p {
 
 .pricing-card__list li {
   position: relative;
-  padding-left: var(--space-md);
+  padding-left: 18px;
   color: var(--ink-secondary);
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
   line-height: var(--lh-ui);
 }
 
@@ -1397,7 +1416,7 @@ p {
   position: absolute;
   top: 0;
   left: 0;
-  color: var(--ink);
+  color: var(--ink-tertiary);
   content: "—";
 }
 
@@ -1408,10 +1427,6 @@ p {
   margin-top: auto;
   padding-top: var(--space-md);
   padding-bottom: var(--space-md);
-}
-
-.pricing-card__list + .pricing-card__cta {
-  margin-top: var(--space-lg);
 }
 
 .pricing-note {
@@ -1426,6 +1441,12 @@ p {
 @media (max-width: 760px) {
   .pricing-grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Stacked, there is no neighbouring card to line up with — the reserved
+     row would just be a gap at the top of each one. */
+  .pricing-card:not(.pricing-card--featured)::before {
+    display: none;
   }
 
   .pricing-heading {
@@ -2291,7 +2312,8 @@ p {
     font-size: clamp(2rem, 8vw, 3.3rem);
     letter-spacing: -0.045em;
     text-align: left;
-    text-transform: none;
+    /* Was `none`, which cancelled the uppercase every other item in the
+       sheet carries and left Enquire as the odd one out. */
   }
 
   .menu-toggle {

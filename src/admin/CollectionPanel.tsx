@@ -248,7 +248,6 @@ export const COLLECTIONS: Record<string, CollectionSpec> = {
       price: "",
       price_prefix: "Starting from",
       price_unit: "",
-      summary: "",
       inclusions: [],
       badge: "",
       cta_label: "Get a free quote",
@@ -273,13 +272,12 @@ export const COLLECTIONS: Record<string, CollectionSpec> = {
         type: "text",
         hint: "per sq ft, one-off, and so on.",
       },
-      { key: "summary", label: "Summary", type: "textarea", rows: 3 },
       {
         key: "inclusions",
         label: "What it includes",
         type: "list",
         addLabel: "Add an inclusion",
-        hint: "One line each. These are what make the price believable.",
+        hint: "One line each, kept short. Four reads best — more and the card starts to crowd the price.",
       },
       {
         key: "badge",

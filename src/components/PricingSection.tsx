@@ -56,19 +56,20 @@ export function PricingSection({ settings, packages, onEnquire }: Props) {
 
               <h3 className="pricing-card__name">{item.name}</h3>
 
+              {/* The figure is what the visitor came for, so it is the
+                  largest thing on the card and the unit rides with it
+                  rather than taking a line of its own. */}
               <p className="pricing-card__price">
                 {item.price_prefix ? (
                   <span className="pricing-card__prefix">{item.price_prefix}</span>
                 ) : null}
-                <span className="pricing-card__figure">{item.price}</span>
-                {item.price_unit ? (
-                  <span className="pricing-card__unit">{item.price_unit}</span>
-                ) : null}
+                <span className="pricing-card__figure">
+                  {item.price}
+                  {item.price_unit ? (
+                    <span className="pricing-card__unit">{item.price_unit}</span>
+                  ) : null}
+                </span>
               </p>
-
-              {item.summary ? (
-                <p className="pricing-card__summary">{item.summary}</p>
-              ) : null}
 
               {item.inclusions.length > 0 ? (
                 <ul className="pricing-card__list">
