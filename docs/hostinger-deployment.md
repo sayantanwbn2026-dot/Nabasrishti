@@ -17,8 +17,9 @@ there is no `thank-you.html` or `admin.html` on disk for it to find.
 
 ## 1. Set the values the build needs
 
-In the project folder, create a file called `.env.production` (it is
-ignored by git and never uploaded):
+The project folder already has `.env.local`, and `vite build` reads it.
+It is ignored by git and never uploaded, and it should already hold the
+two Supabase values:
 
 ```
 VITE_SUPABASE_URL=https://xuzdtsnfomfegfygxiox.supabase.co
@@ -26,14 +27,20 @@ VITE_SUPABASE_ANON_KEY=<the anon key from Supabase → Project Settings → API>
 VITE_ENQUIRY_ENDPOINT=<the Apps Script /exec URL, if the Google Sheet is set up>
 ```
 
+Fill in the third line when the Google Sheet is set up, and leave it
+empty until then. Without it, enquiries still reach the CMS; what is
+lost is the marketing team's copy in the sheet, not the lead. See
+[google-sheets-setup.md](google-sheets-setup.md).
+
+On a different machine, or if `.env.local` is missing, create it with
+those three lines. `.env.production` works identically if you prefer to
+keep the production values apart; both are read by a production build,
+and `.env.local` wins where they disagree.
+
 The anon key is meant to be public — it is in the JavaScript either way,
 and what it can touch is decided by the database's row-level security, not
 by keeping the key secret. The **service role** key is the one that must
 never be in a build.
-
-`VITE_ENQUIRY_ENDPOINT` is optional. Without it, enquiries still reach the
-CMS; you only lose the marketing team's copy in the sheet. See
-[google-sheets-setup.md](google-sheets-setup.md).
 
 ## 2. Build
 
