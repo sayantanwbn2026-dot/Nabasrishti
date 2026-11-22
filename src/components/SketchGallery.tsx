@@ -110,7 +110,9 @@ export function SketchGallery({
                   <img
                     src={item.image_url}
                     alt={repeat ? "" : item.image_alt || item.title}
-                    loading={index < 3 ? "eager" : "lazy"}
+                    /* All lazy: this band sits about 12,500px down, so
+                       nothing here is ever the first thing painted. */
+                    loading="lazy"
                     decoding="async"
                     draggable={false}
                   />

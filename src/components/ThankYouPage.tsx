@@ -1,5 +1,5 @@
 import { fallbackSettings, useSiteSettings } from "@/lib/content";
-import { useNoIndex } from "@/lib/usePageMeta";
+import { useNoIndex, usePageMeta } from "@/lib/usePageMeta";
 
 /**
  * Dedicated Thank You page (Ads audit item 7).
@@ -17,6 +17,11 @@ export function ThankYouPage() {
 
   // Reachable only after a submission; it has no business in search.
   useNoIndex();
+  /* Without this the tab still said "Best Interior Design Studio in South
+     Kolkata" — the home page's title — on the one page that is only ever
+     reached by finishing the form. The page is noindex, so this is for
+     the person looking at their tabs, not for search. */
+  usePageMeta({ title: `${settings.thankyou_heading} | ${settings.name}` });
 
   return (
     <main className="thank-you dark-section">

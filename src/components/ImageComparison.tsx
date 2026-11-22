@@ -19,7 +19,6 @@ export function ImageComparison({
   afterLabel,
   /** Where the divider starts, as a percentage from the left. */
   start = 53,
-  eager = false,
 }: {
   beforeUrl: string;
   afterUrl: string;
@@ -28,7 +27,6 @@ export function ImageComparison({
   beforeLabel?: string;
   afterLabel?: string;
   start?: number;
-  eager?: boolean;
 }) {
   const [position, setPosition] = useState(start);
   const isDragging = useRef(false);
@@ -77,7 +75,12 @@ export function ImageComparison({
     }
   };
 
-  const loading = eager ? "eager" : "lazy";
+  /* Always lazy. Every place this is used — the comparison band, a
+     project page, a journal post — is thousands of pixels below the fold
+     or inside a dialog that has not opened yet. A lazy image that is on
+     screen loads immediately anyway, so the only thing eager bought was
+     downloading two full-size photographs nobody had scrolled to. */
+  const loading = "lazy";
 
   return (
     <div className="comparison-frame" ref={frameRef}>

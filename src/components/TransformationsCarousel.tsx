@@ -97,7 +97,6 @@ export function TransformationsCarousel({ settings, items }: Props) {
                 afterAlt={current.after_alt || current.title || "Finished interior"}
                 beforeLabel={settings.comparison_before_label}
                 afterLabel={settings.comparison_after_label}
-                eager={index === 0}
               />
             </motion.div>
           </AnimatePresence>

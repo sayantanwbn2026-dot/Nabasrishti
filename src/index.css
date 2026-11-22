@@ -4086,14 +4086,21 @@ p {
   white-space: nowrap;
 }
 
+/* The mark carries the brand once the name stops fitting beside the
+   navigation. It was hidden at 760px, where the navigation collapses into
+   the menu button — but the name stops fitting long before that: the
+   links appear at 761px and the first of them, "About us", was printed
+   straight over "NABASRISHTI" from there up to about 870px. That band is
+   an iPad held upright, which is not an edge case. */
+@media (max-width: 900px) {
+  .site-brand__name {
+    display: none;
+  }
+}
+
 @media (max-width: 760px) {
   .site-brand__logo {
     height: 26px;
-  }
-
-  /* The mark carries the brand on small screens; the name would crowd it. */
-  .site-brand__name {
-    display: none;
   }
 }
 
