@@ -790,14 +790,25 @@ p {
   }
 
   /* Stacked, the row has the full width to itself, so it uses it: the
-     three columns span the band and the rules divide it evenly. */
+     three columns span the band and the rules divide it evenly.
+
+     Ranged left, not centred. Centring works when the numbers have a
+     column of their own opposite the sentence, but once they sit under
+     it they are the same block of text, and a centred figure started
+     27px inside the sentence above it with nothing to explain why. The
+     first figure now begins exactly where the sentence begins. */
   .promise-stats {
     justify-content: stretch;
     margin-inline: calc(var(--space-md) * -1);
+    text-align: left;
   }
 
   .promise-stat {
     padding-inline: var(--space-md);
+  }
+
+  .promise-stat__label {
+    margin-inline: 0 auto;
   }
 }
 
