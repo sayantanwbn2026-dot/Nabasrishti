@@ -23,6 +23,12 @@ Create a Google Sheet called **Nabasrishti — Website Leads**.
 You do not need to add headers. The script writes them the first time a
 lead arrives, and freezes the top row.
 
+> **Already running an older copy of this script?** A City column was
+> added to the form. Replace the script below and the new column appears
+> on the next lead; rows written before that keep their old shape, so add
+> a City heading to the sheet by hand if you want the columns to line up
+> across the whole history.
+
 ## 2. Add the script
 
 In the sheet: **Extensions → Apps Script**. Delete whatever is there and
@@ -32,7 +38,7 @@ paste this in.
 const SHEET_NAME = 'Leads';
 
 const HEADERS = [
-  'Submitted at', 'Name', 'Mobile', 'Service', 'Comments',
+  'Submitted at', 'Name', 'Mobile', 'City', 'Service', 'Comments',
   'Form location', 'Page',
   'Campaign', 'Ad source', 'Medium', 'Keyword', 'Ad variant',
   'Click ID', 'Referrer', 'Landing page'
@@ -60,6 +66,7 @@ function doPost(e) {
       d.name || '',
       // The leading quote stops Sheets eating the first digit of a number.
       "'" + (d.mobile || ''),
+      d.city || '',
       d.service || '',
       d.comments || '',
       d.source || '',
@@ -148,6 +155,7 @@ The row should carry `test` under Campaign and `TEST123` under Click ID.
 
 | Column | What it tells you |
 |---|---|
+| City | The city or area the visitor typed. Suggestions are offered, but the box accepts anything |
 | Form location | Which button opened the form — a pricing package, a project, the hero, or the timed pop-up |
 | Page | The page they were on when they submitted |
 | Campaign / Ad source / Medium | Straight from `utm_campaign`, `utm_source`, `utm_medium` |

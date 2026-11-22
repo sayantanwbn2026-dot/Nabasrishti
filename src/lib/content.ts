@@ -8,6 +8,20 @@ import { media } from "@/data/media";
    Types mirroring the CMS tables.
    ------------------------------------------------------------------ */
 
+/* The enquiry form's two lists, used until the CMS answers and whenever
+   it cannot be reached. The database holds the same values as its column
+   defaults; these keep the form usable rather than empty. */
+const FALLBACK_SERVICES = [
+  "Interior design for 1BHK",
+  "Interior design for 2BHK",
+  "Interior design for 3BHK",
+  "Interior design for Villa",
+  "Modular Kitchen Design",
+  "Interior Design for Commercial Spaces",
+  "Interior Design for Offices",
+  "Others",
+] as const;
+
 export type Stat = { value: number; suffix: string; label: string };
 export type Usp = { label: string; value: string };
 
@@ -59,6 +73,7 @@ export type SiteSettings = {
   footer_note: string;
   enquiry_heading: string;
   enquiry_lede: string;
+  /** The choices in the enquiry form's service list. */
   enquiry_services: string[];
   enquiry_delay_ms: number;
   thankyou_heading: string;
@@ -282,6 +297,8 @@ export type Enquiry = {
   id: string;
   name: string;
   mobile: string;
+  /** Where the work is. Older rows predate the field and are empty. */
+  city: string;
   service: string;
   comments: string;
   source: string;
@@ -360,14 +377,7 @@ export const fallbackSettings: SiteSettings = {
   footer_note: "Copyrights ©2025. All right reserved",
   enquiry_heading: "Let's design your space.",
   enquiry_lede: "Share your details and we will get back to you within 24 hours.",
-  enquiry_services: [
-    "1 BHK Interior",
-    "2 BHK Interior",
-    "3 BHK Interior",
-    "4 BHK Interior",
-    "Commercial Interior",
-    "Renovation",
-  ],
+  enquiry_services: [...FALLBACK_SERVICES],
   enquiry_delay_ms: 10000,
   thankyou_heading: "Thank you — your enquiry is with our team.",
   thankyou_body:

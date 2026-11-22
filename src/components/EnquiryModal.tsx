@@ -2,14 +2,20 @@ import { useMutation } from "@tanstack/react-query";
 import { useId, useState, type FormEvent } from "react";
 import { Modal } from "./Modal";
 import {
-  SERVICE_OPTIONS,
   submitEnquiry,
   validateEnquiry,
   type Enquiry,
   type FieldErrors,
 } from "@/lib/enquiry";
+import { useSiteSettings } from "@/lib/content";
 
-const EMPTY: Enquiry = { name: "", mobile: "", service: "", comments: "" };
+const EMPTY: Enquiry = {
+  name: "",
+  mobile: "",
+  city: "",
+  service: "",
+  comments: "",
+};
 
 /** Ads conversion is configured against this URL. */
 const THANK_YOU_PATH = "/thank-you";
@@ -26,6 +32,11 @@ type EnquiryModalProps = {
 
 export function EnquiryModal({ open, onClose, context }: EnquiryModalProps) {
   const headingId = useId();
+  /* The wording and both lists are the studio's to change. They were
+     already in the CMS and already being edited there; the form simply
+     was not reading them, so a service added in the CMS never appeared
+     in the form it was added for. */
+  const { data: settings } = useSiteSettings();
   const [values, setValues] = useState<Enquiry>(EMPTY);
   const [errors, setErrors] = useState<FieldErrors>({});
   /* Errors surface only after a submit attempt, so the form never scolds
@@ -96,9 +107,12 @@ export function EnquiryModal({ open, onClose, context }: EnquiryModalProps) {
         <>
           <header className="enquiry__head">
             <p className="section-label">Free consultation</p>
-            <h2 id={headingId}>Let&apos;s design your space.</h2>
+            <h2 id={headingId}>
+              {settings?.enquiry_heading || "Let's design your space."}
+            </h2>
             <p className="enquiry__lede">
-              Share your details and we will get back to you within 24 hours.
+              {settings?.enquiry_lede ||
+                "Share your details and we will get back to you within 24 hours."}
             </p>
           </header>
 
@@ -160,6 +174,42 @@ export function EnquiryModal({ open, onClose, context }: EnquiryModalProps) {
               ) : null}
             </div>
 
+            {/* Typed, not chosen. A suggestion list here opened a dropdown
+                of places the moment the box was focused, and the browser
+                folded its own saved-address menu into it — so the first
+                thing the visitor met was a list to dismiss rather than a
+                box to fill. Studio work is local enough that the name is
+                quicker to type than to find. */}
+            <div className="field">
+              <label className="field__label" htmlFor="enquiry-city">
+                City or area{" "}
+                <span className="field__required" aria-hidden="true">*</span>
+              </label>
+              <input
+                id="enquiry-city"
+                data-field="city"
+                className="field__control"
+                type="text"
+                name="city"
+                autoComplete="off"
+                autoCapitalize="words"
+                maxLength={80}
+                value={values.city}
+                onChange={(event) => set("city", event.target.value)}
+                placeholder="Where is the space?"
+                aria-required="true"
+                aria-invalid={Boolean(errorFor("city"))}
+                aria-describedby={
+                  errorFor("city") ? "enquiry-city-error" : undefined
+                }
+              />
+              {errorFor("city") ? (
+                <p className="field__error" id="enquiry-city-error">
+                  {errorFor("city")}
+                </p>
+              ) : null}
+            </div>
+
             <div className="field">
               <label className="field__label" htmlFor="enquiry-service">
                 Select service{" "}
@@ -180,7 +230,7 @@ export function EnquiryModal({ open, onClose, context }: EnquiryModalProps) {
                   }
                 >
                   <option value="">Choose a service</option>
-                  {SERVICE_OPTIONS.map((option) => (
+                  {(settings?.enquiry_services ?? []).map((option) => (
                     <option key={option} value={option}>
                       {option}
                     </option>

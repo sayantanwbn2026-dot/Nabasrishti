@@ -1,18 +1,12 @@
 import { supabase } from "./supabase";
 import { getAttribution } from "./attribution";
 
-export const SERVICE_OPTIONS = [
-  "1 BHK Interior",
-  "2 BHK Interior",
-  "3 BHK Interior",
-  "4 BHK Interior",
-  "Commercial Interior",
-  "Renovation",
-] as const;
-
 export type Enquiry = {
   name: string;
   mobile: string;
+  /** Where the work is. Free text with suggestions behind it, not a
+      closed list: a town nobody thought to list must never cost a lead. */
+  city: string;
   service: string;
   comments: string;
   /** Which project the visitor was looking at, when they came from one. */
@@ -35,6 +29,11 @@ export function validateEnquiry(values: Enquiry): FieldErrors {
   if (!mobile) errors.mobile = "Please enter your mobile number.";
   else if (!MOBILE.test(mobile))
     errors.mobile = "Enter a 10-digit mobile number starting with 6–9.";
+
+  const city = values.city.trim();
+  if (!city) errors.city = "Please tell us the city or area.";
+  else if (city.length < 2) errors.city = "That looks too short.";
+  else if (city.length > 80) errors.city = "Please keep this shorter.";
 
   if (!values.service) errors.service = "Please choose a service.";
 
@@ -62,6 +61,7 @@ export async function submitEnquiry(values: Enquiry): Promise<void> {
   const payload = {
     name: values.name.trim(),
     mobile: values.mobile,
+    city: values.city.trim(),
     service: values.service,
     comments: values.comments.trim(),
     // Which CTA produced the lead.
@@ -80,6 +80,7 @@ export async function submitEnquiry(values: Enquiry): Promise<void> {
     const { error } = await supabase.from("enquiries").insert({
       name: payload.name,
       mobile: payload.mobile,
+      city: payload.city,
       service: payload.service,
       comments: payload.comments,
       source: payload.source,

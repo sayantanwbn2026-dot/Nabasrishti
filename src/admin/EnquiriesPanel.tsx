@@ -16,6 +16,7 @@ function toCsv(rows: Enquiry[]): string {
     "Received",
     "Name",
     "Mobile",
+    "City",
     "Service",
     "Comments",
     "Came from",
@@ -30,6 +31,7 @@ function toCsv(rows: Enquiry[]): string {
       // Excel strips the leading digits off a long number; a leading
       // apostrophe keeps the mobile intact when the file is opened.
       `'${row.mobile}`,
+      row.city,
       row.service,
       row.comments,
       row.source,
@@ -178,7 +180,9 @@ export function EnquiriesPanel() {
                   <span>
                     <strong>{row.name || "No name"}</strong>
                     <span className="amuted">
-                      {[row.mobile, row.service].filter(Boolean).join(" · ")}
+                      {[row.mobile, row.city, row.service]
+                        .filter(Boolean)
+                        .join(" · ")}
                     </span>
                   </span>
                 </button>
@@ -207,6 +211,10 @@ export function EnquiriesPanel() {
                           WhatsApp
                         </a>
                       </dd>
+                    </div>
+                    <div>
+                      <dt>City or area</dt>
+                      <dd>{row.city || "—"}</dd>
                     </div>
                     <div>
                       <dt>Service</dt>
