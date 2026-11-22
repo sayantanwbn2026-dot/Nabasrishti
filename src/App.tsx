@@ -968,14 +968,30 @@ function HomePage() {
     ),
     promise: (
       <>
-          {/* The audit's supporting tagline, moved out of the banner so the
-              hero can breathe. The USPs it also asks for are the studio
-              stats immediately below. */}
+          {/* The claim on the left and the evidence for it on the right.
+              The numbers used to sit inside the studio column, where they
+              were a third thing competing with a photograph and a
+              statement; here they have the sentence to answer to and
+              nothing else. */}
           <section className="promise-band light-section" aria-label="Our promise">
-            <div className="page-shell">
+            <div className="page-shell promise-band__inner">
               <Reveal as="p" className="promise-band__text">
                 {settings.tagline}
               </Reveal>
+              <Stagger
+                className="promise-stats"
+                stagger={0.1}
+                aria-label="Studio statistics"
+              >
+                {settings.stats.map((stat) => (
+                  <RevealItem className="promise-stat" key={stat.label}>
+                    <p className="promise-stat__value">
+                      <CountUp value={stat.value} suffix={stat.suffix} />
+                    </p>
+                    <p className="promise-stat__label">{stat.label}</p>
+                  </RevealItem>
+                ))}
+              </Stagger>
             </div>
           </section>
       </>
@@ -1000,20 +1016,6 @@ function HomePage() {
                   className="studio-statement"
                   text={settings.studio_statement}
                 />
-                <Stagger
-                  className="studio-stats"
-                  stagger={0.1}
-                  aria-label="Studio statistics"
-                >
-                  {settings.stats.map((stat) => (
-                    <RevealItem className="studio-stat" key={stat.label}>
-                      <p className="studio-stat__value">
-                        <CountUp value={stat.value} suffix={stat.suffix} />
-                      </p>
-                      <p className="studio-stat__label">{stat.label}</p>
-                    </RevealItem>
-                  ))}
-                </Stagger>
                 <SectionCta
                   context="Studio section"
                   label={settings.cta_studio_label}

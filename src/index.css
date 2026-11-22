@@ -615,21 +615,88 @@ p {
   white-space: nowrap;
 }
 
-/* The audit's supporting tagline, given its own quiet band. */
+/* The claim and the evidence for it, one on each side of the band.
+   Both blocks are set to the same type size and turned to face the
+   centre — the sentence ranged left, the numbers ranged right — so the
+   symmetry is in the alignment rather than in matching shapes. */
 .promise-band {
   padding: var(--space-3xl) 0;
   border-bottom: 1px solid var(--rule-light);
 }
 
+.promise-band__inner {
+  display: grid;
+  /* The sentence takes what is left; the numbers take what they need.
+     Centred on each other rather than on a shared baseline: the right
+     column is two lines of different heights, so a baseline would tilt
+     the band. */
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2xl) var(--space-3xl);
+}
+
 .promise-band__text {
-  max-width: 26ch;
-  margin: 0 auto;
-  font-size: var(--display-xs);
+  /* Two lines, which is what gives the left side a block to balance the
+     numbers with. The sentence is two sentences of 28 and 22
+     characters, so the measure has to clear the longer of them or
+     balancing splits it three ways. */
+  max-width: 28ch;
+  margin: 0;
+  font-size: var(--display-sm);
   font-weight: var(--weight-light);
   letter-spacing: var(--track-tight);
-  line-height: 1.24;
-  text-align: center;
+  line-height: 1.22;
+  text-align: left;
   text-wrap: balance;
+}
+
+.promise-stats {
+  display: grid;
+  grid-auto-flow: column;
+  justify-content: end;
+  gap: var(--space-2xl);
+  text-align: right;
+}
+
+.promise-stat__value {
+  margin: 0;
+  font-size: var(--display-sm);
+  font-weight: var(--weight-light);
+  /* Figures of the same width, so 8+ and 120+ sit on the same rhythm
+     and the row does not look hand-set. */
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--track-display);
+  line-height: 1.22;
+}
+
+.promise-stat__label {
+  /* Capped and pushed right so a long label wraps into the column
+     instead of widening it: "Client Retention" is twice the width of
+     "Years" and would otherwise set the gaps for all three. */
+  max-width: 11ch;
+  margin: var(--space-xs) 0 0 auto;
+  color: var(--ink-tertiary);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--track-micro);
+  line-height: var(--lh-ui);
+  text-transform: uppercase;
+}
+
+/* Between a laptop and a tablet the left column is squeezed below the
+   sentence's own measure, and it breaks to three lines across the full
+   stop — "We don't just design / spaces. We design / your dreams."
+   Dropping both sides a step keeps a sentence to a line each, and
+   keeps the two sides the same size as each other. */
+@media (max-width: 1080px) {
+  .promise-band__inner {
+    gap: var(--space-xl) var(--space-2xl);
+  }
+
+  .promise-band__text,
+  .promise-stat__value {
+    font-size: var(--display-xs);
+  }
 }
 
 /* Baseline rail: the services and the scroll cue along the foot of the
@@ -892,34 +959,6 @@ p {
   line-height: 1.22;
   /* balance would even the lines out and re-introduce early breaks. */
   text-wrap: pretty;
-}
-
-.studio-stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-md);
-  margin-top: var(--space-3xl);
-  padding-top: var(--space-xl);
-  border-top: 1px solid var(--rule-light);
-}
-
-.studio-stat__value {
-  margin: 0;
-  font-size: var(--display-md);
-  font-weight: var(--weight-light);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: var(--track-display);
-  line-height: 1;
-}
-
-.studio-stat__label {
-  margin: var(--space-xs) 0 0;
-  color: var(--ink-tertiary);
-  font-size: var(--text-2xs);
-  font-weight: var(--weight-medium);
-  letter-spacing: var(--track-micro);
-  line-height: var(--lh-ui);
-  text-transform: uppercase;
 }
 
 .projects-section {
@@ -2476,6 +2515,29 @@ p {
     padding: var(--space-2xl) 0;
   }
 
+  /* Side by side needs width the phone does not have, so the claim sits
+     above its evidence. The numbers range left with the sentence: with
+     nothing opposite them, ranging right would only look like a stray
+     indent. */
+  .promise-band__inner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-xl);
+  }
+
+  .promise-band__text {
+    max-width: none;
+  }
+
+  .promise-stats {
+    justify-content: start;
+    gap: var(--space-lg);
+    text-align: left;
+  }
+
+  .promise-stat__label {
+    margin-inline: 0 auto;
+  }
+
   /* The call sits under the button rather than beside it, so both are
      full-width targets and the eye travels straight down. */
   .hero__actions {
@@ -2555,16 +2617,6 @@ p {
     width: 100%;
     min-height: 0;
     aspect-ratio: 4 / 3;
-  }
-
-  .studio-stats {
-    gap: var(--space-xs);
-    margin-top: var(--space-2xl);
-    padding-top: var(--space-md);
-  }
-
-  .studio-stat__label {
-    margin-top: var(--space-2xs);
   }
 
   .projects-section {
@@ -2804,11 +2856,6 @@ p {
   .hero__rail .hero__highlights li {
     font-size: 10px;
     letter-spacing: 0.05em;
-  }
-
-  .studio-stat__label {
-    max-width: 11ch;
-    letter-spacing: var(--track-label);
   }
 
   .article-grid {
@@ -4054,17 +4101,6 @@ p {
 
   .footer-link-column a {
     font-size: var(--text-xs);
-  }
-
-  /* "Client Retention" wrapped to two lines while the others sat on one,
-     so the row read as uneven. Two columns give every label its line. */
-  .studio-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-md) var(--space-sm);
-  }
-
-  .studio-stat__label {
-    max-width: none;
   }
 }
 
