@@ -501,6 +501,7 @@ p {
   color: #f5f4f0;
 }
 
+.hero__picture,
 .hero__image,
 .hero__shade {
   position: absolute;
@@ -510,9 +511,18 @@ p {
   height: 100%;
 }
 
+/* <picture> is an inline wrapper by default and would collapse around an
+   absolutely positioned image, so it takes the frame itself and the image
+   fills it. */
+.hero__picture {
+  display: block;
+}
+
 .hero__image {
   object-fit: cover;
-  object-position: center 53%;
+  /* Set from the CMS, with the centre as the fallback for a photograph
+     nobody has chosen a focus for yet. */
+  object-position: var(--hero-focus, 50% 53%);
 }
 
 /* Two stacked washes rather than one flat overlay, so the photograph keeps
@@ -574,6 +584,30 @@ p {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
   mix-blend-mode: overlay;
   pointer-events: none;
+}
+
+/* The line above the name: a short rule, then where the studio is. Small
+   and quiet — its job is to give the stack somewhere to begin, not to be
+   read before the name. */
+.hero__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  margin: 0 0 var(--space-md);
+  color: rgba(248, 247, 243, 0.86);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.6);
+}
+
+.hero__eyebrow-rule {
+  display: block;
+  flex: 0 0 auto;
+  width: 28px;
+  height: 1px;
+  background: rgba(248, 247, 243, 0.55);
 }
 
 .hero__content h1 {
@@ -2491,14 +2525,15 @@ p {
     min-height: 570px;
   }
 
-  /* A phone shows a 26%-wide upright slice of the hero photograph, so
-     the crop decides what the picture is. Centred is the only framing
-     that is safe for a photograph nobody has seen yet: it is where a
-     room is composed, and it degrades gracefully when the image is
-     swapped in the CMS. An earlier value here was tuned to one
-     particular photograph and framed the edge of the next one. */
+  /* A phone shows an upright slice roughly a quarter of the photograph's
+     width, so the crop decides what the picture is. Which quarter is now
+     the studio's call, set against a preview in the CMS; centred is the
+     fallback, because it is where a room is usually composed and it
+     degrades gracefully when the photograph is swapped. A number tuned
+     to one particular picture used to live here, and it framed the edge
+     of the next one. */
   .hero__image {
-    object-position: 50% 50%;
+    object-position: var(--hero-focus-mobile, 50% 50%);
   }
 
   /* One ramp instead of the desktop corner wash. A radial anchored in
@@ -2536,11 +2571,20 @@ p {
     /* Clears the services line below. Measured against the rail rather
        than guessed: the old 96px pushed the stack past the bottom of
        the hero and the last few pixels were cropped. */
-    padding-bottom: 84px;
+    padding-bottom: 88px;
+  }
+
+  /* A rhythm rather than five arbitrary gaps. The steps were 16, 36, 24
+     and 19px, which is why the stack read as a pile: nothing said what
+     belonged with what. Now the name and its line are one unit at 14px,
+     the eyebrow sits 16px above them, and the step up to the actions is
+     28px — the one gap that separates saying from doing. */
+  .hero__eyebrow {
+    margin-bottom: var(--space-sm);
   }
 
   .hero__content h1 {
-    gap: var(--space-sm);
+    gap: 14px;
   }
 
   /* Sized to very nearly span the column, which is what makes the name
@@ -2557,11 +2601,14 @@ p {
   }
 
   .hero__headline {
-    /* No room to hold one line at phone widths — let it wrap to two. */
-    font-size: var(--text-sm);
+    /* No room to hold one line at phone widths — let it wrap to two.
+       Brighter and a size up from where it was: at 13px and 0.76 alpha
+       it read as a caption under the name rather than as the line that
+       says what the studio does. */
+    font-size: var(--text-base);
     max-width: 24ch;
-    color: rgba(248, 247, 243, 0.76);
-    letter-spacing: var(--track-label);
+    color: rgba(248, 247, 243, 0.88);
+    letter-spacing: 0.01em;
     text-wrap: balance;
     white-space: normal;
   }
@@ -2576,8 +2623,8 @@ p {
     flex-direction: column;
     align-items: flex-start;
     width: 100%;
-    gap: var(--space-md);
-    margin-top: var(--space-xl);
+    gap: var(--space-sm);
+    margin-top: 28px;
     margin-inline: 0;
   }
 
@@ -2594,16 +2641,33 @@ p {
   }
 
   /* No room for a column beside the title — the services lie under it as
-     a single quiet line, and the scroll cue goes. */
+     a single quiet line, and the scroll cue goes. A hairline above gives
+     the foot of the hero an edge to sit on: without it the two labels
+     floated in the dark with nothing holding them. */
   .hero__rail {
     bottom: 0;
     padding-block: 0 var(--space-lg);
   }
 
+  .hero__rail-inner::before {
+    position: absolute;
+    top: calc(var(--space-sm) * -1);
+    right: 0;
+    left: 0;
+    height: 1px;
+    background: rgba(248, 247, 243, 0.2);
+    content: "";
+  }
+
+  .hero__rail-inner {
+    position: relative;
+  }
+
   .hero__rail-inner {
     flex-direction: row;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: space-between;
+    gap: var(--space-sm);
   }
 
   .hero__rail .hero__highlights {
@@ -2627,8 +2691,28 @@ p {
     content: none;
   }
 
+  /* The cue comes back on phones, at the other end of the services line.
+     A full-height photograph with no edge in view gives no sign that
+     there is anything under it, and this is the one moving thing in an
+     otherwise still frame. */
   .hero__scroll {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    gap: var(--space-3xs);
+    /* The cue is a 1px hairline, so without padding it is a 1x22 link —
+       a target nobody could hit and under the 24px minimum. The padding
+       is the target; the hairline is just what it looks like. */
+    padding: 4px 12px;
+    margin-right: -12px;
+  }
+
+  .hero__scroll span:first-child {
     display: none;
+  }
+
+  .hero__scroll-track {
+    width: 1px;
+    height: 22px;
   }
 
   /* Only the first two services at the narrowest widths. */

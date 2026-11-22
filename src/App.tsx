@@ -5,6 +5,7 @@ import {
   useEffect,
   useRef,
   useState,
+  type CSSProperties,
   type ReactNode,
 } from "react";
 import { motion } from "framer-motion";
@@ -61,6 +62,7 @@ import { FitText } from "@/components/FitText";
 import { useDelayedEnquiry } from "@/hooks/useDelayedEnquiry";
 import { useLiveContent } from "@/lib/useLiveContent";
 import { useSmoothAnchors } from "@/lib/useSmoothAnchors";
+import { PHONE_QUERY, useMediaQuery } from "@/lib/useMediaQuery";
 import { useNoIndex, usePageMeta, useStructuredData } from "@/lib/usePageMeta";
 
 
@@ -770,6 +772,10 @@ function HomePage() {
   useLiveContent();
   // Animates clicks on in-page links.
   useSmoothAnchors();
+  /* A <picture> shows one of two photographs and carries a single alt, so
+     the alt that describes what is actually on screen has to be chosen
+     here. This is the only thing the breakpoint is needed for in JS. */
+  const onPhone = useMediaQuery(PHONE_QUERY);
 
   const { data: settings = fallbackSettings, isPlaceholderData: settingsPending } =
     useSiteSettings();
@@ -879,17 +885,49 @@ function HomePage() {
   const bands: Record<string, ReactNode> = {
     hero: (
       <>
-          <section className="hero" id="home" aria-label="Nabasrishti Interior Design Studio">
-            <ParallaxImage
-              className="hero__image"
-              strength={0.06}
-              src={settings.hero_image_url || media.hero}
-              alt={settings.hero_image_alt}
-              width="2150"
-              height="1229"
-              fetchPriority="high"
-              decoding="async"
-            />
+          <section
+            className="hero"
+            id="home"
+            aria-label="Nabasrishti Interior Design Studio"
+            /* The focal points travel as custom properties and the
+               stylesheet decides which one applies, so the breakpoint
+               stays in CSS rather than being duplicated in a matchMedia
+               here. */
+            style={
+              {
+                "--hero-focus": `${settings.hero_focus_x}% ${settings.hero_focus_y}%`,
+                "--hero-focus-mobile": `${settings.hero_focus_mobile_x}% ${settings.hero_focus_mobile_y}%`,
+              } as CSSProperties
+            }
+          >
+            {/* A <picture> rather than two images behind a media query:
+                the browser picks one source and downloads only that, so a
+                phone never pays for the wide photograph it will not show.
+                Falls back to the wide one whenever no phone image is set. */}
+            <picture className="hero__picture">
+              {settings.hero_image_mobile_url ? (
+                <source
+                  media="(max-width: 760px)"
+                  srcSet={settings.hero_image_mobile_url}
+                />
+              ) : null}
+              <ParallaxImage
+                className="hero__image"
+                strength={0.06}
+                src={settings.hero_image_url || media.hero}
+                alt={
+                  onPhone &&
+                  settings.hero_image_mobile_url &&
+                  settings.hero_image_mobile_alt
+                    ? settings.hero_image_mobile_alt
+                    : settings.hero_image_alt
+                }
+                width="2150"
+                height="1229"
+                fetchPriority="high"
+                decoding="async"
+              />
+            </picture>
             <div className="hero__shade" aria-hidden="true" />
             {/* Fine grain stops the gradient wash from banding on large
                 screens and gives the photograph a little tooth. */}
@@ -905,6 +943,17 @@ function HomePage() {
                 initial="hidden"
                 animate="show"
               >
+                {/* A third tier above the name. The stack went straight
+                    into 46px capitals with nothing to enter on, which is
+                    what made it read as a block dropped on a photograph
+                    rather than as a composition. It also says where the
+                    studio is, which is the first thing local search
+                    traffic wants to know. */}
+                <motion.p className="hero__eyebrow" variants={heroItem}>
+                  <span className="hero__eyebrow-rule" aria-hidden="true" />
+                  {settings.location}
+                </motion.p>
+
                 {/* The h1 carries the full keyword phrase the Ads audit asked
                     for; the wordmark is simply its first line. */}
                 <h1>

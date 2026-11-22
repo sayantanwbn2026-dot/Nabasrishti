@@ -5,4 +5,8 @@ Allow: /
 # form submission, and indexing it can inflate Ads conversion reporting.
 Disallow: /thank-you
 
+# The content manager. Nothing behind it is readable without a login, but
+# there is no reason for the sign-in page to appear in search results.
+Disallow: /admin
+
 Sitemap: https://www.nabasrishti.in/sitemap.xml

@@ -1,0 +1,112 @@
+# Nabasrishti — server rules for Hostinger (LiteSpeed, Apache-compatible).
+#
+# This file ships with the build: it sits beside index.html in public_html
+# and is what makes a single-page app behave like a normal website on
+# shared hosting. Without it every URL except the home page returns the
+# host's own 404 — /thank-you and /admin included.
+
+# Content negotiation guesses that /thank-you means thank-you.html and
+# answers 404 when it finds none, before the rules below ever run.
+Options -MultiViews
+# Never list a folder's contents when it has no index file.
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # --- HTTPS ---------------------------------------------------------
+  # The second condition is for the proxy in front of the server, which
+  # speaks plain HTTP to it even when the visitor is on HTTPS; without it
+  # the two can bounce a request between them until the browser gives up.
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+  # --- Canonical host ------------------------------------------------
+  # The canonical link, the Open Graph URL, robots.txt and the sitemap
+  # all name www.nabasrishti.in, so the server sends the bare domain
+  # there too. Two spellings that both answer are two sites to Google,
+  # splitting whatever either has earned.
+  RewriteCond %{HTTP_HOST} ^nabasrishti\.in$ [NC]
+  RewriteRule ^ https://www.nabasrishti.in%{REQUEST_URI} [R=301,L]
+
+  # To drop the www instead, comment the two lines above, uncomment the
+  # two below, and change the canonical link in index.html, robots.txt
+  # and sitemap.xml to match — all four have to agree.
+  # RewriteCond %{HTTP_HOST} ^www\.nabasrishti\.in$ [NC]
+  # RewriteRule ^ https://nabasrishti.in%{REQUEST_URI} [R=301,L]
+
+  # --- Single-page app routing ---------------------------------------
+  # A real file or folder is served as itself. This has to come first, or
+  # the rule below would answer with index.html for the JavaScript too.
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Everything else is a route inside the app, which reads the path and
+  # decides what to show.
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  # --- Caching -------------------------------------------------------
+  # index.html must always be fetched fresh. It names the hashed files
+  # for the current version, so a cached copy pins visitors to the old
+  # build no matter how many times the site is re-uploaded.
+  <FilesMatch "\.(html)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+
+  # Built assets carry a content hash in the filename, so a changed file
+  # is a different URL and the old one can be kept forever.
+  <FilesMatch "-[A-Za-z0-9_-]{8,}\.(js|css)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # Images, icons and fonts in public_html keep their names between
+  # builds, so they get a week rather than a year — long enough to be
+  # worth caching, short enough that replacing a logo is not a support
+  # call.
+  <FilesMatch "\.(png|jpe?g|webp|avif|gif|svg|ico|woff2?)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+
+  # robots.txt and sitemap.xml change rarely but must not go stale for a
+  # week when they do.
+  <FilesMatch "^(robots\.txt|sitemap\.xml)$">
+    Header set Cache-Control "public, max-age=3600"
+  </FilesMatch>
+
+  # --- Security ------------------------------------------------------
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  # Upgrades any stray http:// subresource rather than letting the
+  # browser block it as mixed content.
+  Header always set Content-Security-Policy "upgrade-insecure-requests"
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml
+  AddOutputFilterByType DEFLATE application/javascript application/json
+  AddOutputFilterByType DEFLATE application/xml image/svg+xml
+  AddOutputFilterByType DEFLATE font/woff2 application/manifest+json
+</IfModule>
+
+<IfModule mod_mime.c>
+  AddType application/manifest+json .webmanifest
+  AddType image/avif .avif
+  AddType font/woff2 .woff2
+</IfModule>
+
+# Keep the build's own config files from being served if one is ever
+# uploaded by mistake. Gated on the module that provides "Require",
+# because on an older Apache the directive is a syntax error and a
+# syntax error here takes the whole site down with a 500.
+<IfModule mod_authz_core.c>
+  <FilesMatch "^(\.env.*|package(-lock)?\.json|tsconfig.*\.json|vite\.config\..*|vercel\.json)$">
+    Require all denied
+  </FilesMatch>
+</IfModule>

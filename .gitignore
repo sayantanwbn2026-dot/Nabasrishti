@@ -2,10 +2,12 @@ node_modules
 dist
 dist-ssr
 
-# Local env files — VITE_ENQUIRY_ENDPOINT lives here, set it in Vercel too.
-.env
-.env.local
-.env.*.local
+# Local env files. Ignore every one of them and name the single exception,
+# rather than listing the ones we happen to use today: the Hostinger build
+# reads .env.production, which the old list did not cover, and a key only
+# has to be committed once.
+.env*
+!.env.example
 
 .vercel
 .DS_Store

@@ -19,6 +19,16 @@ export type SiteSettings = {
   location: string;
   hero_image_url: string;
   hero_image_alt: string;
+  /** Used instead of the wide photograph on phones, when one is set. */
+  hero_image_mobile_url: string;
+  hero_image_mobile_alt: string;
+  /** The point of the photograph the crop keeps, as a percentage from the
+      top left. A phone sees roughly a quarter of a landscape image's
+      width, so this is what decides which quarter. */
+  hero_focus_x: number;
+  hero_focus_y: number;
+  hero_focus_mobile_x: number;
+  hero_focus_mobile_y: number;
   headline: string;
   service_highlights: string[];
   cta_primary_label: string;
@@ -305,6 +315,12 @@ export const fallbackSettings: SiteSettings = {
   hero_image_url: "",
   hero_image_alt:
     "Sunlit minimalist living room with timber furniture and black-framed windows",
+  hero_image_mobile_url: "",
+  hero_image_mobile_alt: "",
+  hero_focus_x: 50,
+  hero_focus_y: 53,
+  hero_focus_mobile_x: 50,
+  hero_focus_mobile_y: 50,
   headline: fallbackSite.headline,
   service_highlights: [...fallbackSite.serviceHighlights],
   cta_primary_label: "Get free consultation",

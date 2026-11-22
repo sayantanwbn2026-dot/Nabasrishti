@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSaveRow, useSettingsRow } from "./api";
 import {
+  FocalPointField,
   ImageField,
   NumberField,
   Toggle,
@@ -210,6 +211,42 @@ export function SettingsPanel() {
               hint="Describes the picture for screen readers and search engines."
               value={draft.hero_image_alt}
               onChange={(v) => set("hero_image_alt", v)}
+            />
+            <FocalPointField
+              label="Hero focus on a computer"
+              hint="The point the picture keeps when the screen is a different shape to the photograph. Click or drag on the picture."
+              url={draft.hero_image_url}
+              ratio={16 / 9}
+              x={draft.hero_focus_x}
+              y={draft.hero_focus_y}
+              onChange={({ x, y }) => {
+                set("hero_focus_x", x);
+                set("hero_focus_y", y);
+              }}
+            />
+
+            <ImageField
+              label="Hero image on a phone"
+              hint="Optional. A phone shows a tall slice about a quarter of a wide photograph's width, so a picture that works across a screen often has no good upright crop. Leave this empty to use the one above."
+              value={draft.hero_image_mobile_url}
+              onChange={(v) => set("hero_image_mobile_url", v)}
+            />
+            <TextField
+              label="Phone image description"
+              hint="Only needed if a separate phone picture is set above."
+              value={draft.hero_image_mobile_alt}
+              onChange={(v) => set("hero_image_mobile_alt", v)}
+            />
+            <FocalPointField
+              label="Hero focus on a phone"
+              hint="The frame shows what a phone keeps. Drag it over the part of the room that matters."
+              url={draft.hero_image_mobile_url || draft.hero_image_url}
+              x={draft.hero_focus_mobile_x}
+              y={draft.hero_focus_mobile_y}
+              onChange={({ x, y }) => {
+                set("hero_focus_mobile_x", x);
+                set("hero_focus_mobile_y", y);
+              }}
             />
             <TextField
               label="Headline"

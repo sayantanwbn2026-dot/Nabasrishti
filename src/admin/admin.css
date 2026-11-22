@@ -43,6 +43,10 @@
 }
 
 .alogin__back {
+  /* An 11px line is a 19px-tall target; the padding carries it to the
+     24px minimum without changing how it looks. */
+  display: block;
+  padding-block: 3px;
   margin-top: var(--space-2xs);
   color: var(--ink-tertiary);
   font-size: var(--text-2xs);
@@ -932,4 +936,93 @@
 .aicon:disabled {
   opacity: 0.4;
   cursor: default;
+}
+
+/* --- Focal point picker -------------------------------------------------
+   Choosing which part of a photograph a phone keeps. The decision is
+   visual, so the control is too: the picture with the phone's frame drawn
+   on it, rather than a pair of numbers nobody can picture. */
+
+.afocal {
+  display: grid;
+  gap: 12px;
+}
+
+.afocal__frame {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--rule-light);
+  background: #111;
+  /* The pointer is the control, so it should look like one, and a drag
+     must not start the browser's own image drag. */
+  cursor: crosshair;
+  touch-action: none;
+  user-select: none;
+}
+
+.afocal__frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+
+/* The part a phone keeps. Drawn as a ring with an enormous shadow rather
+   than four dimming panels: one element, and it can never leave a seam. */
+.afocal__keep {
+  position: absolute;
+  /* Size and offset both come from the component: which axis the crop
+     fills depends on the photograph's shape, not on the crop alone. */
+  outline: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+}
+
+.afocal__pin {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  transform: translate(-50%, -50%);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+
+.afocal__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 10px;
+}
+
+.afocal__num {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  gap: 2px 6px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.afocal__num > span:first-child {
+  grid-column: 1 / -1;
+  color: var(--ink-tertiary);
+}
+
+.afocal__num input {
+  width: 68px;
+  padding: 7px 8px;
+  border: 1px solid var(--rule-light);
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.afocal__unit {
+  color: var(--ink-tertiary);
 }

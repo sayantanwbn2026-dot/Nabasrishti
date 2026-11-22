@@ -1,4 +1,4 @@
-import { useId, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { uploadImage, useRows } from "./api";
 
 type MediaRow = {
@@ -478,6 +478,179 @@ export function RecordList<T extends Record<string, string | number>>({
       >
         {addLabel}
       </button>
+    </div>
+  );
+}
+
+/**
+ * Picks the point of a photograph that a crop must keep.
+ *
+ * A phone shows an upright slice roughly a quarter of a wide photograph's
+ * width, so the crop is not a detail — it decides what the picture is of.
+ * Two number boxes would technically do it, but nobody can tell from "78"
+ * whether the sofa survives. This shows the photograph with the phone's
+ * frame drawn over it, moving as you click or drag, so the choice is made
+ * against the thing being decided.
+ */
+export function FocalPointField({
+  label,
+  hint,
+  url,
+  x,
+  y,
+  onChange,
+  /** Aspect ratio of the frame drawn over the image, width / height. */
+  ratio = 375 / 812,
+}: {
+  label: string;
+  hint?: string;
+  url: string;
+  x: number;
+  y: number;
+  onChange: (next: { x: number; y: number }) => void;
+  ratio?: number;
+}) {
+  const frameRef = useRef<HTMLDivElement>(null);
+  const [dragging, setDragging] = useState(false);
+  /* The shape of the picture as drawn, which decides which way round the
+     crop is limited — a tall crop of a wide photograph is as tall as the
+     photograph, a wide crop of a tall one is as wide. */
+  const [box, setBox] = useState({ w: 0, h: 0 });
+
+  useEffect(() => {
+    const el = frameRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(([entry]) => {
+      const r = entry.contentRect;
+      setBox({ w: r.width, h: r.height });
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const clamp = (value: number) => Math.min(100, Math.max(0, Math.round(value)));
+
+  const setFromPointer = (clientX: number, clientY: number) => {
+    const box = frameRef.current?.getBoundingClientRect();
+    if (!box || box.width === 0 || box.height === 0) return;
+    onChange({
+      x: clamp(((clientX - box.left) / box.width) * 100),
+      y: clamp(((clientY - box.top) / box.height) * 100),
+    });
+  };
+
+  /* Which axis the crop fills. Everything else follows from the ratio,
+     so a 16:9 crop of a 4:3 photograph is handled by the same code as a
+     phone-shaped crop of a wide one. */
+  const drawn = box.w > 0 && box.h > 0 ? box.w / box.h : ratio;
+  const keepSize =
+    ratio < drawn
+      ? { height: "100%", width: `${(ratio / drawn) * 100}%` }
+      : { width: "100%", height: `${(drawn / ratio) * 100}%` };
+
+  /* The pin marks the centre of what is kept, so on an axis that is not
+     cropped it belongs in the middle rather than wherever it was last
+     dragged to — there is nothing to choose on that axis. */
+  const pinX = ratio < drawn ? x : 50;
+  const pinY = ratio < drawn ? 50 : y;
+
+  if (!url) {
+    return (
+      <div className="af">
+        <span className="af__label">{label}</span>
+        <span className="af__hint">
+          Add the photograph above first, then choose its focus here.
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="af">
+      <span className="af__label">{label}</span>
+      {hint ? <span className="af__hint">{hint}</span> : null}
+
+      <div className="afocal">
+        {/* The photograph, with the crop drawn over it. Pointer events are
+            captured so a drag that leaves the picture still tracks. */}
+        <div
+          className="afocal__frame"
+          ref={frameRef}
+          onPointerDown={(event) => {
+            event.currentTarget.setPointerCapture(event.pointerId);
+            setDragging(true);
+            setFromPointer(event.clientX, event.clientY);
+          }}
+          onPointerMove={(event) => {
+            if (!dragging) return;
+            setFromPointer(event.clientX, event.clientY);
+          }}
+          onPointerUp={() => setDragging(false)}
+          onPointerCancel={() => setDragging(false)}
+        >
+          <img src={url} alt="" draggable={false} />
+          {/* What a phone will actually keep. Everything outside it is
+              dimmed, so the preview answers the only question being
+              asked: what stays in frame.
+
+              Offset and translated by the same percentage, which is how
+              object-position itself behaves: 0 sits flush to one edge,
+              100 to the other, and the frame never leaves the picture.
+              Offsetting alone would let it hang half outside at the
+              extremes and promise a crop the browser will not give. */}
+          <div
+            className="afocal__keep"
+            style={{
+              ...keepSize,
+              left: `${x}%`,
+              top: `${y}%`,
+              transform: `translate(-${x}%, -${y}%)`,
+            }}
+          />
+          <span
+            className="afocal__pin"
+            style={{ left: `${pinX}%`, top: `${pinY}%` }}
+          />
+        </div>
+
+        {/* Arrow keys for anyone not using a pointer, and the numbers
+            themselves for anyone who wants to type an exact value. */}
+        <div className="afocal__controls">
+          <label className="afocal__num">
+            <span>Across</span>
+            <input
+              type="number"
+              min={0}
+              max={100}
+              value={x}
+              onChange={(event) =>
+                onChange({ x: clamp(Number(event.target.value)), y })
+              }
+            />
+            <span className="afocal__unit">%</span>
+          </label>
+          <label className="afocal__num">
+            <span>Down</span>
+            <input
+              type="number"
+              min={0}
+              max={100}
+              value={y}
+              onChange={(event) =>
+                onChange({ x, y: clamp(Number(event.target.value)) })
+              }
+            />
+            <span className="afocal__unit">%</span>
+          </label>
+          <button
+            type="button"
+            className="abtn abtn--ghost"
+            onClick={() => onChange({ x: 50, y: 50 })}
+          >
+            Centre
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

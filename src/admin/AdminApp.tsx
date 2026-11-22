@@ -9,6 +9,7 @@ import { COLLECTIONS, CollectionPanel } from "./CollectionPanel";
 import { SectionsPanel } from "./SectionsPanel";
 import { confirmDiscard } from "./unsaved";
 import { PanelBoundary } from "./PanelBoundary";
+import { useNoIndex, usePageMeta } from "@/lib/usePageMeta";
 import "./admin.css";
 
 const SECTIONS = [
@@ -104,6 +105,12 @@ function LoginScreen() {
 }
 
 export function AdminApp() {
+  /* robots.txt asks crawlers not to come here; this tells the ones that
+     fetch the page anyway not to index what they found. The CMS has
+     nothing to gain from being in search results. */
+  useNoIndex();
+  usePageMeta({ title: "Content manager" });
+
   const [session, setSession] = useState<Session | null>(null);
   const [checking, setChecking] = useState(true);
   const [section, setSection] = useState<SectionId>("enquiries");
