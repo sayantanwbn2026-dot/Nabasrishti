@@ -697,17 +697,37 @@ p {
 .promise-stats {
   display: grid;
   grid-auto-flow: column;
+  /* Equal columns, which is what a rule between them demands: with
+     columns sized to their own figures the hairlines would land at
+     three different distances from the numbers either side and read as
+     carelessness. The rules themselves now carry the rhythm, so there
+     is no gap — the padding inside each column is the spacing. */
+  grid-auto-columns: 1fr;
   justify-content: end;
-  /* Even gaps rather than even columns. The three figures are of
-     different widths by nature, so forcing the columns to match would
-     only move the unevenness into the whitespace, where it shows. */
-  gap: var(--space-3xl);
-  /* Top, not bottom. Aligning the row to its floor let the one label
-     that wraps to two lines push its figure up out of line with the
-     others — 17px, plainly visible. The figures are the row; the
-     labels hang off them. */
-  align-items: start;
-  text-align: right;
+  gap: 0;
+  /* Stretch, so every column is the height of the tallest and the rules
+     between them match. Sized to their own content the columns came out
+     61, 61 and 78px, and the second rule was visibly shorter than the
+     third. Stretching does not disturb the figures: content still
+     starts at the top of each column, which is what keeps them on one
+     line. Aligning to the floor is what broke that, pushing the figure
+     above a two-line label 17px out of step with the others. */
+  align-items: stretch;
+  text-align: center;
+  /* Cancels the padding on the outside of the first and last columns,
+     so the figures still line up with the page's edges while the
+     columns stay exactly equal. Without it the row would sit a padding
+     width inside the margin and look indented. */
+  margin-inline: calc(var(--space-xl) * -1);
+}
+
+.promise-stat {
+  padding-inline: var(--space-xl);
+}
+
+/* A rule between, never at the ends. */
+.promise-stat + .promise-stat {
+  border-left: 1px solid var(--rule-light);
 }
 
 .promise-stat__value {
@@ -726,7 +746,7 @@ p {
      the third column two lines deep while the others were one, which
      read as a mistake rather than as a set. There is room for it on a
      wide screen; the phone rules put the cap back. */
-  margin: var(--space-2xs) 0 0 auto;
+  margin: var(--space-2xs) auto 0;
   color: var(--ink-tertiary);
   font-size: var(--text-2xs);
   font-weight: var(--weight-medium);
@@ -747,7 +767,11 @@ p {
   }
 
   .promise-stats {
-    gap: var(--space-2xl);
+    margin-inline: calc(var(--space-lg) * -1);
+  }
+
+  .promise-stat {
+    padding-inline: var(--space-lg);
   }
 }
 
@@ -765,21 +789,26 @@ p {
     max-width: 34ch;
   }
 
+  /* Stacked, the row has the full width to itself, so it uses it: the
+     three columns span the band and the rules divide it evenly. */
   .promise-stats {
-    justify-content: start;
-    gap: var(--space-2xl);
-    text-align: left;
+    justify-content: stretch;
+    margin-inline: calc(var(--space-md) * -1);
   }
 
-  .promise-stat__label {
-    margin-inline: 0 auto;
+  .promise-stat {
+    padding-inline: var(--space-md);
   }
 }
 
 /* Narrow enough that three nowrap labels no longer fit on one row. */
 @media (max-width: 460px) {
   .promise-stats {
-    gap: var(--space-md);
+    margin-inline: calc(var(--space-xs) * -1);
+  }
+
+  .promise-stat {
+    padding-inline: var(--space-xs);
   }
 
   .promise-stat__label {
