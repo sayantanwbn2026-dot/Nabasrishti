@@ -665,11 +665,13 @@ p {
 }
 
 /* A short column against the right edge rather than a row along the
-   bottom, so the title has the floor to itself. */
+   bottom, so the title has the floor to itself. The gap is zero because
+   the links carry 5px of padding each: the spacing is the same, it is
+   just inside the target now instead of between them. */
 .hero__rail .hero__highlights {
   flex-direction: column;
   align-items: flex-end;
-  gap: var(--space-3xs);
+  gap: 0;
   text-align: right;
 }
 
@@ -709,6 +711,42 @@ p {
   position: absolute;
   left: calc(var(--space-lg) / -2);
   content: "·";
+  opacity: 0.5;
+}
+
+/* Each highlight links to the services band. A row of small caps gives
+   no sign of being clickable, so it earns a rule that draws itself on
+   hover and focus — a permanent underline under four stacked labels
+   would read as clutter on the photograph. */
+.hero__highlights a {
+  position: relative;
+  display: inline-block;
+  /* The label is about 14px tall; this carries it to the 24px minimum
+     target without a visible box. The rail's own gap is removed below
+     so the column does not open up by the same amount. */
+  padding-block: 5px;
+  transition: color 200ms ease;
+}
+
+.hero__highlights a::after {
+  position: absolute;
+  right: 0;
+  bottom: 3px;
+  left: 0;
+  height: 1px;
+  background: currentColor;
+  opacity: 0;
+  content: "";
+  transition: opacity 200ms ease;
+}
+
+.hero__highlights a:hover,
+.hero__highlights a:focus-visible {
+  color: #fff;
+}
+
+.hero__highlights a:hover::after,
+.hero__highlights a:focus-visible::after {
   opacity: 0.5;
 }
 
@@ -2359,12 +2397,14 @@ p {
     min-height: 570px;
   }
 
-  /* The studio photograph is a dark room with one lit opening to the
-     right of centre. Cropped at 57% the phone landed on bare wall and
-     the hero read as a black rectangle; 78% puts the light in frame and
-     keeps the shadowed floor under the type. */
+  /* A phone shows a 26%-wide upright slice of the hero photograph, so
+     the crop decides what the picture is. Centred is the only framing
+     that is safe for a photograph nobody has seen yet: it is where a
+     room is composed, and it degrades gracefully when the image is
+     swapped in the CMS. An earlier value here was tuned to one
+     particular photograph and framed the edge of the next one. */
   .hero__image {
-    object-position: 78% 50%;
+    object-position: 50% 50%;
   }
 
   /* One ramp instead of the desktop corner wash. A radial anchored in
@@ -2382,8 +2422,8 @@ p {
         to top,
         rgba(0, 0, 0, 0.9) 0,
         rgba(0, 0, 0, 0.84) 140px,
-        rgba(0, 0, 0, 0.66) 280px,
-        rgba(0, 0, 0, 0.4) 390px,
+        rgba(0, 0, 0, 0.7) 280px,
+        rgba(0, 0, 0, 0.48) 390px,
         rgba(0, 0, 0, 0.16) 480px,
         rgba(0, 0, 0, 0) 580px
       ),

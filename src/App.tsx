@@ -943,9 +943,18 @@ function HomePage() {
               animate="show"
             >
               <div className="hero__rail-inner">
+                {/* Each one names a service the studio offers, so each one
+                    goes to where that service is described. They read as
+                    labels, so the link is given an explicit purpose for a
+                    screen reader rather than leaving "Space planning" to
+                    stand on its own in a list of links. */}
                 <ul className="hero__highlights" aria-label="Services">
                   {settings.service_highlights.map((item) => (
-                    <li key={item}>{item}</li>
+                    <li key={item}>
+                      <a href="#services" aria-label={`${item} — see our services`}>
+                        {item}
+                      </a>
+                    </li>
                   ))}
                 </ul>
                 <a className="hero__scroll" href="#studio">
