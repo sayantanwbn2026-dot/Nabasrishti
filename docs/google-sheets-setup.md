@@ -94,6 +94,25 @@ function doPost(e) {
 }
 ```
 
+### If "Sorry, unable to open the file at this time" appears
+
+Apps Script opens under whichever Google account the browser treats as
+first, which is not always the one the sheet belongs to. When those two
+differ, the editor cannot find the sheet and says this.
+
+Look at the address bar. A `/u/1/` or `/u/2/` in the URL means a second
+or third account is in play. Any one of these fixes it:
+
+- Open the sheet in a private window and sign in with only the account
+  that owns it.
+- Sign out of the other Google accounts, then reopen the sheet.
+- In the sheet, use the avatar in the top right to switch to the owning
+  account first, then try **Extensions → Apps Script** again.
+
+If it still refuses — some Workspace accounts have Apps Script turned off
+by an administrator — the script does not have to live inside the sheet.
+See *Running the script outside the sheet* below.
+
 ## 3. Deploy it
 
 **Deploy → New deployment → Web app**
@@ -172,6 +191,42 @@ the rest of their visit. It has to be: the parameters are in the URL on
 arrival and gone the moment they click anything. A visitor who lands from
 an advert, browses for ten minutes and then enquires is still credited to
 that advert.
+
+---
+
+## Running the script outside the sheet
+
+A script normally lives inside the sheet and reaches it through
+`getActiveSpreadsheet()`. When the built-in editor will not open, the
+same script can live on its own and be pointed at the sheet by its id.
+
+Open [script.google.com](https://script.google.com), choose **New
+project**, and paste the same code with one line changed.
+
+Find the sheet's id in its address bar — the long string between `/d/`
+and `/edit`:
+
+```
+https://docs.google.com/spreadsheets/d/THIS_LONG_PART_IS_THE_ID/edit
+```
+
+Then replace this line:
+
+```javascript
+const book = SpreadsheetApp.getActiveSpreadsheet();
+```
+
+with this one, pasting the id between the quotes:
+
+```javascript
+const book = SpreadsheetApp.openById('THIS_LONG_PART_IS_THE_ID');
+```
+
+Deploy it exactly as in step 3. Everything else is the same.
+
+The only practical difference: a standalone script is not attached to the
+sheet, so copying or duplicating the sheet later leaves the script behind
+pointing at the original.
 
 ---
 
