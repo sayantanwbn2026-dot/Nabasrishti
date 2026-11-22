@@ -52,6 +52,12 @@
   --display-xs: clamp(1.5rem, 1.314rem + 0.762vw, 2rem);        /* 24–32px */
   --display-sm: clamp(1.875rem, 1.55rem + 1.333vw, 2.75rem);    /* 30–44px */
   --display-md: clamp(2.125rem, 1.707rem + 1.714vw, 3.25rem);   /* 34–52px */
+
+  /* The promise band sets its two sides against each other, so they get
+     their own pair rather than borrowing display sizes that are tuned
+     for headings standing alone. */
+  --promise-text: clamp(1.5rem, 1.125rem + 1.25vw, 2.125rem);   /* 24–34px */
+  --promise-figure: clamp(1.875rem, 1.275rem + 2vw, 3rem);      /* 30–48px */
   --display-lg: clamp(2.25rem, 1.693rem + 2.286vw, 3.75rem);    /* 36–60px */
 
   /* ---- Tracking ----------------------------------------------------
@@ -639,13 +645,17 @@ p {
   /* Two lines, which is what gives the left side a block to balance the
      numbers with. The sentence is two sentences of 28 and 22
      characters, so the measure has to clear the longer of them or
-     balancing splits it three ways. */
+     balancing splits it three ways.
+
+     A step under the numbers: the sentence is the longer read of the
+     two and does not need to shout to hold its half of the band, while
+     a figure is three characters and has only its size to carry it. */
   max-width: 28ch;
   margin: 0;
-  font-size: var(--display-sm);
+  font-size: var(--promise-text);
   font-weight: var(--weight-light);
   letter-spacing: var(--track-tight);
-  line-height: 1.22;
+  line-height: 1.26;
   text-align: left;
   text-wrap: balance;
 }
@@ -654,14 +664,22 @@ p {
   display: grid;
   grid-auto-flow: column;
   justify-content: end;
-  gap: var(--space-2xl);
+  /* Even gaps rather than even columns. The three figures are of
+     different widths by nature, so forcing the columns to match would
+     only move the unevenness into the whitespace, where it shows. */
+  gap: var(--space-3xl);
+  /* Top, not bottom. Aligning the row to its floor let the one label
+     that wraps to two lines push its figure up out of line with the
+     others — 17px, plainly visible. The figures are the row; the
+     labels hang off them. */
+  align-items: start;
   text-align: right;
 }
 
 .promise-stat__value {
   margin: 0;
-  font-size: var(--display-sm);
-  font-weight: var(--weight-light);
+  font-size: var(--promise-figure);
+  font-weight: var(--weight-regular);
   /* Figures of the same width, so 8+ and 120+ sit on the same rhythm
      and the row does not look hand-set. */
   font-variant-numeric: tabular-nums;
@@ -670,17 +688,18 @@ p {
 }
 
 .promise-stat__label {
-  /* Capped and pushed right so a long label wraps into the column
-     instead of widening it: "Client Retention" is twice the width of
-     "Years" and would otherwise set the gaps for all three. */
-  max-width: 11ch;
-  margin: var(--space-xs) 0 0 auto;
+  /* One line each. Wrapping "Client Retention" under its figure made
+     the third column two lines deep while the others were one, which
+     read as a mistake rather than as a set. There is room for it on a
+     wide screen; the phone rules put the cap back. */
+  margin: var(--space-2xs) 0 0 auto;
   color: var(--ink-tertiary);
   font-size: var(--text-2xs);
   font-weight: var(--weight-medium);
-  letter-spacing: var(--track-micro);
+  letter-spacing: var(--track-label);
   line-height: var(--lh-ui);
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 /* Between a laptop and a tablet the left column is squeezed below the
@@ -693,9 +712,45 @@ p {
     gap: var(--space-xl) var(--space-2xl);
   }
 
-  .promise-band__text,
-  .promise-stat__value {
-    font-size: var(--display-xs);
+  .promise-stats {
+    gap: var(--space-2xl);
+  }
+}
+
+/* Below this the sentence no longer has the width to hold two lines
+   beside the numbers, so the claim sits above its evidence instead.
+   The numbers range left with the sentence: with nothing opposite
+   them, ranging right would only look like a stray indent. */
+@media (max-width: 900px) {
+  .promise-band__inner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-xl);
+  }
+
+  .promise-band__text {
+    max-width: 34ch;
+  }
+
+  .promise-stats {
+    justify-content: start;
+    gap: var(--space-2xl);
+    text-align: left;
+  }
+
+  .promise-stat__label {
+    margin-inline: 0 auto;
+  }
+}
+
+/* Narrow enough that three nowrap labels no longer fit on one row. */
+@media (max-width: 460px) {
+  .promise-stats {
+    gap: var(--space-md);
+  }
+
+  .promise-stat__label {
+    max-width: 10ch;
+    white-space: normal;
   }
 }
 
@@ -2513,29 +2568,6 @@ p {
 
   .promise-band {
     padding: var(--space-2xl) 0;
-  }
-
-  /* Side by side needs width the phone does not have, so the claim sits
-     above its evidence. The numbers range left with the sentence: with
-     nothing opposite them, ranging right would only look like a stray
-     indent. */
-  .promise-band__inner {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-xl);
-  }
-
-  .promise-band__text {
-    max-width: none;
-  }
-
-  .promise-stats {
-    justify-content: start;
-    gap: var(--space-lg);
-    text-align: left;
-  }
-
-  .promise-stat__label {
-    margin-inline: 0 auto;
   }
 
   /* The call sits under the button rather than beside it, so both are
