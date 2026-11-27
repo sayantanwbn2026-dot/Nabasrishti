@@ -44,6 +44,13 @@ Options -Indexes
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
 
+  # A missing file under /assets/ is a missing file, not a route. Without
+  # this, a stale hashed filename — which is exactly what an open tab asks
+  # for after a new build is uploaded — gets index.html back and the
+  # browser tries to parse HTML as JavaScript. A 404 at least says what
+  # actually happened.
+  RewriteRule ^assets/ - [R=404,L]
+
   # Everything else is a route inside the app, which reads the path and
   # decides what to show.
   RewriteRule ^ index.html [L]
