@@ -15,3 +15,6 @@ dist-ssr
 logs
 *.log
 npm-debug.log*
+
+# Packaged builds for upload — rebuilt on demand, never committed.
+deploy/
